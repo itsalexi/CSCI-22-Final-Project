@@ -8,11 +8,14 @@ public class Sprite{
 
     private ArrayList<BufferedImage> sprites;
     private int spriteIndex;
+    private double x, y;
 
     public Sprite(ArrayList<File> f){
         
         sprites = new ArrayList<>();
         spriteIndex = 0;
+        x = 0;
+        y = 0;
 
         try{
             for( File currentFile : f ){
@@ -26,6 +29,11 @@ public class Sprite{
 
     public void draw(Graphics2D g2d){
 
+    }
+
+    public void setPosition(double x, double y){
+        this.x = x;
+        this.y = y;
     }
 
     public BufferedImage getCurrentSprite(){
