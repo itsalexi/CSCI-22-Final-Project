@@ -1,3 +1,4 @@
+import java.awt.Graphics2D;
 import java.awt.image.*;
 import java.io.File;
 import java.util.ArrayList;
@@ -23,6 +24,10 @@ public class Sprite{
 
     }
 
+    public void draw(Graphics2D g2d){
+
+    }
+
     public BufferedImage getCurrentSprite(){
         return sprites.get(spriteIndex);
     }
@@ -33,6 +38,14 @@ public class Sprite{
 
     public void setSprite(int index){
         spriteIndex = index;
+    }
+
+    public double getWidth(){
+        return sprites.get(spriteIndex).getWidth();
+    }
+
+    public double getHeight(){
+        return sprites.get(spriteIndex).getHeight();
     }
 
 }
