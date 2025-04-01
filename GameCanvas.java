@@ -21,11 +21,11 @@ public class GameCanvas extends JComponent {
 
         this.setPreferredSize(new Dimension(800, 600));
 
-        File f = new File("assets/tile_0.png");
         ArrayList<File> listF = new ArrayList<>();
-        listF.add(f);
+        for( File f : new File("assets").listFiles()){
+            listF.add(f);
+        }
         testSprite = new Sprite(listF);
-        // Layer: Layer 1
         // Layer: Layer 1
         int[][] tilemap = {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
