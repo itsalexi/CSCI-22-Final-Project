@@ -18,7 +18,7 @@ public class TileGrid {
     public void draw(Graphics2D g2d){
         for(int i = 0; i < height; i++){
             for(int j = 0; j < width; j ++){
-                sprite.setPosition(i * tileSize, j * tileSize);
+                sprite.setPosition((double) (i * tileSize), (double) (j * tileSize));
                 sprite.draw(g2d);
             }
         }
