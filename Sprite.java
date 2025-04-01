@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +29,9 @@ public class Sprite{
     }
 
     public void draw(Graphics2D g2d){
-
+        AffineTransform at = new AffineTransform();
+        at.translate(x, y);
+        g2d.drawImage(getCurrentSprite(), at, null);
     }
 
     public void setPosition(double x, double y){
