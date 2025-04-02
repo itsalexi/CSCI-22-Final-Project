@@ -5,7 +5,7 @@ import javax.swing.*;
 public class GameCanvas extends JComponent {
 
     private Timer repaintTimer;
-    private Tile testSprite;
+    private Sprite testSprite;
     private TileGrid groundGrid;
     private TileGrid edgeGrid;
     private TileGrid foliageGrid;
@@ -137,6 +137,11 @@ public class GameCanvas extends JComponent {
                         player.move("RIGHT");
                         break;
                 }
+            }
+            
+            @Override
+            public void keyReleased(KeyEvent e) {
+                player.stop();
             }
         });
     }

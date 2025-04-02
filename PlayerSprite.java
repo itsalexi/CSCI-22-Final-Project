@@ -1,8 +1,7 @@
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
 public class PlayerSprite {
 
@@ -18,8 +17,8 @@ public class PlayerSprite {
     SpriteFiles playerIdleFiles = new SpriteFiles(idlePath);
     SpriteFiles playerWalkFiles = new SpriteFiles(walkPath);
 
-    idleSprites = new Sprite(playerIdleFiles.getFiles());
-    walkSprites = new Sprite(playerWalkFiles.getFiles());
+    idleSprites = new Sprite(playerIdleFiles.getFiles(), 64);
+    walkSprites = new Sprite(playerWalkFiles.getFiles(), 64);
     currentSprite = idleSprites;
     currentFrame = 0;
     animationState = "idle";
@@ -29,7 +28,7 @@ public class PlayerSprite {
   }
 
   private void startAnimation() {
-    animationTimer = new Timer(100, new ActionListener() {
+    animationTimer = new Timer(125, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         updateAnimation();
@@ -71,19 +70,16 @@ public class PlayerSprite {
     if (!direction.equals(newDirection)) {
       direction = newDirection;
       currentFrame = 0;
+
+      boolean shouldFlip = direction.equals("LEFT");
+      idleSprites.setFlippedHorizontal(shouldFlip);
+      walkSprites.setFlippedHorizontal(shouldFlip);
     }
   }
 
   public void draw(Graphics2D g2d, double x, double y) {
-    if (direction.equals("LEFT")) {
-      BufferedImage frame = currentSprite.getCurrentSprite();
-      int width = frame.getWidth();
-      int height = frame.getHeight();
-      g2d.drawImage(frame, (int) x + width, (int) y, -width, height, null);
-    } else {
-      currentSprite.setPosition(x, y);
-      currentSprite.draw(g2d);
-    }
+    currentSprite.setPosition(x, y);
+    currentSprite.draw(g2d);
   }
 
   public void stopAnimation() {

@@ -5,65 +5,104 @@ import java.io.File;
 import java.util.ArrayList;
 import javax.imageio.*;
 
-public class Sprite{
+public class Sprite {
 
     private ArrayList<BufferedImage> sprites;
     private int spriteIndex;
     private double x, y;
+    private double size;
+    private boolean flippedHorizontal;
 
-    public Sprite(ArrayList<File> f){
-        
+    public Sprite(ArrayList<File> f) {
+        initializeSprite(f);
+        this.size = 32;
+    }
+
+    public Sprite(ArrayList<File> f, double size) {
+        initializeSprite(f);
+        this.size = size;
+    }
+
+    private void initializeSprite(ArrayList<File> f) {
         sprites = new ArrayList<>();
+        flippedHorizontal = false;
         spriteIndex = 0;
         x = 0;
         y = 0;
 
-        try{
-            for( File currentFile : f ){
+        try {
+            for (File currentFile : f) {
                 sprites.add((BufferedImage) ImageIO.read(currentFile));
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
     }
 
-    public void draw(Graphics2D g2d){
+    public void draw(Graphics2D g2d) {
         AffineTransform at = new AffineTransform();
         at.translate(x, y);
+        if (flippedHorizontal) {
+            at.translate(size, 0);
+            at.scale(-1, 1);
+        }
+        at.scale(size / getWidth(), size / getHeight());
+
         g2d.drawImage(getCurrentSprite(), at, null);
     }
 
-    public void setPosition(double x, double y){
+    public void setPosition(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public BufferedImage getCurrentSprite(){
+    public void setFlippedHorizontal(boolean flip) {
+        flippedHorizontal = flip;
+    }
+
+    public boolean isFlippedHorizontal() {
+        return flippedHorizontal;
+    }
+
+    public BufferedImage getCurrentSprite() {
         return sprites.get(spriteIndex);
     }
 
-    public BufferedImage getSprite(int index){
+    public BufferedImage getSprite(int index) {
         return sprites.get(index);
     }
 
-    public void setSprite(int index){
+    public void setSprite(int index) {
         spriteIndex = index;
     }
 
-    public double getWidth(){
+    public double getWidth() {
         return sprites.get(spriteIndex).getWidth();
     }
 
-    public double getHeight(){
+    public double getHeight() {
         return sprites.get(spriteIndex).getHeight();
     }
 
-    public double getX(){
+    public double getX() {
         return x;
     }
 
-    public double getY(){
+    public double getY() {
         return y;
+    }
+
+    /**
+     * Set the sprite size for scaling
+     */
+    public void setSize(double size) {
+        this.size = size;
+    }
+
+    /**
+     * Get the size used for scaling
+     */
+    public double getSize() {
+        return size;
     }
 }

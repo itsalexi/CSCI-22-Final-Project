@@ -2,17 +2,17 @@ import java.awt.Graphics2D;
 
 public class TileGrid {
 
-    private Tile tiles;
+    private Sprite tiles;
     private int width, height;
     private double tileSize;
     private int[][] map;
 
-    public TileGrid(Tile tiles, int[][] map){
+    public TileGrid(Sprite tiles, int[][] map){
         this.tiles = tiles;
         this.map = map;
         height = map.length;
         width = map[0].length;
-        tileSize = tiles.getTileSize();
+        tileSize = tiles.getSize();
     }
 
     public void draw(Graphics2D g2d){
