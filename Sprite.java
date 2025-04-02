@@ -59,4 +59,11 @@ public class Sprite{
         return sprites.get(spriteIndex).getHeight();
     }
 
+    public double getX(){
+        return x;
+    }
+
+    public double getY(){
+        return y;
+    }
 }

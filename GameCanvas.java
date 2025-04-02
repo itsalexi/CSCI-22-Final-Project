@@ -9,7 +9,7 @@ import javax.swing.*;
 public class GameCanvas extends JComponent {
 
     private Timer repaintTimer;
-    private Sprite testSprite;
+    private Tile testSprite;
     private TileGrid fg;
 
     public GameCanvas() {
@@ -38,7 +38,7 @@ public class GameCanvas extends JComponent {
         for( File f : listF ){
             System.out.println(f.getName());
         }
-        testSprite = new Sprite(listF);
+        testSprite = new Tile(listF, 32);
         // Layer: Layer 1
         int[][] tilemap = {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
