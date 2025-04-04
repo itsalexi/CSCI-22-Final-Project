@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 public class Player {
 
@@ -49,7 +50,18 @@ public class Player {
         return x;
     }
 
+    public Rectangle2D getHitbox() {
+        return new Rectangle2D.Double(x + sprite.getWidth() * sprite.getHScale() * 8 / 32,
+                y + sprite.getHeight() * sprite.getVScale() * 10 / 32, sprite.getWidth(),
+                sprite.getHeight());
+    }
+
     public double getY() {
         return y;
     }
+
+    public String getDirection() {
+        return sprite.getDirection();
+    }
+
 }

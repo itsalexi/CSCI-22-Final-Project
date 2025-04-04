@@ -51,6 +51,14 @@ public class Sprite {
         g2d.drawImage(getCurrentSprite(), at, null);
     }
 
+    public double getHScale() {
+        return size / getWidth();
+    }
+
+    public double getVScale() {
+        return size / getHeight();
+    }
+
     public void setPosition(double x, double y) {
         this.x = x;
         this.y = y;

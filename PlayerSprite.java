@@ -87,4 +87,25 @@ public class PlayerSprite {
       animationTimer.stop();
     }
   }
+
+  public String getDirection() {
+    return direction;
+  }
+
+  public double getHScale() {
+    return currentSprite.getHScale();
+  }
+
+  public double getVScale() {
+    return currentSprite.getVScale();
+  }
+
+  public double getWidth() {
+    return currentSprite.getWidth();
+  }
+
+  public double getHeight() {
+    return currentSprite.getHeight();
+  }
+
 }
