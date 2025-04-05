@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Rectangle2D;
 import javax.swing.*;
 
 public class GameCanvas extends JComponent {
@@ -170,6 +171,8 @@ public class GameCanvas extends JComponent {
                 edgeGrid = new TileGrid(testSprite, edgeMap);
                 foliageGrid = new TileGrid(testSprite, foliageMap);
                 addKeyBindings();
+                addMouseListener();
+
         }
 
         public void addKeyBindings() {
@@ -200,6 +203,29 @@ public class GameCanvas extends JComponent {
                 });
         }
 
+        public void addMouseListener() {
+                this.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                                int x = e.getX();
+                                int y = e.getY();
+                                
+                                int tileSize = 32;
+                                int tileX = x / tileSize;
+                                int tileY = y / tileSize;
+                                
+                                System.out.println("Clicked on tile: [" + tileX + ", " + tileY + "]");
+                                
+                                if (tileX < groundGrid.getWidth() && tileY < groundGrid.getHeight()) {
+                                        System.out.println("Ground tile ID: " + groundGrid.getTileAt(tileY, tileX));
+                                        System.out.println("Edge tile ID: " + edgeGrid.getTileAt(tileY, tileX));
+                                        System.out.println("Foliage tile ID: " + foliageGrid.getTileAt(tileY, tileX));
+                                }
+                        }
+                });
+                
+        }
+
         @Override
         public void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
@@ -210,9 +236,12 @@ public class GameCanvas extends JComponent {
                 g2d.draw(player.getHitbox());
 
                 for (int i = 0; i < edgeGrid.getHeight(); i++) {
-                    for (int j = 0; j < edgeGrid.getWidth(); j++ ) {
-                        
-                    }
+                        for (int j = 0; j < edgeGrid.getWidth(); j++) {
+                                Rectangle2D hitbox = edgeGrid.getTileHitBoxAt(i, j);
+                                if (hitbox != null) {
+                                        g2d.draw(hitbox);
+                                }
+                        }
                 }
         }
 
