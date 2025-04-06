@@ -14,45 +14,42 @@ public class Player {
         sprite = new PlayerSprite("assets/player/idle", "assets/player/walk");
     }
 
-    public void move(String direction) {
-        sprite.setAnimationState("walk");
-        sprite.setDirection(direction);
-
-        switch (direction) {
-            case "UP":
-                y -= speed;
-                break;
-            case "DOWN":
-                y += speed;
-                break;
-            case "LEFT":
-                x -= speed;
-                break;
-            case "RIGHT":
-                x += speed;
-                break;
-        }
-    }
-
-    public void stop() {
-        sprite.setAnimationState("idle");
-    }
-
     public void draw(Graphics2D g2d) {
         sprite.draw(g2d, x, y);
+    }
+
+    public void setAnimationState(String state) {
+        sprite.setAnimationState(state);
     }
 
     public void setSpeed(double speed) {
         this.speed = speed;
     }
 
+    public double getWidth() {
+        return sprite.getWidth();
+    }
+
+    public double getHeight() {
+        return sprite.getHeight();
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
     public double getX() {
         return x;
     }
 
-    public Rectangle2D getHitbox() {
-        return new Rectangle2D.Double(x + sprite.getWidth() * sprite.getHScale() * 8 / 32,
-                y + sprite.getHeight() * sprite.getVScale() * 10 / 32, sprite.getWidth(),
+    public Rectangle2D getHitboxAt(double newX, double newY) {
+        double offsetX = sprite.getWidth() * sprite.getHScale() * 8 / 32;
+        double offsetY = sprite.getHeight() * sprite.getVScale() * 10 / 32;
+
+        return new Rectangle2D.Double(
+                newX + offsetX,
+                newY + offsetY,
+                sprite.getWidth(),
                 sprite.getHeight());
     }
 
@@ -62,6 +59,15 @@ public class Player {
 
     public String getDirection() {
         return sprite.getDirection();
+    }
+
+    public void setDirection(String direction) {
+        sprite.setDirection(direction);
+    }
+
+    public void setPosition(double newX, double newY) {
+        x = newX;
+        y = newY;
     }
 
 }

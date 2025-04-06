@@ -1,12 +1,15 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+
 import javax.swing.*;
 
 public class GameCanvas extends JComponent {
 
         private Timer repaintTimer;
         private Sprite testSprite;
+        private ArrayList<TileGrid> collidableGrids;
         private TileGrid groundGrid;
         private TileGrid edgeGrid;
         private TileGrid foliageGrid;
@@ -27,7 +30,7 @@ public class GameCanvas extends JComponent {
 
                 player = new Player();
 
-                testSprite = new Tile(tileMapFiles.getFiles(), 32);
+                testSprite = new Sprite(tileMapFiles.getFiles(), 32);
 
                 // Layer: Ground
                 int[][] groundMap = {
@@ -170,9 +173,27 @@ public class GameCanvas extends JComponent {
                 groundGrid = new TileGrid(testSprite, groundMap);
                 edgeGrid = new TileGrid(testSprite, edgeMap);
                 foliageGrid = new TileGrid(testSprite, foliageMap);
+                collidableGrids = new ArrayList<>();
+                collidableGrids.add(edgeGrid);
                 addKeyBindings();
                 addMouseListener();
 
+        }
+
+        public boolean isColliding(Rectangle2D hitbox) {
+                for (TileGrid cg : collidableGrids) {
+                        for (int i = 0; i < cg.getHeight(); i++) {
+                                for (int j = 0; j < cg.getWidth(); j++) {
+                                        Rectangle2D collidableHitbox = cg.getTileHitBoxAt(i, j);
+                                        if (collidableHitbox != null) {
+                                                if (hitbox.intersects(collidableHitbox)) {
+                                                        return true;
+                                                }
+                                        }
+                                }
+                        }
+                }
+                return false;
         }
 
         public void addKeyBindings() {
@@ -180,27 +201,61 @@ public class GameCanvas extends JComponent {
                 this.addKeyListener(new KeyAdapter() {
                         @Override
                         public void keyPressed(KeyEvent e) {
+                                String direction = null;
                                 switch (e.getKeyCode()) {
                                         case KeyEvent.VK_W:
-                                                player.move("UP");
+                                                direction = "UP";
                                                 break;
                                         case KeyEvent.VK_S:
-                                                player.move("DOWN");
+                                                direction = "DOWN";
                                                 break;
                                         case KeyEvent.VK_A:
-                                                player.move("LEFT");
+                                                direction = "LEFT";
                                                 break;
                                         case KeyEvent.VK_D:
-                                                player.move("RIGHT");
+                                                direction = "RIGHT";
                                                 break;
+                                }
+
+                                if (direction != null) {
+                                        movePlayer(direction);
                                 }
                         }
 
                         @Override
                         public void keyReleased(KeyEvent e) {
-                                player.stop();
+                                player.setAnimationState("idle");
                         }
                 });
+        }
+
+        public void movePlayer(String direction) {
+                double speed = player.getSpeed();
+                double newX = player.getX();
+                double newY = player.getY();
+
+                switch (direction) {
+                        case "UP":
+                                newY -= speed;
+                                break;
+                        case "DOWN":
+                                newY += speed;
+                                break;
+                        case "LEFT":
+                                newX -= speed;
+                                break;
+                        case "RIGHT":
+                                newX += speed;
+                                break;
+                }
+
+                Rectangle2D futureHitbox = player.getHitboxAt(newX, newY);
+
+                if (!isColliding(futureHitbox)) {
+                        player.setDirection(direction);
+                        player.setAnimationState("walk");
+                        player.setPosition(newX, newY);
+                }
         }
 
         public void addMouseListener() {
@@ -209,13 +264,13 @@ public class GameCanvas extends JComponent {
                         public void mouseClicked(MouseEvent e) {
                                 int x = e.getX();
                                 int y = e.getY();
-                                
+
                                 int tileSize = 32;
                                 int tileX = x / tileSize;
                                 int tileY = y / tileSize;
-                                
+
                                 System.out.println("Clicked on tile: [" + tileX + ", " + tileY + "]");
-                                
+
                                 if (tileX < groundGrid.getWidth() && tileY < groundGrid.getHeight()) {
                                         System.out.println("Ground tile ID: " + groundGrid.getTileAt(tileY, tileX));
                                         System.out.println("Edge tile ID: " + edgeGrid.getTileAt(tileY, tileX));
@@ -223,7 +278,7 @@ public class GameCanvas extends JComponent {
                                 }
                         }
                 });
-                
+
         }
 
         @Override
@@ -233,7 +288,7 @@ public class GameCanvas extends JComponent {
                 edgeGrid.draw(g2d);
                 foliageGrid.draw(g2d);
                 player.draw(g2d);
-                g2d.draw(player.getHitbox());
+                g2d.draw(player.getHitboxAt(player.getX(), player.getY()));
 
                 for (int i = 0; i < edgeGrid.getHeight(); i++) {
                         for (int j = 0; j < edgeGrid.getWidth(); j++) {
