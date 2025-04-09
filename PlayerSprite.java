@@ -1,24 +1,43 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+
 import javax.swing.Timer;
 
 public class PlayerSprite {
 
   private Sprite idleSprites;
   private Sprite walkSprites;
+  private Sprite hoeSprites;
+
+  private String direction;
   private Sprite currentSprite;
   private int currentFrame;
   private Timer animationTimer;
   private String animationState; // "idle" or "walk"
-  private String direction; // "DOWN", "UP", "RIGHT", "LEFT"
+  private HashMap<String, Integer> animationFrames;
+  private HashMap<String, Sprite> spritesMap;
 
-  public PlayerSprite(String idlePath, String walkPath) {
+  public PlayerSprite(String idlePath, String walkPath, String hoePath) {
     SpriteFiles playerIdleFiles = new SpriteFiles(idlePath);
     SpriteFiles playerWalkFiles = new SpriteFiles(walkPath);
+    SpriteFiles playerHoeFiles = new SpriteFiles(hoePath);
+    animationFrames = new HashMap<>();
+    spritesMap = new HashMap<>();
+
+    animationFrames.put("idle", 4);
+    animationFrames.put("walk", 6);
+    animationFrames.put("hoe", 6);
 
     idleSprites = new Sprite(playerIdleFiles.getFiles(), 64);
     walkSprites = new Sprite(playerWalkFiles.getFiles(), 64);
+    hoeSprites = new Sprite(playerHoeFiles.getFiles(), 64);
+
+    spritesMap.put("idle", idleSprites);
+    spritesMap.put("walk", walkSprites);
+    spritesMap.put("hoe", hoeSprites);
+
     currentSprite = idleSprites;
     currentFrame = 0;
     animationState = "idle";
@@ -38,7 +57,7 @@ public class PlayerSprite {
   }
 
   private void updateAnimation() {
-    int framesPerDirection = animationState.equals("idle") ? 4 : 6;
+    int framesPerDirection = animationFrames.get(animationState);
 
     switch (direction) {
       case "DOWN":
@@ -58,22 +77,43 @@ public class PlayerSprite {
     currentSprite.setSprite(currentFrame);
   }
 
+  public void updateFrameForDirection() {
+    int framesPerDirection = animationFrames.get(animationState);
+
+    switch (direction) {
+      case "DOWN":
+        currentFrame = 0;
+        break;
+      case "UP":
+        currentFrame = framesPerDirection;
+        break;
+      case "RIGHT":
+      case "LEFT":
+        currentFrame = 2 * framesPerDirection;
+        break;
+    }
+
+    currentSprite.setSprite(currentFrame);
+  }
+
   public void setAnimationState(String state) {
     if (!animationState.equals(state)) {
       animationState = state;
-      currentFrame = 0;
-      currentSprite = animationState.equals("idle") ? idleSprites : walkSprites;
+      currentSprite = spritesMap.get(state);
+      updateFrameForDirection();
     }
   }
 
   public void setDirection(String newDirection) {
     if (!direction.equals(newDirection)) {
       direction = newDirection;
-      currentFrame = 0;
+
+      updateFrameForDirection();
 
       boolean shouldFlip = direction.equals("LEFT");
       idleSprites.setFlippedHorizontal(shouldFlip);
       walkSprites.setFlippedHorizontal(shouldFlip);
+      hoeSprites.setFlippedHorizontal(shouldFlip);
     }
   }
 

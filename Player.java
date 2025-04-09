@@ -1,17 +1,45 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
+import javax.swing.Timer;
 
 public class Player {
 
     private double x, y;
     private double speed;
     private PlayerSprite sprite;
+    private Timer hoeTimer;
+    private boolean isHoeing;
 
     public Player() {
         x = 0;
         y = 0;
         speed = 2.0;
-        sprite = new PlayerSprite("assets/player/idle", "assets/player/walk");
+        sprite = new PlayerSprite("assets/player/idle", "assets/player/walk", "assets/player/hoe");
+        isHoeing = false;
+
+        hoeTimer = new Timer(750, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                isHoeing = false;
+                sprite.setAnimationState("idle");
+                hoeTimer.stop();
+            }
+        });
+        hoeTimer.setRepeats(false);
+    }
+
+    public void useHoe() {
+        if (!isHoeing) {
+            isHoeing = true;
+            sprite.setAnimationState("hoe");
+            hoeTimer.restart();
+        }
+    }
+
+    public boolean isHoeing() {
+        return isHoeing;
     }
 
     public void draw(Graphics2D g2d) {

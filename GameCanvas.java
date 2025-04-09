@@ -196,6 +196,12 @@ public class GameCanvas extends JComponent {
                 return false;
         }
 
+        private void useHoe() {
+                if (!player.isHoeing()) {
+                        player.useHoe();
+                }
+        }
+
         public void addKeyBindings() {
                 this.setFocusable(true);
                 this.addKeyListener(new KeyAdapter() {
@@ -215,6 +221,9 @@ public class GameCanvas extends JComponent {
                                         case KeyEvent.VK_D:
                                                 direction = "RIGHT";
                                                 break;
+                                        case KeyEvent.VK_SPACE:
+                                                useHoe();
+
                                 }
 
                                 if (direction != null) {
@@ -224,7 +233,9 @@ public class GameCanvas extends JComponent {
 
                         @Override
                         public void keyReleased(KeyEvent e) {
-                                player.setAnimationState("idle");
+                                if (!player.isHoeing()) {
+                                        player.setAnimationState("idle");
+                                }
                         }
                 });
         }
