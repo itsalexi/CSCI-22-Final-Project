@@ -295,10 +295,14 @@ public class GameCanvas extends JComponent {
         @Override
         public void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
+                Sprite avatar = new Sprite(new SpriteFiles("assets/player/avatar/").getFiles(), 200);
+                Dialogue dialogue = new Dialogue(100, 400, "Gay", "Hello, this is my message!", avatar);
                 groundGrid.draw(g2d);
                 edgeGrid.draw(g2d);
                 foliageGrid.draw(g2d);
                 player.draw(g2d);
+                dialogue.draw(g2d);
+
                 g2d.draw(player.getHitboxAt(player.getX(), player.getY()));
 
                 for (int i = 0; i < edgeGrid.getHeight(); i++) {

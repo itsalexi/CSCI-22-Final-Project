@@ -12,15 +12,24 @@ public class Sprite {
     private double x, y;
     private double size;
     private boolean flippedHorizontal;
+    private boolean noScaling;
 
     public Sprite(ArrayList<File> f) {
         initializeSprite(f);
-        this.size = 32;
+        size = 32;
+        noScaling = false;
     }
 
-    public Sprite(ArrayList<File> f, double size) {
+    public Sprite(ArrayList<File> f, double s) {
         initializeSprite(f);
-        this.size = size;
+        size = s;
+        noScaling = false;
+    }
+
+    public Sprite(ArrayList<File> f, boolean n) {
+        initializeSprite(f);
+        size = 32;
+        noScaling = n;
     }
 
     private void initializeSprite(ArrayList<File> f) {
@@ -40,15 +49,25 @@ public class Sprite {
     }
 
     public void draw(Graphics2D g2d) {
-        AffineTransform at = new AffineTransform();
-        at.translate(x, y);
-        if (flippedHorizontal) {
-            at.translate(size, 0);
-            at.scale(-1, 1);
+        if (noScaling) {
+            if (flippedHorizontal) {
+                AffineTransform at = new AffineTransform();
+                at.translate(x + getWidth(), y);
+                at.scale(-1, 1);
+                g2d.drawImage(getCurrentSprite(), at, null);
+            } else {
+                g2d.drawImage(getCurrentSprite(), (int) x, (int) y, null);
+            }
+        } else {
+            AffineTransform at = new AffineTransform();
+            at.translate(x, y);
+            if (flippedHorizontal) {
+                at.translate(size, 0);
+                at.scale(-1, 1);
+            }
+            at.scale(size / getWidth(), size / getHeight());
+            g2d.drawImage(getCurrentSprite(), at, null);
         }
-        at.scale(size / getWidth(), size / getHeight());
-
-        g2d.drawImage(getCurrentSprite(), at, null);
     }
 
     public double getHScale() {
@@ -100,17 +119,19 @@ public class Sprite {
         return y;
     }
 
-    /**
-     * Set the sprite size for scaling
-     */
-    public void setSize(double size) {
-        this.size = size;
+    public void setSize(double s) {
+        size = s;
     }
 
-    /**
-     * Get the size used for scaling
-     */
     public double getSize() {
         return size;
+    }
+
+    public void setNoScaling(boolean n) {
+        noScaling = n;
+    }
+
+    public boolean isNoScaling() {
+        return noScaling;
     }
 }
