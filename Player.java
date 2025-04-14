@@ -1,16 +1,20 @@
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Player {
 
     private double x, y;
     private double speed;
     private PlayerSprite sprite;
-    private boolean isHoeing;
-    private final long hoeDuration = 750;
-    private long hoeStartTime;
+
+    private long animStartTime;
+
     private int type;
     private String username;
+
+    private Map<String, PlayerAction> playerActions;
 
     public Player(String u, int t) {
         x = 0;
@@ -20,30 +24,42 @@ public class Player {
         username = u;
         String pathName = String.format("assets/characters/%d/", type);
         sprite = new PlayerSprite(pathName + "idle", pathName + "walk", pathName + "hoe");
-        isHoeing = false;
+        playerActions = new HashMap<>();
+        playerActions.put("hoe", new PlayerAction("hoe", 750));
+        playerActions.put("water", new PlayerAction("watering", 750));
+
     }
 
     public void tick() {
         sprite.tick();
-        if (isHoeing) {
-            long now = System.currentTimeMillis();
-            if (now - hoeStartTime >= hoeDuration) {
-                isHoeing = false;
-                sprite.setAnimationState("idle");
+        for (PlayerAction action : playerActions.values()) {
+            if (action.isRunning()) {
+                long now = System.currentTimeMillis();
+                if (now - animStartTime >= action.getDuration()) {
+                    action.setRunning(false);
+                    sprite.setAnimationState("idle");
+                }
             }
         }
+
     }
 
-    public void useHoe() {
-        if (!isHoeing) {
-            isHoeing = true;
-            hoeStartTime = System.currentTimeMillis();
-            sprite.setAnimationState("hoe");
+    public boolean isDoingAction() {
+        for (PlayerAction action : playerActions.values()) {
+            if (action.isRunning()) {
+                return true;
+            }
         }
+        return false;
     }
 
-    public boolean isHoeing() {
-        return isHoeing;
+    public void useAction(String name) {
+        if (isDoingAction())
+            return;
+        PlayerAction action = playerActions.get(name);
+        action.setRunning(true);
+        animStartTime = System.currentTimeMillis();
+        sprite.setAnimationState(name);
     }
 
     public void draw(Graphics2D g2d) {

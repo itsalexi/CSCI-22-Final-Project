@@ -214,8 +214,8 @@ public class GameCanvas extends JComponent {
   }
 
   private void useHoe() {
-    if (!player.isHoeing()) {
-      player.useHoe();
+    if (!player.isDoingAction()) {
+      player.useAction("hoe");
       writer.send("ACTION " + client.getPlayerID() + " HOE " + player.getX() + " " + player.getY() + " "
           + player.getDirection());
 
@@ -253,7 +253,7 @@ public class GameCanvas extends JComponent {
 
       @Override
       public void keyReleased(KeyEvent e) {
-        if (!player.isHoeing()) {
+        if (!player.isDoingAction()) {
           player.setAnimationState("idle");
           writer.send("MOVE " + client.getPlayerID() + " " + player.getX() + " " + player.getY() + " "
               + player.getDirection() + " " + "idle");
@@ -264,7 +264,7 @@ public class GameCanvas extends JComponent {
   }
 
   public void movePlayer(String direction) {
-    if (player.isHoeing())
+    if (player.isDoingAction())
       return;
     double speed = player.getSpeed();
     double newX = player.getX();
@@ -298,7 +298,7 @@ public class GameCanvas extends JComponent {
   public void actionPlayer(String id, double x, double y, String dir, String action) {
     Player newPlayer = otherPlayers.get(id);
     switch (action) {
-      case "HOE" -> newPlayer.useHoe();
+      case "HOE" -> newPlayer.useAction("hoe");
     }
     otherPlayers.put(id, newPlayer);
 
