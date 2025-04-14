@@ -50,6 +50,10 @@ public class Player {
         sprite.setAnimationState(state);
     }
 
+    public String getAnimationState() {
+        return sprite.getAnimationState();
+    }
+
     public void setSpeed(double speed) {
         this.speed = speed;
     }

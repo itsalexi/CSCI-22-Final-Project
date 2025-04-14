@@ -2,7 +2,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-
 import javax.swing.Timer;
 
 public class PlayerSprite {
@@ -47,6 +46,7 @@ public class PlayerSprite {
   }
 
   private void startAnimation() {
+
     animationTimer = new Timer(125, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -57,6 +57,7 @@ public class PlayerSprite {
   }
 
   private void updateAnimation() {
+
     int framesPerDirection = animationFrames.get(animationState);
 
     switch (direction) {
@@ -102,6 +103,10 @@ public class PlayerSprite {
       currentSprite = spritesMap.get(state);
       updateFrameForDirection();
     }
+  }
+
+  public String getAnimationState() {
+    return animationState;
   }
 
   public void setDirection(String newDirection) {
