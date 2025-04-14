@@ -1,48 +1,36 @@
 import java.awt.*;
 import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerSprite {
 
-  private Sprite idleSprites;
-  private Sprite walkSprites;
-  private Sprite hoeSprites;
-
   private String direction;
+  private String animationState;
   private Sprite currentSprite;
   private int currentFrame;
   private long lastFrameTime;
   private long animationSpeed;
-  private String animationState;
 
-  private HashMap<String, Integer> animationFrames;
-  private HashMap<String, Sprite> spritesMap;
+  private final Map<String, Integer> animationFrames;
+  private final Map<String, Sprite> spritesMap;
 
-  public PlayerSprite(String idlePath, String walkPath, String hoePath) {
-    SpriteFiles playerIdleFiles = new SpriteFiles(idlePath);
-    SpriteFiles playerWalkFiles = new SpriteFiles(walkPath);
-    SpriteFiles playerHoeFiles = new SpriteFiles(hoePath);
+  public PlayerSprite(Map<String, String> spritePaths, Map<String, Integer> frameCounts) {
+    this.animationFrames = new HashMap<>(frameCounts);
+    this.spritesMap = new HashMap<>();
 
-    animationFrames = new HashMap<>();
-    spritesMap = new HashMap<>();
+    for (Map.Entry<String, String> entry : spritePaths.entrySet()) {
+      String state = entry.getKey();
+      String path = entry.getValue();
+      SpriteFiles files = new SpriteFiles(path);
+      spritesMap.put(state, new Sprite(files.getFiles(), 64));
+    }
 
-    animationFrames.put("idle", 4);
-    animationFrames.put("walk", 6);
-    animationFrames.put("hoe", 6);
-
-    idleSprites = new Sprite(playerIdleFiles.getFiles(), 64);
-    walkSprites = new Sprite(playerWalkFiles.getFiles(), 64);
-    hoeSprites = new Sprite(playerHoeFiles.getFiles(), 64);
-
-    spritesMap.put("idle", idleSprites);
-    spritesMap.put("walk", walkSprites);
-    spritesMap.put("hoe", hoeSprites);
-
-    currentSprite = idleSprites;
-    currentFrame = 0;
-    animationState = "idle";
-    direction = "DOWN";
-    animationSpeed = 125;
-    lastFrameTime = System.currentTimeMillis();
+    this.direction = "DOWN";
+    this.animationState = "idle";
+    this.currentSprite = spritesMap.get("idle");
+    this.currentFrame = 0;
+    this.animationSpeed = 125;
+    this.lastFrameTime = System.currentTimeMillis();
 
     updateFrameForDirection();
   }
@@ -56,16 +44,16 @@ public class PlayerSprite {
   }
 
   private void advanceFrame() {
-    int framesPerDirection = animationFrames.get(animationState);
-    int localFrame = (currentFrame % framesPerDirection + 1) % framesPerDirection;
-    setFrameForDirectionAndIndex(direction, localFrame);
+    int frames = animationFrames.get(animationState);
+    int index = (currentFrame % frames + 1) % frames;
+    setFrameForDirectionAndIndex(direction, index);
   }
 
   private void setFrameForDirectionAndIndex(String dir, int index) {
-    int framesPerDirection = animationFrames.get(animationState);
+    int frames = animationFrames.get(animationState);
     int base = switch (dir) {
-      case "UP" -> framesPerDirection;
-      case "RIGHT", "LEFT" -> 2 * framesPerDirection;
+      case "UP" -> frames;
+      case "RIGHT", "LEFT" -> 2 * frames;
       default -> 0;
     };
     currentFrame = base + index;
@@ -77,7 +65,7 @@ public class PlayerSprite {
   }
 
   public void setAnimationState(String state) {
-    if (!animationState.equals(state)) {
+    if (!animationState.equals(state) && spritesMap.containsKey(state)) {
       animationState = state;
       currentSprite = spritesMap.get(state);
       currentFrame = 0;
@@ -91,10 +79,10 @@ public class PlayerSprite {
       direction = newDirection;
       updateFrameForDirection();
 
-      boolean shouldFlip = direction.equals("LEFT");
-      idleSprites.setFlippedHorizontal(shouldFlip);
-      walkSprites.setFlippedHorizontal(shouldFlip);
-      hoeSprites.setFlippedHorizontal(shouldFlip);
+      boolean shouldFlip = newDirection.equals("LEFT");
+      for (Sprite sprite : spritesMap.values()) {
+        sprite.setFlippedHorizontal(shouldFlip);
+      }
     }
   }
 

@@ -222,6 +222,15 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  private void useWater() {
+    if (!player.isDoingAction()) {
+      player.useAction("water");
+      writer.send("ACTION " + client.getPlayerID() + " WATER " + player.getX() + " " + player.getY() + " "
+          + player.getDirection());
+
+    }
+  }
+
   public void addKeyBindings() {
     this.setFocusable(true);
     this.addKeyListener(new KeyAdapter() {
@@ -243,6 +252,10 @@ public class GameCanvas extends JComponent {
             break;
           case KeyEvent.VK_SPACE:
             useHoe();
+            break;
+          case KeyEvent.VK_R:
+            useWater();
+            break;
 
         }
 
@@ -299,6 +312,7 @@ public class GameCanvas extends JComponent {
     Player newPlayer = otherPlayers.get(id);
     switch (action) {
       case "HOE" -> newPlayer.useAction("hoe");
+      case "WATER" -> newPlayer.useAction("water");
     }
     otherPlayers.put(id, newPlayer);
 

@@ -23,7 +23,20 @@ public class Player {
         type = t;
         username = u;
         String pathName = String.format("assets/characters/%d/", type);
-        sprite = new PlayerSprite(pathName + "idle", pathName + "walk", pathName + "hoe");
+
+        Map<String, String> animations = Map.of(
+                "idle", pathName + "idle",
+                "walk", pathName + "walk",
+                "hoe", pathName + "hoe",
+                "water", pathName + "watering");
+
+        Map<String, Integer> frames = Map.of(
+                "idle", 4,
+                "walk", 6,
+                "hoe", 6,
+                "water", 8);
+
+        sprite = new PlayerSprite(animations, frames);
         playerActions = new HashMap<>();
         playerActions.put("hoe", new PlayerAction("hoe", 750));
         playerActions.put("water", new PlayerAction("watering", 750));
