@@ -12,14 +12,15 @@ public class GameServer {
 
     private static class PlayerState {
         double x, y;
-        String direction, state;
+        String direction, state, username;
+        int skin;
     }
 
     private static Map<String, PlayerState> playerStates;
 
     public GameServer() {
         numPlayers = 0;
-        maxPlayers = 5;
+        maxPlayers = 15;
         players = new HashMap<>();
         playerStates = new HashMap<>();
 
@@ -92,6 +93,9 @@ public class GameServer {
 
             switch (type) {
                 case "JOIN": {
+                    String username = parts[1];
+                    int skin = Integer.parseInt(parts[2]);
+
                     int spawnX = 100;
                     int spawnY = 300;
 
@@ -100,6 +104,8 @@ public class GameServer {
                     ps.y = spawnY;
                     ps.direction = "DOWN";
                     ps.state = "idle";
+                    ps.username = username;
+                    ps.skin = skin;
                     playerStates.put(playerId, ps);
 
                     send("JOIN_SUCCESS " + playerId + " " + spawnX + " " + spawnY);
@@ -107,12 +113,17 @@ public class GameServer {
                         String otherId = entry.getKey();
                         if (!otherId.equals(playerId)) {
                             PlayerState other = entry.getValue();
-                            send("JOIN_ANNOUNCE " + otherId + " " + other.x + " " + other.y + " " + other.direction
+                            send("JOIN_ANNOUNCE " + otherId + " " + other.username + " " + other.skin + " "
+                                    + other.x + " " + other.y + " "
+                                    + other.direction
                                     + " " + other.state);
                         }
                     }
 
-                    broadcast("JOIN_ANNOUNCE " + playerId + " " + spawnX + " " + spawnY + " DOWN idle", playerId);
+                    broadcast(
+                            "JOIN_ANNOUNCE " + playerId + " " + username + " " + skin + " " + spawnX + " "
+                                    + spawnY + " DOWN idle",
+                            playerId);
                     break;
                 }
 
@@ -131,6 +142,10 @@ public class GameServer {
                         ps.state = state;
                     }
 
+                    broadcast(msg, playerId);
+                    break;
+                }
+                case "ACTION": {
                     broadcast(msg, playerId);
                     break;
                 }

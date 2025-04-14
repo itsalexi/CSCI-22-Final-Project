@@ -1,40 +1,44 @@
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
-import javax.swing.Timer;
 
 public class Player {
 
     private double x, y;
     private double speed;
     private PlayerSprite sprite;
-    private Timer hoeTimer;
     private boolean isHoeing;
+    private final long hoeDuration = 750;
+    private long hoeStartTime;
+    private int type;
+    private String username;
 
-    public Player() {
+    public Player(String u, int t) {
         x = 0;
         y = 0;
         speed = 2.0;
-        sprite = new PlayerSprite("assets/player/idle", "assets/player/walk", "assets/player/hoe");
+        type = t;
+        username = u;
+        String pathName = String.format("assets/characters/%d/", type);
+        sprite = new PlayerSprite(pathName + "idle", pathName + "walk", pathName + "hoe");
         isHoeing = false;
+    }
 
-        hoeTimer = new Timer(750, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+    public void tick() {
+        sprite.tick();
+        if (isHoeing) {
+            long now = System.currentTimeMillis();
+            if (now - hoeStartTime >= hoeDuration) {
                 isHoeing = false;
                 sprite.setAnimationState("idle");
-                hoeTimer.stop();
             }
-        });
-        hoeTimer.setRepeats(false);
+        }
     }
 
     public void useHoe() {
         if (!isHoeing) {
             isHoeing = true;
+            hoeStartTime = System.currentTimeMillis();
             sprite.setAnimationState("hoe");
-            hoeTimer.restart();
         }
     }
 

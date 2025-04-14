@@ -1,8 +1,5 @@
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
-import javax.swing.Timer;
 
 public class PlayerSprite {
 
@@ -13,8 +10,10 @@ public class PlayerSprite {
   private String direction;
   private Sprite currentSprite;
   private int currentFrame;
-  private Timer animationTimer;
-  private String animationState; // "idle" or "walk"
+  private long lastFrameTime;
+  private long animationSpeed;
+  private String animationState;
+
   private HashMap<String, Integer> animationFrames;
   private HashMap<String, Sprite> spritesMap;
 
@@ -22,6 +21,7 @@ public class PlayerSprite {
     SpriteFiles playerIdleFiles = new SpriteFiles(idlePath);
     SpriteFiles playerWalkFiles = new SpriteFiles(walkPath);
     SpriteFiles playerHoeFiles = new SpriteFiles(hoePath);
+
     animationFrames = new HashMap<>();
     spritesMap = new HashMap<>();
 
@@ -41,78 +41,54 @@ public class PlayerSprite {
     currentFrame = 0;
     animationState = "idle";
     direction = "DOWN";
+    animationSpeed = 125;
+    lastFrameTime = System.currentTimeMillis();
 
-    startAnimation();
+    updateFrameForDirection();
   }
 
-  private void startAnimation() {
-
-    animationTimer = new Timer(125, new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        updateAnimation();
-      }
-    });
-    animationTimer.start();
-  }
-
-  private void updateAnimation() {
-
-    int framesPerDirection = animationFrames.get(animationState);
-
-    switch (direction) {
-      case "DOWN":
-        currentFrame = (currentFrame + 1) % framesPerDirection;
-        break;
-      case "UP":
-        currentFrame = (currentFrame + 1) % framesPerDirection + framesPerDirection;
-        break;
-      case "RIGHT":
-        currentFrame = (currentFrame + 1) % framesPerDirection + 2 * framesPerDirection;
-        break;
-      case "LEFT":
-        currentFrame = (currentFrame + 1) % framesPerDirection + 2 * framesPerDirection;
-        break;
+  public void tick() {
+    long now = System.currentTimeMillis();
+    if (now - lastFrameTime >= animationSpeed) {
+      advanceFrame();
+      lastFrameTime = now;
     }
+  }
 
+  private void advanceFrame() {
+    int framesPerDirection = animationFrames.get(animationState);
+    int localFrame = (currentFrame % framesPerDirection + 1) % framesPerDirection;
+    setFrameForDirectionAndIndex(direction, localFrame);
+  }
+
+  private void setFrameForDirectionAndIndex(String dir, int index) {
+    int framesPerDirection = animationFrames.get(animationState);
+    int base = switch (dir) {
+      case "UP" -> framesPerDirection;
+      case "RIGHT", "LEFT" -> 2 * framesPerDirection;
+      default -> 0;
+    };
+    currentFrame = base + index;
     currentSprite.setSprite(currentFrame);
   }
 
   public void updateFrameForDirection() {
-    int framesPerDirection = animationFrames.get(animationState);
-
-    switch (direction) {
-      case "DOWN":
-        currentFrame = 0;
-        break;
-      case "UP":
-        currentFrame = framesPerDirection;
-        break;
-      case "RIGHT":
-      case "LEFT":
-        currentFrame = 2 * framesPerDirection;
-        break;
-    }
-
-    currentSprite.setSprite(currentFrame);
+    setFrameForDirectionAndIndex(direction, 0);
   }
 
   public void setAnimationState(String state) {
     if (!animationState.equals(state)) {
       animationState = state;
       currentSprite = spritesMap.get(state);
+      currentFrame = 0;
       updateFrameForDirection();
+      lastFrameTime = System.currentTimeMillis();
     }
-  }
-
-  public String getAnimationState() {
-    return animationState;
   }
 
   public void setDirection(String newDirection) {
     if (!direction.equals(newDirection)) {
       direction = newDirection;
-
       updateFrameForDirection();
 
       boolean shouldFlip = direction.equals("LEFT");
@@ -127,14 +103,12 @@ public class PlayerSprite {
     currentSprite.draw(g2d);
   }
 
-  public void stopAnimation() {
-    if (animationTimer != null) {
-      animationTimer.stop();
-    }
-  }
-
   public String getDirection() {
     return direction;
+  }
+
+  public String getAnimationState() {
+    return animationState;
   }
 
   public double getHScale() {
@@ -152,5 +126,4 @@ public class PlayerSprite {
   public double getHeight() {
     return currentSprite.getHeight();
   }
-
 }

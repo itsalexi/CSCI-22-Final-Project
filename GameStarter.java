@@ -1,13 +1,13 @@
 
 import java.io.*;
 import java.net.*;
-import java.util.Map;
 
 public class GameStarter {
 
     private static String playerId;
     private static GameCanvas canvas;
-    private Map<String, Player> otherPlayers;
+    private static String username;
+    private static int skin;
 
     private Socket socket;
     private DataInputStream in;
@@ -23,7 +23,7 @@ public class GameStarter {
             canvas = frame.getCanvas();
             canvas.setClient(this);
             canvas.setServerOut(out);
-            out.writeUTF("JOIN");
+            out.writeUTF(String.format("JOIN %s %d", username, skin));
             out.flush();
 
             new Thread(new ReadFromServer(in)).start();
@@ -59,6 +59,7 @@ public class GameStarter {
         private void handleMessage(String msg) {
             String[] parts = msg.split(" ");
             String type = parts[0];
+            String id, dir, state, action;
             double x, y;
 
             switch (type) {
@@ -70,21 +71,42 @@ public class GameStarter {
                     break;
 
                 case "JOIN_ANNOUNCE":
+                    id = parts[1];
+                    if (id.equals(playerId))
+                        break;
+                    String username = parts[2];
+                    int skin = Integer.parseInt(parts[3]);
+                    x = Double.parseDouble(parts[4]);
+                    y = Double.parseDouble(parts[5]);
+                    dir = parts[6];
+                    state = parts[7];
+                    System.out.println(state);
+                    canvas.addPlayer(id, username, skin, x, y, dir, state);
+                    break;
                 case "MOVE": {
-                    String id = parts[1];
+                    id = parts[1];
                     if (id.equals(playerId))
                         break;
                     x = Double.parseDouble(parts[2]);
                     y = Double.parseDouble(parts[3]);
-                    String dir = parts[4];
-                    String state = parts[5];
+                    dir = parts[4];
+                    state = parts[5];
 
                     canvas.updatePlayer(id, x, y, dir, state);
                     break;
                 }
 
+                case "ACTION": {
+                    id = parts[1];
+                    action = parts[2];
+                    x = Double.parseDouble(parts[3]);
+                    y = Double.parseDouble(parts[4]);
+                    dir = parts[5];
+                    canvas.actionPlayer(id, x, y, dir, action);
+                    break;
+                }
                 case "LEAVE":
-                    String id = parts[1];
+                    id = parts[1];
                     canvas.removePlayer(id);
                     break;
             }
@@ -95,7 +117,20 @@ public class GameStarter {
         return playerId;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public int getSkin() {
+        return skin;
+    }
+
     public static void main(String[] args) {
+        if (args.length == 2) {
+            username = args[0];
+            skin = Integer.parseInt(args[1]);
+        }
+
         new GameStarter().start();
     }
 

@@ -25,19 +25,10 @@ public class GameCanvas extends JComponent {
 
   public GameCanvas() {
     otherPlayers = new HashMap<>();
-    repaintTimer = new Timer(1000 / 60, new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        repaint();
-      }
-    });
-    repaintTimer.start();
 
     this.setPreferredSize(new Dimension(800, 600));
 
     SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap");
-
-    player = new Player();
 
     testSprite = new Sprite(tileMapFiles.getFiles(), 32);
 
@@ -186,7 +177,16 @@ public class GameCanvas extends JComponent {
     collidableGrids.add(edgeGrid);
     addKeyBindings();
     addMouseListener();
-
+    repaintTimer = new Timer(1000 / 60, new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        player.tick();
+        for (Player ghost : otherPlayers.values()) {
+          ghost.tick();
+        }
+        repaint();
+      }
+    });
   }
 
   public void setServerOut(DataOutputStream out) {
@@ -216,6 +216,9 @@ public class GameCanvas extends JComponent {
   private void useHoe() {
     if (!player.isHoeing()) {
       player.useHoe();
+      writer.send("ACTION " + client.getPlayerID() + " HOE " + player.getX() + " " + player.getY() + " "
+          + player.getDirection());
+
     }
   }
 
@@ -261,6 +264,8 @@ public class GameCanvas extends JComponent {
   }
 
   public void movePlayer(String direction) {
+    if (player.isHoeing())
+      return;
     double speed = player.getSpeed();
     double newX = player.getX();
     double newY = player.getY();
@@ -290,8 +295,17 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  public void actionPlayer(String id, double x, double y, String dir, String action) {
+    Player newPlayer = otherPlayers.get(id);
+    switch (action) {
+      case "HOE" -> newPlayer.useHoe();
+    }
+    otherPlayers.put(id, newPlayer);
+
+  }
+
   public void updatePlayer(String id, double x, double y, String dir, String state) {
-    Player newPlayer = otherPlayers.getOrDefault(id, new Player());
+    Player newPlayer = otherPlayers.get(id);
     newPlayer.setPosition(x, y);
 
     if (!newPlayer.getDirection().equals(dir)) {
@@ -306,6 +320,15 @@ public class GameCanvas extends JComponent {
 
   public void removePlayer(String id) {
     otherPlayers.remove(id);
+  }
+
+  public void addPlayer(String id, String username, int skin, double x, double y, String dir, String state) {
+    Player newPlayer = new Player(username, skin);
+    newPlayer.setPosition(x, y);
+    newPlayer.setDirection(dir);
+    newPlayer.setAnimationState(state);
+
+    otherPlayers.put(id, newPlayer);
   }
 
   public void addMouseListener() {
@@ -337,6 +360,9 @@ public class GameCanvas extends JComponent {
 
   public void setClient(GameStarter c) {
     client = c;
+    player = new Player(client.getUsername(), client.getSkin());
+    repaintTimer.start();
+
   }
 
   @Override
@@ -352,8 +378,9 @@ public class GameCanvas extends JComponent {
       other.draw(g2d);
     }
     player.draw(g2d);
+    // dialogue.draw(g2d);
 
-    g2d.draw(player.getHitboxAt(player.getX(), player.getY()));
+    // g2d.draw(player.getHitboxAt(player.getX(), player.getY()));
 
     for (int i = 0; i < edgeGrid.getHeight(); i++) {
       for (int j = 0; j < edgeGrid.getWidth(); j++) {
