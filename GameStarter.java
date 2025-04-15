@@ -14,6 +14,7 @@ public class GameStarter {
     private DataOutputStream out;
 
     public void start() {
+
         try {
             socket = new Socket("localhost", 25565);
             in = new DataInputStream(socket.getInputStream());
@@ -33,6 +34,21 @@ public class GameStarter {
         } catch (IOException e) {
             System.out.println("IOException in GameStarter");
         }
+    }
+
+    private static int[][] parseTileMapString(String tilemapString) {
+        String[] rows = tilemapString.split(" ", 3)[2].split(" \\| ");
+        int[][] map = new int[rows.length][];
+
+        for (int i = 0; i < rows.length; i++) {
+            String[] cols = rows[i].split(",");
+            map[i] = new int[cols.length];
+            for (int j = 0; j < cols.length; j++) {
+                map[i][j] = Integer.parseInt(cols[j]);
+            }
+        }
+
+        return map;
     }
 
     private static class ReadFromServer implements Runnable {
@@ -99,16 +115,38 @@ public class GameStarter {
                 case "ACTION": {
                     id = parts[1];
                     action = parts[2];
-                    x = Double.parseDouble(parts[3]);
-                    y = Double.parseDouble(parts[4]);
+                    int tileX = Integer.parseInt(parts[3]);
+                    int tileY = Integer.parseInt(parts[4]);
                     dir = parts[5];
-                    canvas.actionPlayer(id, x, y, dir, action);
+                    canvas.actionPlayer(id, tileX, tileY, dir, action);
                     break;
                 }
                 case "LEAVE":
                     id = parts[1];
                     canvas.removePlayer(id);
                     break;
+                case "TILEMAP":
+                    action = parts[0];
+                    String name = parts[1];
+                    System.out.println(name);
+
+                    if (name.equals("DONE")) {
+                        canvas.initializeWorld();
+                    } else {
+                        SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap");
+                        Sprite tiles = new Sprite(tileMapFiles.getFiles(), 32);
+                        TileGrid tg = new TileGrid(tiles, parseTileMapString(msg));
+                        canvas.setTileGrid(name, tg);
+                    }
+                    break;
+                case "UPDATE":
+                    String layer = parts[1];
+                    int tileId = Integer.parseInt(parts[2]);
+                    int tileX = Integer.parseInt(parts[3]);
+                    int tileY = Integer.parseInt(parts[4]);
+
+                    canvas.updateTileGrid(layer, tileX, tileY, tileId);
+
             }
         }
     }

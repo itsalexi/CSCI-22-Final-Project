@@ -81,4 +81,8 @@ public class TileGrid {
         return map[row][col];
     }
 
+    public void setTileAt(int row, int col, int val) {
+        map[row][col] = val;
+    }
+
 }

@@ -3,7 +3,6 @@ import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,172 +11,28 @@ import javax.swing.*;
 public class GameCanvas extends JComponent {
 
   private Timer repaintTimer;
-  private Sprite testSprite;
   private Sprite highlight;
   private ArrayList<TileGrid> collidableGrids;
-  private TileGrid groundGrid;
-  private TileGrid edgeGrid;
-  private TileGrid foliageGrid;
   private Player player;
   private Map<String, Player> otherPlayers;
+  private Map<String, TileGrid> tileGrids;
   private GameStarter client;
   private WriteToServer writer;
   private int[] lastClickedTile;
+  private boolean isMapLoaded;
 
   public GameCanvas() {
+    isMapLoaded = false;
     otherPlayers = new HashMap<>();
+    tileGrids = new HashMap<>();
+    collidableGrids = new ArrayList<>();
 
     this.setPreferredSize(new Dimension(800, 600));
 
-    SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap");
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
     lastClickedTile = new int[2];
-    testSprite = new Sprite(tileMapFiles.getFiles(), 32);
     highlight = new Sprite(selectorFiles.getFiles(), 32);
 
-    // Layer: Ground
-    int[][] groundMap = {
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
-            36, 36, 36, 36 },
-        { 36, 36, -1, -1, -1, -1, -1, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
-            36, 36, 36, 36 },
-        { 36, 36, -1, 153, 153, 153, -1, -1, -1, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
-            36, 36, 36,
-            36 },
-        { 36, 36, -1, 153, 153, 153, 153, 153, -1, 36, 36, 36, 36, 36, 36, 36, 36, 36, -1, -1,
-            -1, -1, -1, 36,
-            36 },
-        { 36, 36, -1, -1, 153, 153, 153, 153, -1, 36, 36, 36, 36, 36, 36, 36, 36, 36, -1, 153,
-            153, 153, -1, -1,
-            36 },
-        { 36, 36, 36, -1, -1, 153, 153, -1, -1, 36, 36, 36, 36, 36, 36, 36, 36, 36, -1, 153,
-            153, 153, 153, -1,
-            36 },
-        { 36, 36, 36, 36, -1, -1, -1, -1, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, -1, -1, -1,
-            -1, 153, -1, 36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
-            -1, 153, -1, 36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
-            -1, -1, -1, 36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
-            36, 36, 36, 36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
-            36, 36, 36, 36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
-            36, 36, 36, 36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, -1, -1, -1, -1,
-            36, 36, 36, 36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, -1, -1, 150, 153, 153, -1,
-            36, 36, 36,
-            36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, -1, 154, 154, 153, 153,
-            -1, -1, 36, 36,
-            36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, -1, -1, -1, -1, -1, -1,
-            -1, 36, 36, 36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
-            36, 36, 36, 36 },
-        { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
-            36, 36, 36, 36 }
-    };
-
-    // Layer: Water Edges
-    int[][] edgeMap = {
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, 138, 133, 133, 133, 140, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1,
-            -1 },
-        { -1, -1, 182, -1, -1, -1, 117, 133, 140, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1,
-            -1 },
-        { -1, -1, 182, -1, -1, -1, -1, -1, 148, -1, -1, -1, -1, -1, -1, -1, -1, -1, 138, 133,
-            133, 133, 140, -1,
-            -1 },
-        { -1, -1, 162, 102, -1, -1, -1, -1, 148, -1, -1, -1, -1, -1, -1, -1, -1, -1, 182, -1,
-            -1, -1, 117, 140,
-            -1 },
-        { -1, -1, -1, 162, 102, -1, -1, 101, 164, -1, -1, -1, -1, -1, -1, -1, -1, -1, 182, -1,
-            -1, -1, -1, 148,
-            -1 },
-        { -1, -1, -1, -1, 162, 163, 163, 164, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 162, 163,
-            163, 102, -1,
-            148, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            182, -1, 148,
-            -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            162, 163, 164,
-            -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 138, 139, 139,
-            140, -1, -1, -1,
-            -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 138, 133, 116, -1, -1,
-            148, -1, -1, -1,
-            -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 182, -1, -1, -1, -1, 117,
-            140, -1, -1,
-            -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 162, 163, 163, 163, 163,
-            163, 164, -1, -1,
-            -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 }
-    };
-
-    // Layer: Foliage
-    int[][] foliageMap = {
-        { -1, -1, -1, -1, -1, -1, -1, 82, -1, -1, -1, -1, -1, -1, -1, -1, -1, 82, -1, -1, -1,
-            -1, -1, 94, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 79, -1, -1, -1, -1, -1, -1, 85,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, 85 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, 76, 94, -1, -1, -1, -1, -1, -1, 94, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 85, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, 82 },
-        { -1, 85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, 85, -1, -1, 94, -1, 79, -1, -1, -1, 76, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, 85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 76, -1, -1, 85,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, 79, -1, 85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, 82, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 85, -1, -1, -1, -1, -1, 76,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, 76, -1, -1, -1, -1, -1, -1, -1, -1, 94, -1, -1, -1, -1,
-            -1, -1, 85, -1 },
-        { -1, -1, -1, -1, -1, -1, 94, -1, -1, 94, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, 82, -1, -1 },
-        { -1, -1, -1, 76, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, 79, -1 },
-        { -1, -1, -1, -1, -1, 85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, 94, -1, -1, -1, -1, -1, -1, 82, -1, -1, -1, 76, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 },
-        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1 }
-    };
-
-    groundGrid = new TileGrid(testSprite, groundMap);
-    edgeGrid = new TileGrid(testSprite, edgeMap);
-    foliageGrid = new TileGrid(testSprite, foliageMap);
-    collidableGrids = new ArrayList<>();
-    collidableGrids.add(edgeGrid);
     addKeyBindings();
     addMouseListener();
     repaintTimer = new Timer(1000 / 60, new ActionListener() {
@@ -194,6 +49,15 @@ public class GameCanvas extends JComponent {
 
   public void setServerOut(DataOutputStream out) {
     writer = new WriteToServer(out);
+  }
+
+  public void setTileGrid(String name, TileGrid grid) {
+    tileGrids.put(name, grid);
+  }
+
+  public void initializeWorld() {
+    collidableGrids.add(tileGrids.get("edge"));
+    setMapLoaded(true);
   }
 
   public void setOtherPlayers(Map<String, Player> p) {
@@ -216,7 +80,7 @@ public class GameCanvas extends JComponent {
     return false;
   }
 
-  private void doPlayerAction(double x, double y) {
+  private void doPlayerAction(int x, int y) {
     if (!player.isDoingAction()) {
       player.useAction(player.getActiveTool());
       writer.send("ACTION " + client.getPlayerID() + " " + player.getActiveTool().toUpperCase() + " " + x
@@ -301,7 +165,11 @@ public class GameCanvas extends JComponent {
     }
   }
 
-  public void actionPlayer(String id, double x, double y, String dir, String action) {
+  public void updateTileGrid(String name, int x, int y, int val) {
+    tileGrids.get(name).setTileAt(y, x, val);
+  }
+
+  public void actionPlayer(String id, int x, int y, String dir, String action) {
     Player newPlayer = otherPlayers.get(id);
     switch (action) {
       case "HOE" -> newPlayer.useAction("hoe");
@@ -374,32 +242,30 @@ public class GameCanvas extends JComponent {
 
   }
 
+  public void setMapLoaded(boolean b) {
+    isMapLoaded = b;
+  }
+
   @Override
   public void paintComponent(Graphics g) {
 
     Graphics2D g2d = (Graphics2D) g;
 
-    groundGrid.draw(g2d);
-    edgeGrid.draw(g2d);
-    foliageGrid.draw(g2d);
-    for (Player other : otherPlayers.values()) {
-      other.draw(g2d);
-    }
-    player.draw(g2d);
-    highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
-    highlight.draw(g2d);
-
-    // dialogue.draw(g2d);
-
-    // g2d.draw(player.getHitboxAt(player.getX(), player.getY()));
-
-    for (int i = 0; i < edgeGrid.getHeight(); i++) {
-      for (int j = 0; j < edgeGrid.getWidth(); j++) {
-        Rectangle2D hitbox = edgeGrid.getTileHitBoxAt(i, j);
-        if (hitbox != null) {
-          g2d.draw(hitbox);
-        }
+    if (isMapLoaded) {
+      tileGrids.get("ground").draw(g2d);
+      tileGrids.get("edge").draw(g2d);
+      tileGrids.get("foliage").draw(g2d);
+      for (Player other : otherPlayers.values()) {
+        other.draw(g2d);
       }
+      player.draw(g2d);
+      highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
+      highlight.draw(g2d);
+
+      // dialogue.draw(g2d);
+
+      // g2d.draw(player.getHitboxAt(player.getX(), player.getY()));
+
     }
   }
 
