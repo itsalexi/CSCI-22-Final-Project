@@ -29,9 +29,6 @@ public class GameCanvas extends JComponent {
     animals = new HashMap<>();
 
     collidableGrids = new ArrayList<>();
-    // animals.add(new Animal(125, 200, "cow", 0, 64));
-
-    // animals.add(new Animal(100, 200, "chicken", 0, 32));
 
     this.setPreferredSize(new Dimension(800, 600));
 
@@ -48,7 +45,7 @@ public class GameCanvas extends JComponent {
         for (Player ghost : otherPlayers.values()) {
           ghost.tick();
         }
-        for (Map.Entry<String, Animal> entry : animals.entrySet()) {
+        for (Map.Entry<String, Animal> entry : new ArrayList<>(animals.entrySet())) {
           String id = entry.getKey();
           Animal animal = entry.getValue();
 
