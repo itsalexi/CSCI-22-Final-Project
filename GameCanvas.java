@@ -15,6 +15,7 @@ public class GameCanvas extends JComponent {
   private ArrayList<TileGrid> collidableGrids;
   private Player player;
   private Map<String, Player> otherPlayers;
+  private Map<String, Animal> animals;
   private Map<String, TileGrid> tileGrids;
   private GameStarter client;
   private WriteToServer writer;
@@ -25,7 +26,12 @@ public class GameCanvas extends JComponent {
     isMapLoaded = false;
     otherPlayers = new HashMap<>();
     tileGrids = new HashMap<>();
+    animals = new HashMap<>();
+
     collidableGrids = new ArrayList<>();
+    // animals.add(new Animal(125, 200, "cow", 0, 64));
+
+    // animals.add(new Animal(100, 200, "chicken", 0, 32));
 
     this.setPreferredSize(new Dimension(800, 600));
 
@@ -42,9 +48,22 @@ public class GameCanvas extends JComponent {
         for (Player ghost : otherPlayers.values()) {
           ghost.tick();
         }
+        for (Map.Entry<String, Animal> entry : animals.entrySet()) {
+          String id = entry.getKey();
+          Animal animal = entry.getValue();
+
+          animal.tick();
+
+          animal.randomAction(GameCanvas.this);
+
+          writer.send("ANIMAL MOVE " + id + " " + animal.getX() + " " + animal.getY()
+              + " " + animal.getDirection() + " " + animal.getAnimationState());
+
+        }
         repaint();
       }
     });
+
   }
 
   public void setServerOut(DataOutputStream out) {
@@ -87,6 +106,10 @@ public class GameCanvas extends JComponent {
           + " " + y + " "
           + player.getDirection());
     }
+  }
+
+  public Map<String, Animal> getAnimals() {
+    return animals;
   }
 
   public void addKeyBindings() {
@@ -206,6 +229,28 @@ public class GameCanvas extends JComponent {
     otherPlayers.put(id, newPlayer);
   }
 
+  public void addAnimal(String id, String animalName, int type, double x, double y, int size, String dir,
+      String state) {
+    Animal newAnimal = new Animal(x, y, animalName, type, size);
+    newAnimal.setDirection(dir);
+    newAnimal.setAnimationState(state);
+    animals.put(id, newAnimal);
+  }
+
+  public void updateAnimal(String id, double x, double y, String dir, String state) {
+    Animal newAnimal = animals.get(id);
+    newAnimal.setPosition(x, y);
+
+    if (!newAnimal.getDirection().equals(dir)) {
+      newAnimal.setDirection(dir);
+    }
+
+    if (!newAnimal.getAnimationState().equals(state)) {
+      newAnimal.setAnimationState(state);
+    }
+    animals.put(id, newAnimal);
+  }
+
   public void addMouseListener() {
     this.addMouseListener(new MouseAdapter() {
       @Override
@@ -248,7 +293,6 @@ public class GameCanvas extends JComponent {
 
   @Override
   public void paintComponent(Graphics g) {
-
     Graphics2D g2d = (Graphics2D) g;
 
     if (isMapLoaded) {
@@ -261,6 +305,10 @@ public class GameCanvas extends JComponent {
       player.draw(g2d);
       highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
       highlight.draw(g2d);
+
+      for (Animal an : animals.values()) {
+        an.draw(g2d);
+      }
 
       // dialogue.draw(g2d);
 

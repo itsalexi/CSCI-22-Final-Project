@@ -146,6 +146,29 @@ public class GameStarter {
                     int tileY = Integer.parseInt(parts[4]);
 
                     canvas.updateTileGrid(layer, tileX, tileY, tileId);
+                case "ANIMAL":
+                    action = parts[1];
+
+                    if (action.equals("ADD")) {
+                        String animalId = parts[2];
+                        String animalName = parts[3];
+                        int animalType = Integer.parseInt(parts[4]);
+                        x = Double.parseDouble(parts[5]);
+                        y = Double.parseDouble(parts[6]);
+                        int size = Integer.parseInt(parts[7]);
+                        String direction = parts[8];
+                        state = parts[9];
+                        canvas.addAnimal(animalId, animalName, animalType, x, y, size, direction, state);
+                    } else if (action.equals("MOVE")) {
+                        String animalId = parts[2];
+                        x = Double.parseDouble(parts[3]);
+                        y = Double.parseDouble(parts[4]);
+                        String direction = parts[5];
+                        state = parts[6];
+                        if (canvas.getAnimals().containsKey(animalId)) {
+                            canvas.updateAnimal(animalId, x, y, direction, state);
+                        }
+                    }
 
             }
         }

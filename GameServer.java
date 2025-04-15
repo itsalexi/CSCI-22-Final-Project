@@ -19,13 +19,22 @@ public class GameServer {
     int skin;
   }
 
+  private static class AnimalState {
+    double x, y;
+    String id, name, direction, state;
+    int type, size;
+  }
+
   private static Map<String, PlayerState> playerStates;
+  private static Map<String, AnimalState> animalStates;
+  private String animalControllerId = null;
 
   public GameServer() {
     numPlayers = 0;
     maxPlayers = 15;
     players = new HashMap<>();
     playerStates = new HashMap<>();
+    animalStates = new HashMap<>();
 
     // Layer: Ground
     groundMap = new int[][] {
@@ -193,7 +202,40 @@ public class GameServer {
     return output;
   }
 
+  public void spawnAnimal(String animalId, String name, int type, double x, double y, int size, String dir,
+      String state) {
+    AnimalState a = new AnimalState();
+    a.id = animalId;
+    a.name = name;
+    a.type = type;
+    a.x = x;
+    a.y = y;
+    a.size = size;
+    a.direction = dir;
+    a.state = state;
+
+    animalStates.put(animalId, a);
+
+    broadcastAll("ANIMAL ADD " + animalId + " " + name + " " + type + " " +
+        x + " " + y + " " + size + " " + dir + " " + state);
+  }
+
+  public void moveAnimal(String animalId, double x, double y, String dir, String state) {
+    AnimalState a = animalStates.get(animalId);
+    if (a != null) {
+      a.x = x;
+      a.y = y;
+      a.direction = dir;
+      a.state = state;
+
+      broadcastAll("ANIMAL MOVE " + animalId + " " + x + " " + y + " " + dir + " " + state);
+    }
+  }
+
   public void acceptConnections() {
+    spawnAnimal("animal1", "cow", 0, 120, 250, 64, "LEFT", "idle");
+    spawnAnimal("animal2", "chicken", 0, 120, 250, 32, "LEFT", "idle");
+
     try {
       System.out.println("Waiting for connections.");
       while (numPlayers < maxPlayers) {
@@ -239,6 +281,16 @@ public class GameServer {
         System.out.println(playerId + " disconnected.");
         players.remove(playerId);
         playerStates.remove(playerId);
+
+        if (playerId.equals(animalControllerId)) {
+          animalControllerId = null;
+
+          for (String id : players.keySet()) {
+            animalControllerId = id;
+            break;
+          }
+        }
+
         broadcast("LEAVE " + playerId, playerId);
       } finally {
         try {
@@ -270,6 +322,9 @@ public class GameServer {
           playerStates.put(playerId, ps);
 
           send("JOIN_SUCCESS " + playerId + " " + spawnX + " " + spawnY);
+          if (animalControllerId == null) {
+            animalControllerId = playerId;
+          }
           send(tileMapToString("ground", groundMap));
           send(tileMapToString("edge", edgeMap));
           send(tileMapToString("foliage", foliageMap));
@@ -284,6 +339,10 @@ public class GameServer {
                   + other.direction
                   + " " + other.state);
             }
+          }
+          for (AnimalState a : animalStates.values()) {
+            send("ANIMAL ADD " + a.id + " " + a.name + " " + a.type + " "
+                + a.x + " " + a.y + " " + a.size + " " + a.direction + " " + a.state);
           }
 
           broadcast(
@@ -319,15 +378,46 @@ public class GameServer {
           int y = Integer.parseInt(parts[4]);
 
           if (tool.equals("HOE")) {
-            System.out.println("HE USED A HOE");
             if (foliageMap[y][x] != -1) {
               foliageMap[y][x] = -1;
               broadcastAll("UPDATE foliage -1 " + x + " " + y);
+            } else if (groundMap[y][x] == 36) {
+              groundMap[y][x] = 353;
+              broadcastAll("UPDATE ground 353 " + x + " " + y);
+            }
+          } else if (tool.equals("WATER")) {
+            if (groundMap[y][x] == 353) {
+              groundMap[y][x] = 354;
+              broadcastAll("UPDATE ground 354 " + x + " " + y);
             }
           }
           broadcast(msg, playerId);
           break;
         }
+
+        case "ANIMAL":
+          String action = parts[1];
+          if (!playerId.equals(animalControllerId))
+            return;
+
+          if (action.equals("MOVE")) {
+            String animalId = parts[2];
+            double x = Double.parseDouble(parts[3]);
+            double y = Double.parseDouble(parts[4]);
+            String dir = parts[5];
+            String state = parts[6];
+
+            AnimalState a = animalStates.get(animalId);
+
+            if (a != null) {
+              a.x = x;
+              a.y = y;
+              a.direction = dir;
+              a.state = state;
+            }
+            broadcastAll(msg);
+
+          }
       }
     }
 
