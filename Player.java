@@ -8,13 +8,13 @@ public class Player {
     private double x, y;
     private double speed;
     private PlayerSprite sprite;
-
     private long animStartTime;
 
     private int type;
     private String username;
 
     private Map<String, PlayerAction> playerActions;
+    private String activeTool;
 
     public Player(String u, int t) {
         x = 0;
@@ -22,6 +22,7 @@ public class Player {
         speed = 2.0;
         type = t;
         username = u;
+        activeTool = "hoe";
         String pathName = String.format("assets/characters/%d/", type);
 
         Map<String, String> animations = Map.of(
@@ -57,6 +58,14 @@ public class Player {
 
     }
 
+    public String getActiveTool() {
+        return activeTool;
+    }
+
+    public void setActiveTool(String t) {
+        activeTool = t;
+    }
+
     public boolean isDoingAction() {
         for (PlayerAction action : playerActions.values()) {
             if (action.isRunning()) {
@@ -82,6 +91,7 @@ public class Player {
     public void setAnimationState(String state) {
         sprite.setAnimationState(state);
     }
+
 
     public String getAnimationState() {
         return sprite.getAnimationState();

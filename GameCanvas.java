@@ -13,15 +13,16 @@ public class GameCanvas extends JComponent {
 
   private Timer repaintTimer;
   private Sprite testSprite;
+  private Sprite highlight;
   private ArrayList<TileGrid> collidableGrids;
   private TileGrid groundGrid;
   private TileGrid edgeGrid;
   private TileGrid foliageGrid;
   private Player player;
-  private Socket socket;
   private Map<String, Player> otherPlayers;
   private GameStarter client;
   private WriteToServer writer;
+  private int[] lastClickedTile;
 
   public GameCanvas() {
     otherPlayers = new HashMap<>();
@@ -29,8 +30,10 @@ public class GameCanvas extends JComponent {
     this.setPreferredSize(new Dimension(800, 600));
 
     SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap");
-
+    SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
+    lastClickedTile = new int[2];
     testSprite = new Sprite(tileMapFiles.getFiles(), 32);
+    highlight = new Sprite(selectorFiles.getFiles(), 32);
 
     // Layer: Ground
     int[][] groundMap = {
@@ -213,21 +216,12 @@ public class GameCanvas extends JComponent {
     return false;
   }
 
-  private void useHoe() {
+  private void doPlayerAction(double x, double y) {
     if (!player.isDoingAction()) {
-      player.useAction("hoe");
-      writer.send("ACTION " + client.getPlayerID() + " HOE " + player.getX() + " " + player.getY() + " "
+      player.useAction(player.getActiveTool());
+      writer.send("ACTION " + client.getPlayerID() + " " + player.getActiveTool().toUpperCase() + " " + x
+          + " " + y + " "
           + player.getDirection());
-
-    }
-  }
-
-  private void useWater() {
-    if (!player.isDoingAction()) {
-      player.useAction("water");
-      writer.send("ACTION " + client.getPlayerID() + " WATER " + player.getX() + " " + player.getY() + " "
-          + player.getDirection());
-
     }
   }
 
@@ -250,13 +244,12 @@ public class GameCanvas extends JComponent {
           case KeyEvent.VK_D:
             direction = "RIGHT";
             break;
-          case KeyEvent.VK_SPACE:
-            useHoe();
+          case KeyEvent.VK_Y:
+            player.setActiveTool("hoe");
             break;
           case KeyEvent.VK_R:
-            useWater();
+            player.setActiveTool("water");
             break;
-
         }
 
         if (direction != null) {
@@ -349,6 +342,13 @@ public class GameCanvas extends JComponent {
     this.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
+        doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
+      }
+    });
+
+    this.addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
         int x = e.getX();
         int y = e.getY();
 
@@ -356,13 +356,8 @@ public class GameCanvas extends JComponent {
         int tileX = x / tileSize;
         int tileY = y / tileSize;
 
-        System.out.println("Clicked on tile: [" + tileX + ", " + tileY + "]");
-
-        if (tileX < groundGrid.getWidth() && tileY < groundGrid.getHeight()) {
-          System.out.println("Ground tile ID: " + groundGrid.getTileAt(tileY, tileX));
-          System.out.println("Edge tile ID: " + edgeGrid.getTileAt(tileY, tileX));
-          System.out.println("Foliage tile ID: " + foliageGrid.getTileAt(tileY, tileX));
-        }
+        lastClickedTile[0] = tileX;
+        lastClickedTile[1] = tileY;
       }
     });
 
@@ -387,11 +382,13 @@ public class GameCanvas extends JComponent {
     groundGrid.draw(g2d);
     edgeGrid.draw(g2d);
     foliageGrid.draw(g2d);
-
     for (Player other : otherPlayers.values()) {
       other.draw(g2d);
     }
     player.draw(g2d);
+    highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
+    highlight.draw(g2d);
+
     // dialogue.draw(g2d);
 
     // g2d.draw(player.getHitboxAt(player.getX(), player.getY()));

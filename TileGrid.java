@@ -48,6 +48,7 @@ public class TileGrid {
                     tiles.setPosition(j * tileSize, i * tileSize);
                     tiles.setSprite(map[i][j]);
                     tiles.draw(g2d);
+                    g2d.draw(new Rectangle2D.Double(j * tileSize, i * tileSize, tileSize, tileSize));
                 }
             }
         }
