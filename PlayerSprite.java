@@ -45,7 +45,7 @@ public class PlayerSprite {
 
   private void advanceFrame() {
     int frames = animationFrames.get(animationState);
-    int index = (currentFrame % frames + 1) % frames;
+    int index = (currentFrame + 1) % frames;
     setFrameForDirectionAndIndex(direction, index);
   }
 
