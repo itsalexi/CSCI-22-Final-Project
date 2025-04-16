@@ -112,6 +112,7 @@ public class GameCanvas extends JComponent {
     this.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
+
         String direction = null;
         switch (e.getKeyCode()) {
           case KeyEvent.VK_W:
@@ -133,15 +134,42 @@ public class GameCanvas extends JComponent {
             player.setActiveTool("water");
             break;
         }
-
+        
         if (direction != null) {
-          movePlayer(direction);
+          player.setDirectionStatus(direction, true);
+          movePlayer();
         }
       }
 
       @Override
       public void keyReleased(KeyEvent e) {
-        if (!player.isDoingAction()) {
+        String direction = null;
+        switch (e.getKeyCode()) {
+          case KeyEvent.VK_W:
+            direction = "UP";
+            break;
+          case KeyEvent.VK_S:
+            direction = "DOWN";
+            break;
+          case KeyEvent.VK_A:
+            direction = "LEFT";
+            break;
+          case KeyEvent.VK_D:
+            direction = "RIGHT";
+            break;
+        }
+
+        System.out.println(player.getActiveDirections());
+
+        if (direction != null){
+          player.setDirectionStatus(direction, false);
+        }
+
+        Boolean isMoving = false;
+        for (Boolean isActive : player.getActiveDirections().values()){
+          isMoving = isMoving || isActive;
+        }
+        if (!player.isDoingAction() && !isMoving) {
           player.setAnimationState("idle");
           writer.send("MOVE " + client.getPlayerID() + " " + player.getX() + " " + player.getY() + " "
               + player.getDirection() + " " + "idle");
@@ -151,27 +179,47 @@ public class GameCanvas extends JComponent {
     });
   }
 
-  public void movePlayer(String direction) {
+  private double[] addVector(double x1, double y1, double x2, double y2){
+    double angle = Math.atan( (y2 - y1) / (x2 - x1) );
+    double[] result = {(x1 + x2) * Math.cos(angle), (y1 + y2) * Math.sin(angle)};
+    return result;
+  }
+
+  public void movePlayer() {
     if (player.isDoingAction())
       return;
     double speed = player.getSpeed();
-    double newX = player.getX();
-    double newY = player.getY();
+    Map<String, Boolean> activeDirections = player.getActiveDirections();
+    
+    String direction = "DOWN";
+    double[] currVector = {0, 0};
 
-    switch (direction) {
-      case "UP":
-        newY -= speed;
-        break;
-      case "DOWN":
-        newY += speed;
-        break;
-      case "LEFT":
-        newX -= speed;
-        break;
-      case "RIGHT":
-        newX += speed;
-        break;
-    }
+    for (Map.Entry<String, Boolean> entry : activeDirections.entrySet()) {
+      String currentDirection = entry.getKey();
+      Boolean isActive = entry.getValue();
+
+      if (isActive) {
+        direction = currentDirection;
+        switch (currentDirection) {
+          case "UP":
+            currVector = addVector(currVector[0], currVector[1], 0, -speed);
+            break;
+          case "DOWN":
+            currVector = addVector(currVector[0], currVector[1], 0, speed);
+            break;
+          case "LEFT":
+            currVector = addVector(currVector[0], currVector[1], -speed, 0);
+            break;  
+          case "RIGHT":
+            currVector = addVector(currVector[0], currVector[1], speed, 0);
+            break;
+        }
+      }
+    } 
+    
+    System.out.printf("%f, %f\n", currVector[0], currVector[1]);
+    double newX = player.getX() + currVector[0];
+    double newY = player.getY() + currVector[1];
 
     Rectangle2D futureHitbox = player.getHitboxAt(newX, newY);
 
@@ -181,6 +229,7 @@ public class GameCanvas extends JComponent {
       player.setAnimationState("walk");
       player.setPosition(newX, newY);
     }
+    
   }
 
   public void updateTileGrid(String name, int x, int y, int val) {
@@ -282,8 +331,8 @@ public class GameCanvas extends JComponent {
 
   }
 
-  public void setMapLoaded(boolean b) {
-    isMapLoaded = b;
+  public void setMapLoaded(boolean isLoaded) {
+    isMapLoaded = isLoaded;
   }
 
   @Override

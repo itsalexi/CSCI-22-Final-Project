@@ -15,6 +15,7 @@ public class Player {
 
     private Map<String, PlayerAction> playerActions;
     private String activeTool;
+    private Map<String, Boolean> activeDirections;
 
     public Player(String u, int t) {
         x = 0;
@@ -36,6 +37,12 @@ public class Player {
                 "walk", 6,
                 "hoe", 6,
                 "water", 8);
+
+        activeDirections = new HashMap<>(Map.of(
+            "UP", false,
+            "DOWN", false,
+            "LEFT", false,
+            "RIGHT", false));
 
         sprite = new PlayerSprite(animations, frames);
         playerActions = new HashMap<>();
@@ -136,6 +143,10 @@ public class Player {
         return sprite.getDirection();
     }
 
+    public Map<String, Boolean> getActiveDirections() {
+        return activeDirections;
+    }
+
     public void setDirection(String direction) {
         sprite.setDirection(direction);
     }
@@ -143,6 +154,10 @@ public class Player {
     public void setPosition(double newX, double newY) {
         x = newX;
         y = newY;
+    }
+
+    public void setDirectionStatus(String direction, Boolean isMoving){
+        activeDirections.replace(direction, isMoving);
     }
 
 }

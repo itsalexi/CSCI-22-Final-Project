@@ -31,43 +31,47 @@ public class Animal {
   }
 
   public void randomAction(GameCanvas canvas) {
-    Random rand = new Random();
-    if (rand.nextInt(60) == 0) {
-      boolean shouldIdle = rand.nextBoolean();
+    // Random rand = new Random();
+    // if (getAnimationState().equals("walk")) {
+    //   return;
+    // }
 
-      if (shouldIdle) {
-        setDirection("LEFT");
-        setAnimationState("idle");
-      } else {
-        String[] directions = { "UP", "DOWN", "LEFT", "RIGHT" };
-        String randomDirection = directions[rand.nextInt(directions.length)];
-        setDirection(randomDirection);
-        setAnimationState("walk");
-      }
-    }
+    // if (rand.nextInt(240) == 0) {
+    //   double distance = 32 + rand.nextDouble(64);
+    //   double angle = rand.nextDouble(2) * Math.PI;
+    //   double finalX = Math.cos(angle) * distance; 
+    //   double finalY = Math.sin(angle) * distance;
+    //   setAnimationState("walk");
 
-    if (getAnimationState().equals("walk")) {
-      double nextX = x;
-      double nextY = y;
+    //   while(getAnimationState().equals("walk")){
+    //     double nextX = x;
+    //     double nextY = y;
 
-      switch (getDirection()) {
-        case "UP" -> nextY -= speed;
-        case "DOWN" -> nextY += speed;
-        case "LEFT" -> nextX -= speed;
-        case "RIGHT" -> nextX += speed;
-      }
-      boolean outOfBounds = nextX < 0 || nextY < 0
-          || nextX + getWidth() > canvas.getWidth()
-          || nextY + getHeight() > canvas.getHeight();
+    //     switch (getDirection()) {
+    //       case "UP" -> nextY -= speed;
+    //       case "DOWN" -> nextY += speed;
+    //       case "LEFT" -> nextX -= speed;
+    //       case "RIGHT" -> nextX += speed;
+    //     }
+    //     boolean outOfBounds = nextX < 0 || nextY < 0
+    //         || nextX + getWidth() > canvas.getWidth()
+    //         || nextY + getHeight() > canvas.getHeight();
 
-      Rectangle2D temp = getHitboxAt(nextX, nextY);
-      if (!outOfBounds && !canvas.isColliding(temp)) {
-        x = nextX;
-        y = nextY;
-      } else {
-        setAnimationState("idle");
-      }
-    }
+    //     Rectangle2D temp = getHitboxAt(nextX, nextY);
+    //     if (!outOfBounds && !canvas.isColliding(temp)) {
+    //       x = nextX;
+    //       y = nextY;
+    //     } else {
+    //       setAnimationState("idle");
+    //     }
+    //   }
+    //   // String[] directions = { "UP", "DOWN", "LEFT", "RIGHT" };
+    //   // String randomDirection = directions[rand.nextInt(directions.length)];
+    //   // setDirection(randomDirection);
+    //   // setAnimationState("walk");
+    //   setDirection("LEFT");
+    //   setAnimationState("idle");
+    // }
   }
 
   public void draw(Graphics2D g2d) {
