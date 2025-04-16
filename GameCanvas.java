@@ -134,7 +134,7 @@ public class GameCanvas extends JComponent {
             player.setActiveTool("water");
             break;
         }
-        
+
         if (direction != null) {
           player.setDirectionStatus(direction, true);
           movePlayer();
@@ -161,12 +161,12 @@ public class GameCanvas extends JComponent {
 
         System.out.println(player.getActiveDirections());
 
-        if (direction != null){
+        if (direction != null) {
           player.setDirectionStatus(direction, false);
         }
 
         Boolean isMoving = false;
-        for (Boolean isActive : player.getActiveDirections().values()){
+        for (Boolean isActive : player.getActiveDirections().values()) {
           isMoving = isMoving || isActive;
         }
         if (!player.isDoingAction() && !isMoving) {
@@ -179,9 +179,11 @@ public class GameCanvas extends JComponent {
     });
   }
 
-  private double[] addVector(double x1, double y1, double x2, double y2){
-    double angle = Math.atan( (y2 - y1) / (x2 - x1) );
-    double[] result = {(x1 + x2) * Math.cos(angle), (y1 + y2) * Math.sin(angle)};
+  private double[] addVector(double x1, double y1, double x2, double y2) {
+    double x = x1 + x2;
+    double y = y1 + y2;
+    double magnitude = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    double[] result = { x / magnitude, y / magnitude };
     return result;
   }
 
@@ -190,9 +192,9 @@ public class GameCanvas extends JComponent {
       return;
     double speed = player.getSpeed();
     Map<String, Boolean> activeDirections = player.getActiveDirections();
-    
+
     String direction = "DOWN";
-    double[] currVector = {0, 0};
+    double[] currVector = { 0, 0 };
 
     for (Map.Entry<String, Boolean> entry : activeDirections.entrySet()) {
       String currentDirection = entry.getKey();
@@ -209,17 +211,17 @@ public class GameCanvas extends JComponent {
             break;
           case "LEFT":
             currVector = addVector(currVector[0], currVector[1], -speed, 0);
-            break;  
+            break;
           case "RIGHT":
             currVector = addVector(currVector[0], currVector[1], speed, 0);
             break;
         }
       }
-    } 
-    
+    }
+
     System.out.printf("%f, %f\n", currVector[0], currVector[1]);
-    double newX = player.getX() + currVector[0];
-    double newY = player.getY() + currVector[1];
+    double newX = player.getX() + currVector[0] * speed;
+    double newY = player.getY() + currVector[1] * speed;
 
     Rectangle2D futureHitbox = player.getHitboxAt(newX, newY);
 
@@ -229,7 +231,7 @@ public class GameCanvas extends JComponent {
       player.setAnimationState("walk");
       player.setPosition(newX, newY);
     }
-    
+
   }
 
   public void updateTileGrid(String name, int x, int y, int val) {
