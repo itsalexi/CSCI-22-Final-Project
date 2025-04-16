@@ -38,12 +38,19 @@ public class AnimalSprite {
   public void tick() {
     long now = System.currentTimeMillis();
     if (now - lastFrameTime >= animationSpeed) {
-      advanceFrame();
+      if (animationState.equals("idle")) {
+        if (currentFrame != 3) {
+          advanceFrame();
+        }
+      } else {
+        advanceFrame();
+      }
       lastFrameTime = now;
     }
   }
 
   private void advanceFrame() {
+
     int frames = animationFrames.get(animationState);
 
     int index = (currentFrame + 1) % frames;

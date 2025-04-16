@@ -1,3 +1,4 @@
+import java.awt.Dimension;
 import javax.swing.*;
 
 public class GameFrame {
@@ -12,7 +13,7 @@ public class GameFrame {
 
     public void setUpGUI() {
         f.add(gc);
-
+        f.setPreferredSize(new Dimension(800, 600));
         f.setTitle("Placeholder");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.pack();

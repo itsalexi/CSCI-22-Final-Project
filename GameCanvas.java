@@ -30,8 +30,6 @@ public class GameCanvas extends JComponent {
 
     collidableGrids = new ArrayList<>();
 
-    this.setPreferredSize(new Dimension(800, 600));
-
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
     lastClickedTile = new int[2];
     highlight = new Sprite(selectorFiles.getFiles(), 32);

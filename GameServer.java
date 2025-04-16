@@ -233,10 +233,13 @@ public class GameServer {
   }
 
   public void acceptConnections() {
-    spawnAnimal("animal1", "cow", 0, 120, 250, 64, "LEFT", "idle");
-    spawnAnimal("animal2", "chicken", 0, 120, 250, 32, "UP", "idle");
-    spawnAnimal("animal3", "sheep", 0, 120, 250, 64, "LEFT", "idle");
-    spawnAnimal("animal4", "pig", 0, 120, 250, 64, "LEFT", "idle");
+    spawnAnimal("animal1", "cow", 0, 250, 350, 64, "LEFT", "idle");
+    spawnAnimal("animal2", "chicken", 0, 150, 365, 32, "LEFT", "idle");
+    spawnAnimal("animal3", "sheep", 0, 300, 50, 64, "LEFT", "idle");
+    spawnAnimal("animal4", "pig", 0, 350, 100, 64, "LEFT", "idle");
+    spawnAnimal("animal5", "fox", 0, 130, 365, 64, "LEFT", "idle");
+    spawnAnimal("animal6", "cat", 0, 110, 340, 64, "LEFT", "idle");
+    spawnAnimal("animal7", "dog", 0, 100, 320, 64, "LEFT", "idle");
 
     try {
       System.out.println("Waiting for connections.");
