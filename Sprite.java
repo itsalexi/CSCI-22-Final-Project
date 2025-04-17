@@ -70,6 +70,10 @@ public class Sprite {
         }
     }
 
+    public ArrayList<BufferedImage> getSprites() {
+        return sprites;
+    }
+
     public double getHScale() {
         return size / getWidth();
     }

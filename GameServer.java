@@ -425,6 +425,8 @@ public class GameServer {
             broadcastAll(msg);
 
           }
+          break;
+
         }
 
         case "FARM": {
@@ -446,6 +448,7 @@ public class GameServer {
             }
             broadcastAll(farmSystem.harvest(x, y));
           }
+          break;
         }
       }
     }

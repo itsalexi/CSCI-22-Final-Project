@@ -64,7 +64,6 @@ public class GameStarter {
             try {
                 while (true) {
                     String msg = in.readUTF();
-                    System.out.println(msg);
                     handleMessage(msg);
                 }
             } catch (IOException e) {

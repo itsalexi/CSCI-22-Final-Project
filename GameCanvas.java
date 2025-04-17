@@ -23,6 +23,7 @@ public class GameCanvas extends JComponent {
   private int[] lastClickedTile;
   private boolean isMapLoaded;
   private double anchorX, anchorY;
+  private Inventory inventory;
 
   public GameCanvas() {
     isMapLoaded = false;
@@ -30,6 +31,7 @@ public class GameCanvas extends JComponent {
     tileGrids = new HashMap<>();
     animals = new HashMap<>();
 
+    inventory = new Inventory();
     collidableGrids = new ArrayList<>();
 
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
@@ -118,7 +120,11 @@ public class GameCanvas extends JComponent {
     this.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-
+        char c = e.getKeyChar();
+        if ((Character.isDigit(c))) {
+          inventory.setActiveHotbarSlot(Character.getNumericValue(c) - 1);
+          return;
+        }
         String direction = null;
         switch (e.getKeyCode()) {
           case KeyEvent.VK_W:
@@ -132,6 +138,9 @@ public class GameCanvas extends JComponent {
             break;
           case KeyEvent.VK_D:
             direction = "RIGHT";
+            break;
+          case KeyEvent.VK_E:
+            inventory.setOpen(!inventory.isOpen());
             break;
           case KeyEvent.VK_Y:
             player.setActiveTool("hoe");
@@ -165,8 +174,6 @@ public class GameCanvas extends JComponent {
             break;
         }
 
-        System.out.println(player.getActiveDirections());
-
         if (direction != null) {
           player.setDirectionStatus(direction, false);
         }
@@ -182,6 +189,7 @@ public class GameCanvas extends JComponent {
 
         }
       }
+
     });
   }
 
@@ -225,7 +233,6 @@ public class GameCanvas extends JComponent {
       }
     }
 
-    System.out.printf("%f, %f\n", currVector[0], currVector[1]);
     double newX = player.getX() + currVector[0] * speed;
     double newY = player.getY() + currVector[1] * speed;
 
@@ -303,7 +310,7 @@ public class GameCanvas extends JComponent {
     animals.put(id, newAnimal);
   }
 
-  private double clamp(double left, double right, double value){
+  private double clamp(double left, double right, double value) {
     return Math.max(left, Math.min(right, value));
   }
 
@@ -330,6 +337,20 @@ public class GameCanvas extends JComponent {
       }
     });
 
+    this.addMouseWheelListener(new MouseWheelListener() {
+      @Override
+      public void mouseWheelMoved(MouseWheelEvent e) {
+        int notches = e.getWheelRotation();
+        int current = inventory.getActiveHotbarSlot();
+        if (notches < 0) {
+          current = (current + 1) % 9;
+        } else {
+          current = (current - 1 + 9) % 9;
+        }
+
+        inventory.setActiveHotbarSlot(current);
+      }
+    });
   }
 
   public Player getPlayer() {
@@ -352,6 +373,7 @@ public class GameCanvas extends JComponent {
     Graphics2D g2d = (Graphics2D) g;
 
     if (isMapLoaded) {
+
       AffineTransform camera = new AffineTransform();
       camera.translate(400 - anchorX, 300 - anchorY);
       g2d.setTransform(camera);
@@ -366,10 +388,13 @@ public class GameCanvas extends JComponent {
       player.draw(g2d);
       highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
       highlight.draw(g2d);
+      for (Animal an : animals.values()) {
+        an.draw(g2d);
+      }
 
-      // for (Animal an : animals.values()) {
-      // an.draw(g2d);
-      // }
+      AffineTransform reset = new AffineTransform();
+      g2d.setTransform(reset);
+      inventory.draw(g2d);
 
       // dialogue.draw(g2d);
 
