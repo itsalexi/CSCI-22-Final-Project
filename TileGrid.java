@@ -84,4 +84,19 @@ public class TileGrid {
         map[row][col] = val;
     }
 
+    public void drawRows(Graphics2D g2d, int startRow, int endRow) {
+        startRow = Math.max(0, startRow);
+        endRow = Math.min(height - 1, endRow);
+
+        for (int i = startRow; i <= endRow; i++) {
+            for (int j = 0; j < width; j++) {
+                if (map[i][j] != -1) {
+                    tiles.setPosition(j * tileSize, i * tileSize);
+                    tiles.setSprite(map[i][j]);
+                    tiles.draw(g2d);
+                }
+            }
+        }
+    }
+
 }

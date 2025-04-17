@@ -13,6 +13,8 @@ public class GameCanvas extends JComponent {
 
   private Timer repaintTimer;
   private Sprite highlight;
+  private Sprite invHighlight;
+
   private ArrayList<TileGrid> collidableGrids;
   private Player player;
   private Map<String, Player> otherPlayers;
@@ -21,6 +23,7 @@ public class GameCanvas extends JComponent {
   private GameStarter client;
   private WriteToServer writer;
   private int[] lastClickedTile;
+  private int[] lastClickedInventoryTile;
   private boolean isMapLoaded;
   private double anchorX, anchorY;
   private Inventory inventory;
@@ -36,8 +39,10 @@ public class GameCanvas extends JComponent {
 
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
     lastClickedTile = new int[2];
+    lastClickedInventoryTile = new int[]{6, 1};
     highlight = new Sprite(selectorFiles.getFiles(), 32);
-
+    invHighlight = new Sprite(selectorFiles.getFiles(), 32);
+    invHighlight.setSprite(1);
     addKeyBindings();
     addMouseListener();
     repaintTimer = new Timer(1000 / 60, new ActionListener() {
@@ -337,6 +342,31 @@ public class GameCanvas extends JComponent {
       }
     });
 
+    this.addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        double x = e.getX();
+        double y = e.getY();
+        int[] coords = inventory.getTileAtMouse(x, y);
+        if (coords != null) {
+          int tileX = coords[0];
+          int tileY = coords[1];
+
+          boolean isValidHotbar = tileY == 6 && tileX >= 1 && tileX <= 9;
+          boolean isValidInventory = tileY >= 1 && tileY <= 3 && tileX >= 1 && tileX <= 9;
+
+          if (isValidHotbar || (inventory.isOpen() && isValidInventory)) {
+            lastClickedInventoryTile[0] = tileX;
+            lastClickedInventoryTile[1] = tileY;
+          } else {
+            lastClickedInventoryTile[0] = -1;
+            lastClickedInventoryTile[1] = -1;
+          }
+        }
+
+      }
+    });
+
     this.addMouseWheelListener(new MouseWheelListener() {
       @Override
       public void mouseWheelMoved(MouseWheelEvent e) {
@@ -368,6 +398,24 @@ public class GameCanvas extends JComponent {
     isMapLoaded = isLoaded;
   }
 
+  private void drawInventoryHighlight(Graphics2D g2d) {
+    if (lastClickedInventoryTile[0] == -1 || lastClickedInventoryTile[1] == -1)
+      return;
+
+    int tileSize = 32;
+    int tileX = lastClickedInventoryTile[0];
+    int tileY = lastClickedInventoryTile[1];
+
+    int gridWidth = 11 * tileSize;
+    int xOffset = (800 - gridWidth) / 2;
+    int yOffset = 600 - (8 * tileSize) - 40;
+
+    g2d.translate(xOffset, yOffset);
+    invHighlight.setPosition(tileX * tileSize, tileY * tileSize);
+    invHighlight.draw(g2d);
+    g2d.translate(-xOffset, -yOffset);
+  }
+
   @Override
   public void paintComponent(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
@@ -388,6 +436,7 @@ public class GameCanvas extends JComponent {
       player.draw(g2d);
       highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
       highlight.draw(g2d);
+
       for (Animal an : animals.values()) {
         an.draw(g2d);
       }
@@ -395,6 +444,8 @@ public class GameCanvas extends JComponent {
       AffineTransform reset = new AffineTransform();
       g2d.setTransform(reset);
       inventory.draw(g2d);
+      // draw inventory highlight
+      drawInventoryHighlight(g2d);
 
       // dialogue.draw(g2d);
 
