@@ -64,6 +64,7 @@ public class GameStarter {
             try {
                 while (true) {
                     String msg = in.readUTF();
+                    System.out.println(msg);
                     handleMessage(msg);
                 }
             } catch (IOException e) {
@@ -132,7 +133,8 @@ public class GameStarter {
                     if (name.equals("DONE")) {
                         canvas.initializeWorld();
                     } else {
-                        SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap");
+                        String tilemapType = name.equals("farm") ? "assets/tilemap/crops" : "assets/tilemap/world";
+                        SpriteFiles tileMapFiles = new SpriteFiles(tilemapType);
                         Sprite tiles = new Sprite(tileMapFiles.getFiles(), 32);
                         TileGrid tg = new TileGrid(tiles, parseTileMapString(msg));
                         canvas.setTileGrid(name, tg);

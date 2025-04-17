@@ -351,6 +351,8 @@ public class GameCanvas extends JComponent {
       tileGrids.get("ground").draw(g2d);
       tileGrids.get("edge").draw(g2d);
       tileGrids.get("foliage").draw(g2d);
+      tileGrids.get("farm").draw(g2d);
+
       for (Player other : otherPlayers.values()) {
         other.draw(g2d);
       }
@@ -358,9 +360,9 @@ public class GameCanvas extends JComponent {
       highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
       highlight.draw(g2d);
 
-      for (Animal an : animals.values()) {
-        an.draw(g2d);
-      }
+      // for (Animal an : animals.values()) {
+      // an.draw(g2d);
+      // }
 
       // dialogue.draw(g2d);
 

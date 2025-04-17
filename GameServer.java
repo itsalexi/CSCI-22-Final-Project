@@ -12,6 +12,7 @@ public class GameServer {
   private int[][] groundMap;
   private int[][] edgeMap;
   private int[][] foliageMap;
+  private FarmingSystem farmSystem;
 
   private static class PlayerState {
     double x, y;
@@ -35,7 +36,7 @@ public class GameServer {
     players = new HashMap<>();
     playerStates = new HashMap<>();
     animalStates = new HashMap<>();
-
+    farmSystem = new FarmingSystem();
     // Layer: Ground
     groundMap = new int[][] {
         { 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
@@ -333,6 +334,7 @@ public class GameServer {
           send(tileMapToString("ground", groundMap));
           send(tileMapToString("edge", edgeMap));
           send(tileMapToString("foliage", foliageMap));
+          send(tileMapToString("farm", farmSystem.getFarmMap()));
           send("TILEMAP DONE");
           for (Map.Entry<String, PlayerState> entry : playerStates.entrySet()) {
             String otherId = entry.getKey();
@@ -400,7 +402,7 @@ public class GameServer {
           break;
         }
 
-        case "ANIMAL":
+        case "ANIMAL": {
           String action = parts[1];
           if (!playerId.equals(animalControllerId))
             return;
@@ -423,6 +425,28 @@ public class GameServer {
             broadcastAll(msg);
 
           }
+        }
+
+        case "FARM": {
+          String action = parts[1];
+          if (action.equals("PLANT")) {
+            String cropType = parts[2];
+            int x = Integer.parseInt(parts[3]);
+            int y = Integer.parseInt(parts[4]);
+            if (groundMap[y][x] == 354) {
+              broadcastAll(farmSystem.plant(x, y, cropType));
+            }
+          } else {
+            int x = Integer.parseInt(parts[2]);
+            int y = Integer.parseInt(parts[3]);
+            int[][] farmMap = farmSystem.getFarmMap();
+            int val = farmMap[y][x];
+            if (val < 6 && val == 5 || val >= 6 && val % 6 == 5) {
+              // mature, do drop item command
+            }
+            broadcastAll(farmSystem.harvest(x, y));
+          }
+        }
       }
     }
 
