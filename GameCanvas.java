@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -308,12 +309,12 @@ public class GameCanvas extends JComponent {
     this.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseMoved(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
+        double x = e.getX() - (400 - player.getX() + player.getWidth() / 2);
+        double y = e.getY() - (300 - player.getY() + player.getHeight() / 2);
 
         int tileSize = 32;
-        int tileX = x / tileSize;
-        int tileY = y / tileSize;
+        int tileX = (int) Math.ceil(x / tileSize);
+        int tileY = (int) Math.ceil(y / tileSize);
 
         lastClickedTile[0] = tileX;
         lastClickedTile[1] = tileY;
@@ -342,6 +343,11 @@ public class GameCanvas extends JComponent {
     Graphics2D g2d = (Graphics2D) g;
 
     if (isMapLoaded) {
+      double anchorX = player.getX() + player.getWidth() / 2;
+      double anchorY = player.getY() + player.getHeight() / 2;
+      AffineTransform camera = new AffineTransform();
+      camera.translate(400 - anchorX, 300 - anchorY);
+      g2d.setTransform(camera);
       tileGrids.get("ground").draw(g2d);
       tileGrids.get("edge").draw(g2d);
       tileGrids.get("foliage").draw(g2d);
