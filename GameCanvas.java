@@ -22,6 +22,7 @@ public class GameCanvas extends JComponent {
   private WriteToServer writer;
   private int[] lastClickedTile;
   private boolean isMapLoaded;
+  private double anchorX, anchorY;
 
   public GameCanvas() {
     isMapLoaded = false;
@@ -44,6 +45,10 @@ public class GameCanvas extends JComponent {
         for (Player ghost : otherPlayers.values()) {
           ghost.tick();
         }
+
+        anchorX = player.getX() + player.getWidth() / 2;
+        anchorY = player.getY() + player.getHeight() / 2;
+
         for (Map.Entry<String, Animal> entry : new ArrayList<>(animals.entrySet())) {
           String id = entry.getKey();
           Animal animal = entry.getValue();
@@ -298,6 +303,10 @@ public class GameCanvas extends JComponent {
     animals.put(id, newAnimal);
   }
 
+  private double clamp(double left, double right, double value){
+    return Math.max(left, Math.min(right, value));
+  }
+
   public void addMouseListener() {
     this.addMouseListener(new MouseAdapter() {
       @Override
@@ -309,15 +318,15 @@ public class GameCanvas extends JComponent {
     this.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseMoved(MouseEvent e) {
-        double x = e.getX() - (400 - player.getX() + player.getWidth() / 2);
-        double y = e.getY() - (300 - player.getY() + player.getHeight() / 2);
+        double x = e.getX() - (400 - anchorX);
+        double y = e.getY() - (300 - anchorY);
 
         int tileSize = 32;
         int tileX = (int) Math.ceil(x / tileSize);
         int tileY = (int) Math.ceil(y / tileSize);
 
-        lastClickedTile[0] = tileX;
-        lastClickedTile[1] = tileY;
+        lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
+        lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
       }
     });
 
@@ -343,8 +352,6 @@ public class GameCanvas extends JComponent {
     Graphics2D g2d = (Graphics2D) g;
 
     if (isMapLoaded) {
-      double anchorX = player.getX() + player.getWidth() / 2;
-      double anchorY = player.getY() + player.getHeight() / 2;
       AffineTransform camera = new AffineTransform();
       camera.translate(400 - anchorX, 300 - anchorY);
       g2d.setTransform(camera);
