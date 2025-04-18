@@ -33,13 +33,14 @@ public class Inventory {
   public Inventory() {
     SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap/inventory");
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
+    items = new Sprite(itemFiles.getFiles(), 32);
+
     activeHotbarSlot = 0;
 
     inventory = new Item[35];
     inventory[0] = new Item("Hoe", 1, 1, false, "hoe");
     inventory[1] = new Item("Watering Can", 0, 1, false, "water");
     tiles = new Sprite(tileMapFiles.getFiles(), 32);
-    items = new Sprite(itemFiles.getFiles(), 32);
     isOpen = false;
     inventoryGrid = new TileGrid(tiles, inventoryMap);
     itemsGrid = new TileGrid(items, itemsMap);
@@ -50,11 +51,11 @@ public class Inventory {
     inventory[slot] = item;
   }
 
-  public Item getItem(int slot){
+  public Item getItem(int slot) {
     return inventory[slot];
   }
 
-  public Item getActiveItem(){
+  public Item getActiveItem() {
     return inventory[activeHotbarSlot];
   }
 
@@ -118,11 +119,7 @@ public class Inventory {
 
   public void draw(Graphics2D g2d) {
 
-    System.out.println(inventory[0]);
-
     for (int i = 0; i < inventory.length; i++) {
-      if (inventory[i] == null)
-        continue;
 
       int[] coords = getGridFromInventory(i);
       if (coords == null)
@@ -131,10 +128,10 @@ public class Inventory {
       int row = coords[1];
       int col = coords[0] + 1;
 
-      // itemsMap[row][col] = inventory[i].getId();
       itemsGrid.setTileAt(row, col, inventory[i] == null ? -1 : inventory[i].getId());
 
     }
+    System.out.println(itemsMap[6][1]);
     // unhighlight previous
     for (int i = 1; i <= 9; i++) {
       inventoryMap[6][i] = 0;
@@ -163,12 +160,12 @@ public class Inventory {
 
   }
 
-  public Sprite getItemSprites(){
+  public Sprite getItemSprites() {
     return items;
   }
 
-  public int getSlotFromGrid(int x, int y){
-    if (y == 6) { 
+  public int getSlotFromGrid(int x, int y) {
+    if (y == 6) {
       return x - 1;
     }
     return y * 9 + x - 1;

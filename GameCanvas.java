@@ -41,12 +41,14 @@ public class GameCanvas extends JComponent {
     inventory = new Inventory();
     collidableGrids = new ArrayList<>();
     zoom = 2;
-    hoveredItemSprite = inventory.getItemSprites();
     previousItemSlot = -1;
 
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
+    SpriteFiles itemFiles = new SpriteFiles("assets/items");
+    hoveredItemSprite = new Sprite(itemFiles.getFiles(), 32);
+
     lastClickedTile = new int[2];
-    lastClickedInventoryTile = new int[]{6, 1};
+    lastClickedInventoryTile = new int[] { 6, 1 };
     highlight = new Sprite(selectorFiles.getFiles(), 32);
     invHighlight = new Sprite(selectorFiles.getFiles(), 32);
     invHighlight.setSprite(1);
@@ -62,7 +64,7 @@ public class GameCanvas extends JComponent {
           isMoving = isMoving || isActive;
         }
 
-        if(isMoving){
+        if (isMoving) {
           movePlayer();
         }
 
@@ -125,11 +127,11 @@ public class GameCanvas extends JComponent {
   }
 
   private void doPlayerAction(int x, int y) {
-    if (!player.isDoingAction()){
-      if(inventory.getActiveItem() != null){
+    if (!player.isDoingAction()) {
+      if (inventory.getActiveItem() != null) {
         Item activeItem = inventory.getActiveItem();
-        for (String action : player.getPlayerActions().keySet()){
-          if(activeItem.getActionName().equals(action)){
+        for (String action : player.getPlayerActions().keySet()) {
+          if (activeItem.getActionName().equals(action)) {
             player.useAction(action);
             writer.send("ACTION " + client.getPlayerID() + " " + activeItem.getActionName().toUpperCase() + " " + x
                 + " " + y + " "
@@ -365,7 +367,7 @@ public class GameCanvas extends JComponent {
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
 
-        if(!inventory.isOpen()){
+        if (!inventory.isOpen()) {
           doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
         }
       }
@@ -428,7 +430,7 @@ public class GameCanvas extends JComponent {
 
     this.addMouseListener(new MouseAdapter() {
       @Override
-      public void mouseClicked(MouseEvent e){
+      public void mouseClicked(MouseEvent e) {
         double x = e.getX();
         double y = e.getY();
 
@@ -437,12 +439,13 @@ public class GameCanvas extends JComponent {
           int tileX = lastClickedInventoryTile[0];
           int tileY = lastClickedInventoryTile[1];
 
-          if (tileX != -1){
+          if (tileX != -1) {
             hoveredItem = inventory.getItem(inventory.getSlotFromGrid(tileX, tileY));
-            if (hoveredItem != null){
+            if (hoveredItem != null) {
               previousItemSlot = inventory.getSlotFromGrid(tileX, tileY);
               hoveredItemSprite.setSprite(hoveredItem.getId());
-              hoveredItemSprite.setPosition(x - hoveredItemSprite.getSize() * hoveredItemSprite.getHScale() / 2, y - hoveredItemSprite.getSize() * hoveredItemSprite.getVScale() / 2);
+              hoveredItemSprite.setPosition(x - hoveredItemSprite.getSize() * hoveredItemSprite.getHScale() / 2,
+                  y - hoveredItemSprite.getSize() * hoveredItemSprite.getVScale() / 2);
             }
             inventory.setItem(previousItemSlot, null);
           }
@@ -452,12 +455,13 @@ public class GameCanvas extends JComponent {
 
     this.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
-      public void mouseMoved(MouseEvent e){
+      public void mouseMoved(MouseEvent e) {
         double x = e.getX();
         double y = e.getY();
 
-        if (hoveredItem != null){
-          hoveredItemSprite.setPosition(x - hoveredItemSprite.getSize() * hoveredItemSprite.getHScale() / 2, y - hoveredItemSprite.getSize() * hoveredItemSprite.getVScale() / 2);
+        if (hoveredItem != null) {
+          hoveredItemSprite.setPosition(x - hoveredItemSprite.getSize() * hoveredItemSprite.getHScale() / 2,
+              y - hoveredItemSprite.getSize() * hoveredItemSprite.getVScale() / 2);
         }
       }
     });
@@ -507,7 +511,7 @@ public class GameCanvas extends JComponent {
       camera.translate(400, 300);
       camera.scale(zoom, zoom);
       camera.translate(-anchorX, -anchorY);
-      
+
       g2d.setTransform(camera);
       tileGrids.get("ground").draw(g2d);
       tileGrids.get("edge").draw(g2d);
@@ -519,7 +523,7 @@ public class GameCanvas extends JComponent {
       }
 
       player.draw(g2d);
-      if(!inventory.isOpen()){
+      if (!inventory.isOpen()) {
         highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
         highlight.draw(g2d);
       }
@@ -531,7 +535,7 @@ public class GameCanvas extends JComponent {
       g2d.setTransform(new AffineTransform());
       inventory.draw(g2d);
       // draw inventory highlight
-      if (inventory.isOpen()){
+      if (inventory.isOpen()) {
         drawInventoryHighlight(g2d);
 
         if (hoveredItem != null) {
