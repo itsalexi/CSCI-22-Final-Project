@@ -3,6 +3,7 @@ public class Item {
   private int id, quantity;
   private boolean stackable;
   private String actionName;
+  
 
   public Item(String n, int i, int q, boolean isS, String a) {
     name = n;

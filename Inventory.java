@@ -46,6 +46,10 @@ public class Inventory {
 
   }
 
+  public void setItem(int slot, Item item) {
+    inventory[slot] = item;
+  }
+
   public Item getItem(int slot){
     return inventory[slot];
   }
@@ -114,6 +118,8 @@ public class Inventory {
 
   public void draw(Graphics2D g2d) {
 
+    System.out.println(inventory[0]);
+
     for (int i = 0; i < inventory.length; i++) {
       if (inventory[i] == null)
         continue;
@@ -125,7 +131,8 @@ public class Inventory {
       int row = coords[1];
       int col = coords[0] + 1;
 
-      itemsMap[row][col] = inventory[i].getId();
+      // itemsMap[row][col] = inventory[i].getId();
+      itemsGrid.setTileAt(row, col, inventory[i] == null ? -1 : inventory[i].getId());
 
     }
     // unhighlight previous
@@ -154,5 +161,16 @@ public class Inventory {
 
     g2d.translate(-x, -y);
 
+  }
+
+  public Sprite getItemSprites(){
+    return items;
+  }
+
+  public int getSlotFromGrid(int x, int y){
+    if (y == 6) { 
+      return x - 1;
+    }
+    return y * 9 + x - 1;
   }
 }

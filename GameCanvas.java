@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,17 +29,20 @@ public class GameCanvas extends JComponent {
   private double anchorX, anchorY;
   private Inventory inventory;
   private double zoom;
+  private Sprite hoveredItemSprite;
+  private Item hoveredItem;
+  private int previousItemSlot;
 
   public GameCanvas() {
     isMapLoaded = false;
     otherPlayers = new HashMap<>();
     tileGrids = new HashMap<>();
     animals = new HashMap<>();
-
-    zoom = 2;
-
     inventory = new Inventory();
     collidableGrids = new ArrayList<>();
+    zoom = 2;
+    hoveredItemSprite = inventory.getItemSprites();
+    previousItemSlot = -1;
 
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
     lastClickedTile = new int[2];
@@ -61,7 +65,7 @@ public class GameCanvas extends JComponent {
         if(isMoving){
           movePlayer();
         }
-        
+
         for (Player ghost : otherPlayers.values()) {
           ghost.tick();
         }
@@ -168,6 +172,11 @@ public class GameCanvas extends JComponent {
             direction = "RIGHT";
             break;
           case KeyEvent.VK_E:
+            if (inventory.isOpen() && previousItemSlot != -1) {
+              inventory.setItem(previousItemSlot, hoveredItem);
+              hoveredItem = null;
+              previousItemSlot = -1;
+            }
             inventory.setOpen(!inventory.isOpen());
             break;
           case KeyEvent.VK_Y:
@@ -399,7 +408,6 @@ public class GameCanvas extends JComponent {
             lastClickedInventoryTile[1] = -1;
           }
         }
-
       }
     });
 
@@ -417,6 +425,43 @@ public class GameCanvas extends JComponent {
         inventory.setActiveHotbarSlot(current);
       }
     });
+
+    this.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e){
+        double x = e.getX();
+        double y = e.getY();
+
+        if (inventory.isOpen()) {
+
+          int tileX = lastClickedInventoryTile[0];
+          int tileY = lastClickedInventoryTile[1];
+
+          if (tileX != -1){
+            hoveredItem = inventory.getItem(inventory.getSlotFromGrid(tileX, tileY));
+            if (hoveredItem != null){
+              previousItemSlot = inventory.getSlotFromGrid(tileX, tileY);
+              hoveredItemSprite.setSprite(hoveredItem.getId());
+              hoveredItemSprite.setPosition(x - hoveredItemSprite.getSize() * hoveredItemSprite.getHScale() / 2, y - hoveredItemSprite.getSize() * hoveredItemSprite.getVScale() / 2);
+            }
+            inventory.setItem(previousItemSlot, null);
+          }
+        }
+      }
+    });
+
+    this.addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e){
+        double x = e.getX();
+        double y = e.getY();
+
+        if (hoveredItem != null){
+          hoveredItemSprite.setPosition(x - hoveredItemSprite.getSize() * hoveredItemSprite.getHScale() / 2, y - hoveredItemSprite.getSize() * hoveredItemSprite.getVScale() / 2);
+        }
+      }
+    });
+
   }
 
   public Player getPlayer() {
@@ -472,6 +517,7 @@ public class GameCanvas extends JComponent {
       for (Player other : otherPlayers.values()) {
         other.draw(g2d);
       }
+
       player.draw(g2d);
       if(!inventory.isOpen()){
         highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
@@ -482,11 +528,16 @@ public class GameCanvas extends JComponent {
         an.draw(g2d);
       }
 
-      AffineTransform reset = new AffineTransform();
-      g2d.setTransform(reset);
+      g2d.setTransform(new AffineTransform());
       inventory.draw(g2d);
       // draw inventory highlight
-      drawInventoryHighlight(g2d);
+      if (inventory.isOpen()){
+        drawInventoryHighlight(g2d);
+
+        if (hoveredItem != null) {
+          hoveredItemSprite.draw(g2d);
+        }
+      }
 
       // dialogue.draw(g2d);
 
