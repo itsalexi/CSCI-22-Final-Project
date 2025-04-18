@@ -2,7 +2,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class GameCanvas extends JComponent {
     otherPlayers = new HashMap<>();
     tileGrids = new HashMap<>();
     animals = new HashMap<>();
-    inventory = new Inventory();
+    inventory = new Inventory(this);
     collidableGrids = new ArrayList<>();
     zoom = 2;
     previousItemSlot = -1;
@@ -55,7 +54,6 @@ public class GameCanvas extends JComponent {
     addKeyBindings();
     addMouseListener();
 
-    
     repaintTimer = new Timer(1000 / 60, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -232,7 +230,7 @@ public class GameCanvas extends JComponent {
   }
 
   private double[] addVector(double x1, double y1, double x2, double y2) {
-    double angle = Math.atan( ( 1 - (y1 + y2) ) / -(x1 + x2) );
+    double angle = Math.atan((1 - (y1 + y2)) / -(x1 + x2));
     double[] result = { (x1 + x2), (y1 + y2) };
     return result;
   }
@@ -269,8 +267,10 @@ public class GameCanvas extends JComponent {
       }
     }
 
-    double newX = player.getX() + currVector[0];
-    double newY = player.getY() + currVector[1];
+    double newX = clamp(0, tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize(),
+        player.getX() + currVector[0]);
+    double newY = clamp(0, tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize(),
+        player.getY() + currVector[1]);
 
     Rectangle2D futureHitbox = player.getHitboxAt(newX, newY);
 
@@ -354,8 +354,8 @@ public class GameCanvas extends JComponent {
     this.addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(MouseEvent e) {
-        double x = (e.getX() - 400) / zoom + anchorX;
-        double y = (e.getY() - 300) / zoom + anchorY;
+        double x = (e.getX() - (getWidth() / 2)) / zoom + anchorX;
+        double y = (e.getY() - (getHeight() / 2)) / zoom + anchorY;
 
         double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
@@ -364,7 +364,8 @@ public class GameCanvas extends JComponent {
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
 
-        // System.out.println(tileGrids.get("edge").getTileAt(lastClickedTile[1], lastClickedTile[0]));
+        // System.out.println(tileGrids.get("edge").getTileAt(lastClickedTile[1],
+        // lastClickedTile[0]));
 
         if (!inventory.isOpen()) {
           doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
@@ -376,8 +377,8 @@ public class GameCanvas extends JComponent {
       @Override
       public void mouseMoved(MouseEvent e) {
         // System.out.printf("%f, %f\n", anchorX, anchorY);
-        double x = (e.getX() - 400) / zoom + anchorX;
-        double y = (e.getY() - 300) / zoom + anchorY;
+        double x = (e.getX() - (getWidth() / 2)) / zoom + anchorX;
+        double y = (e.getY() - (getHeight() / 2)) / zoom + anchorY;
 
         double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
@@ -436,9 +437,9 @@ public class GameCanvas extends JComponent {
         if (inventory.isOpen()) {
           int tileX = lastClickedInventoryTile[0];
           int tileY = lastClickedInventoryTile[1];
-          
 
-          if (tileX == -1) return;
+          if (tileX == -1)
+            return;
 
           int slot = inventory.getSlotFromGrid(tileX, tileY);
 
@@ -447,7 +448,7 @@ public class GameCanvas extends JComponent {
             inventory.setItem(slot, hoveredItem);
             hoveredItem = temp;
             previousItemSlot = inventory.getEmptySlot(); // TODO: make item drop instead
-            if (hoveredItem != null){
+            if (hoveredItem != null) {
               hoveredItemSprite.setSprite(hoveredItem.getId());
               hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth() * hoveredItemSprite.getHScale() / 2,
                   y - hoveredItemSprite.getHeight() * hoveredItemSprite.getVScale() / 2);
@@ -506,8 +507,8 @@ public class GameCanvas extends JComponent {
     int tileY = lastClickedInventoryTile[1];
 
     int gridWidth = 11 * tileSize;
-    int xOffset = (800 - gridWidth) / 2;
-    int yOffset = 600 - (8 * tileSize) - 40;
+    int xOffset = (getWidth() - gridWidth) / 2;
+    int yOffset = getHeight() - (8 * tileSize);
 
     g2d.translate(xOffset, yOffset);
     invHighlight.setPosition(tileX * tileSize, tileY * tileSize);
@@ -519,14 +520,19 @@ public class GameCanvas extends JComponent {
   public void paintComponent(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
 
+    double halfViewWidth = (getWidth() / 2.0) / zoom;
+    double halfViewHeight = (getHeight() / 2.0) / zoom;
+
     if (isMapLoaded) {
-      anchorX = clamp(400 / zoom, tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - 400 / zoom, player.getX() + player.getWidth() / 2);
-      anchorY = clamp(300 / zoom, tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize() - 300 / zoom, player.getY() + player.getHeight() / 2);
-      // System.out.println(tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - 400 / zoom);
-      // System.out.println(tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize() - 300 / zoom);
+      anchorX = clamp(halfViewWidth,
+          tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - halfViewWidth,
+          player.getX() + player.getWidth() / 2);
+      anchorY = clamp(halfViewHeight,
+          tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize() - halfViewHeight,
+          player.getY() + player.getHeight() / 2);
 
       AffineTransform camera = new AffineTransform();
-      camera.translate(400, 300);
+      camera.translate(getWidth() / 2, getHeight() / 2);
       camera.scale(zoom, zoom);
       camera.translate(-anchorX, -anchorY);
 
@@ -552,12 +558,12 @@ public class GameCanvas extends JComponent {
 
       // draw hitboxes
       // for (int i = 0; i < tileGrids.get("edge").getHeight(); i++) {
-      //   for (int j = 0; j < tileGrids.get("edge").getWidth(); j++) {
-      //       Rectangle2D hitbox = tileGrids.get("edge").getTileHitBoxAt(i, j);
-      //       if (hitbox != null) {
-      //         g2d.draw(hitbox);
-      //       }
-      //   }
+      // for (int j = 0; j < tileGrids.get("edge").getWidth(); j++) {
+      // Rectangle2D hitbox = tileGrids.get("edge").getTileHitBoxAt(i, j);
+      // if (hitbox != null) {
+      // g2d.draw(hitbox);
+      // }
+      // }
       // }
 
       // g2d.draw(player.getHitboxAt(player.getX(), player.getY()));

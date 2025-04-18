@@ -9,6 +9,7 @@ public class Inventory {
   private Sprite items;
   private boolean isOpen;
   private int activeHotbarSlot;
+  private GameCanvas canvas;
 
   private int[][] inventoryMap = {
       { 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10 },
@@ -30,11 +31,11 @@ public class Inventory {
 
   private Item[] inventory;
 
-  public Inventory() {
+  public Inventory(GameCanvas c) {
     SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap/inventory");
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
     items = new Sprite(itemFiles.getFiles(), 32);
-
+    canvas = c;
     activeHotbarSlot = 0;
 
     inventory = new Item[36];
@@ -80,8 +81,8 @@ public class Inventory {
     int gridWidth = inventoryMap[0].length * tileSize;
     int gridHeight = inventoryMap.length * tileSize;
 
-    int xOffset = (800 - gridWidth) / 2;
-    int yOffsetHotbar = 600 - gridHeight - 40;
+    int xOffset = (canvas.getWidth() - gridWidth) / 2;
+    int yOffsetHotbar = canvas.getHeight() - gridHeight;
 
     double localX = mouseX - xOffset;
     double localY = mouseY - yOffsetHotbar;
@@ -143,8 +144,8 @@ public class Inventory {
     int gridWidth = inventoryMap[0].length * tileSize;
     int gridHeight = inventoryMap.length * tileSize;
 
-    int x = (800 - gridWidth) / 2;
-    int y = 600 - gridHeight - 40;
+    int x = (canvas.getWidth() - gridWidth) / 2;
+    int y = canvas.getHeight() - gridHeight;
     g2d.translate(x, y);
 
     if (isOpen) {
