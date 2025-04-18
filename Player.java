@@ -129,14 +129,14 @@ public class Player {
     }
 
     public Rectangle2D getHitboxAt(double newX, double newY) {
-        double offsetX = sprite.getWidth() * sprite.getHScale() * 8 / 32;
-        double offsetY = sprite.getHeight() * sprite.getVScale() * 10 / 32;
+        double offsetX = sprite.getWidth() * sprite.getHScale() * 12 / 32;
+        double offsetY = sprite.getHeight() * sprite.getVScale() * 20 / 32;
 
         return new Rectangle2D.Double(
                 newX + offsetX,
                 newY + offsetY,
-                sprite.getWidth(),
-                sprite.getHeight());
+                sprite.getWidth() - sprite.getWidth() * sprite.getHScale() * 8 / 32,
+                sprite.getHeight() - sprite.getHeight() * sprite.getVScale() * 8 / 32);
     }
 
     public double getY() {

@@ -315,7 +315,7 @@ public class GameServer {
           String username = parts[1];
           int skin = Integer.parseInt(parts[2]);
 
-          int spawnX = 100;
+          int spawnX = 400;
           int spawnY = 300;
 
           PlayerState ps = new PlayerState();
