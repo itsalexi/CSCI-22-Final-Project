@@ -27,12 +27,15 @@ public class GameCanvas extends JComponent {
   private boolean isMapLoaded;
   private double anchorX, anchorY;
   private Inventory inventory;
+  private double zoom;
 
   public GameCanvas() {
     isMapLoaded = false;
     otherPlayers = new HashMap<>();
     tileGrids = new HashMap<>();
     animals = new HashMap<>();
+
+    zoom = 2;
 
     inventory = new Inventory();
     collidableGrids = new ArrayList<>();
@@ -108,11 +111,21 @@ public class GameCanvas extends JComponent {
   }
 
   private void doPlayerAction(int x, int y) {
-    if (!player.isDoingAction()) {
-      player.useAction(player.getActiveTool());
-      writer.send("ACTION " + client.getPlayerID() + " " + player.getActiveTool().toUpperCase() + " " + x
-          + " " + y + " "
-          + player.getDirection());
+    if (!player.isDoingAction()){
+      if(inventory.getActiveItem() != null){
+        Item activeItem = inventory.getActiveItem();
+        for (String action : player.getPlayerActions().keySet()){
+          if(activeItem.getActionName().equals(action)){
+            player.useAction(action);
+            writer.send("ACTION " + client.getPlayerID() + " " + activeItem.getActionName().toUpperCase() + " " + x
+                + " " + y + " "
+                + player.getDirection());
+            activeItem.consume();
+            return;
+          }
+        }
+
+      }
     }
   }
 
@@ -323,6 +336,16 @@ public class GameCanvas extends JComponent {
     this.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
+        double x = e.getX() - (400 - anchorX) / zoom;
+        double y = e.getY() - (300 - anchorY) / zoom;
+
+        double tileSize = 32;
+        int tileX = (int) Math.floor(x / tileSize);
+        int tileY = (int) Math.floor(y / tileSize);
+
+        lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
+        lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
+
         if(!inventory.isOpen()){
           doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
         }
@@ -332,10 +355,11 @@ public class GameCanvas extends JComponent {
     this.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseMoved(MouseEvent e) {
-        double x = e.getX() - (400 - anchorX);
-        double y = e.getY() - (300 - anchorY);
+        System.out.printf("%f, %f\n", anchorX, anchorY);
+        double x = e.getX() - (400 - anchorX) / zoom;
+        double y = e.getY() - (300 - anchorY) / zoom;
 
-        int tileSize = 32;
+        double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
         int tileY = (int) Math.floor(y / tileSize);
 
@@ -425,7 +449,10 @@ public class GameCanvas extends JComponent {
     if (isMapLoaded) {
 
       AffineTransform camera = new AffineTransform();
-      camera.translate(400 - anchorX, 300 - anchorY);
+      camera.translate(400, 300);
+      camera.scale(zoom, zoom);
+      camera.translate(-anchorX, -anchorY);
+      
       g2d.setTransform(camera);
       tileGrids.get("ground").draw(g2d);
       tileGrids.get("edge").draw(g2d);
@@ -458,7 +485,7 @@ public class GameCanvas extends JComponent {
     }
   }
 
-  private class WriteToServer implements Runnable {
+  public class WriteToServer implements Runnable {
     private DataOutputStream out;
 
     public WriteToServer(DataOutputStream out) {

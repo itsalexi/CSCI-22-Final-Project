@@ -36,13 +36,22 @@ public class Inventory {
     activeHotbarSlot = 0;
 
     inventory = new Item[35];
-    inventory[0] = new Item("hoe", 1, 1, false);
+    inventory[0] = new Item("Hoe", 1, 1, false, "hoe");
+    inventory[1] = new Item("Watering Can", 0, 1, false, "water");
     tiles = new Sprite(tileMapFiles.getFiles(), 32);
     items = new Sprite(itemFiles.getFiles(), 32);
     isOpen = false;
     inventoryGrid = new TileGrid(tiles, inventoryMap);
     itemsGrid = new TileGrid(items, itemsMap);
 
+  }
+
+  public Item getItem(int slot){
+    return inventory[slot];
+  }
+
+  public Item getActiveItem(){
+    return inventory[activeHotbarSlot];
   }
 
   public int getActiveHotbarSlot() {

@@ -82,6 +82,10 @@ public class Player {
         return false;
     }
 
+    public Map<String, PlayerAction> getPlayerActions(){
+        return playerActions;
+    }
+
     public void useAction(String name) {
         if (isDoingAction())
             return;
@@ -109,11 +113,11 @@ public class Player {
     }
 
     public double getWidth() {
-        return sprite.getWidth();
+        return sprite.getWidth() * sprite.getHScale();
     }
 
     public double getHeight() {
-        return sprite.getHeight();
+        return sprite.getHeight() * sprite.getVScale();
     }
 
     public double getSpeed() {
