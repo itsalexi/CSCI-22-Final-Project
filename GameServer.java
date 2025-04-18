@@ -383,22 +383,29 @@ public class GameServer {
           String tool = parts[2];
           int x = Integer.parseInt(parts[3]);
           int y = Integer.parseInt(parts[4]);
-
-          if (tool.equals("HOE")) {
-            if (foliageMap[y][x] != -1) {
-              foliageMap[y][x] = -1;
-              broadcastAll("UPDATE foliage -1 " + x + " " + y);
-            } else if (groundMap[y][x] == 36) {
-              groundMap[y][x] = 353;
-              broadcastAll("UPDATE ground 353 " + x + " " + y);
-            }
-          } else if (tool.equals("WATER")) {
-            if (groundMap[y][x] == 353) {
-              groundMap[y][x] = 354;
-              broadcastAll("UPDATE ground 354 " + x + " " + y);
-            }
-          }
           broadcast(msg, playerId);
+
+          Timer timer = new Timer();
+          timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+              if (tool.equals("HOE")) {
+                if (foliageMap[y][x] != -1) {
+                  foliageMap[y][x] = -1;
+                  broadcastAll("UPDATE foliage -1 " + x + " " + y);
+                } else if (groundMap[y][x] == 36) {
+                  groundMap[y][x] = 353;
+                  broadcastAll("UPDATE ground 353 " + x + " " + y);
+                }
+              } else if (tool.equals("WATER")) {
+                if (groundMap[y][x] == 353) {
+                  groundMap[y][x] = 354;
+                  broadcastAll("UPDATE ground 354 " + x + " " + y);
+                }
+              }
+              timer.cancel();
+            }
+          }, 650);
           break;
         }
 
