@@ -438,14 +438,29 @@ public class GameCanvas extends JComponent {
 
           int tileX = lastClickedInventoryTile[0];
           int tileY = lastClickedInventoryTile[1];
+          
 
-          if (tileX != -1) {
-            hoveredItem = inventory.getItem(inventory.getSlotFromGrid(tileX, tileY));
-            if (hoveredItem != null) {
-              previousItemSlot = inventory.getSlotFromGrid(tileX, tileY);
+          if (tileX == -1) return;
+
+          int slot = inventory.getSlotFromGrid(tileX, tileY);
+
+          if (hoveredItem != null) {
+            Item temp = inventory.getItem(slot) != null ? inventory.getItem(slot) : null;
+            inventory.setItem(slot, hoveredItem);
+            hoveredItem = temp;
+            previousItemSlot = inventory.getEmptySlot(); // TODO: make item drop instead
+            if (hoveredItem != null){
               hoveredItemSprite.setSprite(hoveredItem.getId());
-              hoveredItemSprite.setPosition(x - hoveredItemSprite.getSize() * hoveredItemSprite.getHScale() / 2,
-                  y - hoveredItemSprite.getSize() * hoveredItemSprite.getVScale() / 2);
+              hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth() * hoveredItemSprite.getHScale() / 2,
+                  y - hoveredItemSprite.getHeight() * hoveredItemSprite.getVScale() / 2);
+            }
+          } else {
+            hoveredItem = inventory.getItem(slot);
+            if (hoveredItem != null) {
+              previousItemSlot = slot;
+              hoveredItemSprite.setSprite(hoveredItem.getId());
+              hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth() * hoveredItemSprite.getHScale() / 2,
+                  y - hoveredItemSprite.getHeight() * hoveredItemSprite.getVScale() / 2);
             }
             inventory.setItem(previousItemSlot, null);
           }
@@ -460,8 +475,8 @@ public class GameCanvas extends JComponent {
         double y = e.getY();
 
         if (hoveredItem != null) {
-          hoveredItemSprite.setPosition(x - hoveredItemSprite.getSize() * hoveredItemSprite.getHScale() / 2,
-              y - hoveredItemSprite.getSize() * hoveredItemSprite.getVScale() / 2);
+          hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth() * hoveredItemSprite.getHScale() / 2,
+              y - hoveredItemSprite.getHeight() * hoveredItemSprite.getVScale() / 2);
         }
       }
     });

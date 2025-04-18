@@ -170,4 +170,13 @@ public class Inventory {
     }
     return y * 9 + x - 1;
   }
+
+  public int getEmptySlot(){
+    for (int i = 0; i < 36; i ++){
+      if (getItem(i) == null) {
+        return i;
+      }
+    }
+    return -1;
+  }
 }
