@@ -112,7 +112,7 @@ public class Inventory {
     if (i < 9) {
       grid[1] = 6;
     } else {
-      grid[1] = (int) Math.floor(i / 9) + 1;
+      grid[1] = ((i - 9) / 9) + 1;
     }
     return grid;
   }
@@ -168,11 +168,11 @@ public class Inventory {
     if (y == 6) {
       return x - 1;
     }
-    return (y - 1) * 9 + x - 1;
+    return (y - 1) * 9 + (x - 1) + 9;
   }
 
-  public int getEmptySlot(){
-    for (int i = 0; i < 36; i ++){
+  public int getEmptySlot() {
+    for (int i = 0; i < 36; i++) {
       if (getItem(i) == null) {
         return i;
       }
