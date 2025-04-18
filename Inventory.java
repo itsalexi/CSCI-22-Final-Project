@@ -37,7 +37,7 @@ public class Inventory {
 
     activeHotbarSlot = 0;
 
-    inventory = new Item[35];
+    inventory = new Item[36];
     inventory[0] = new Item("Hoe", 1, 1, false, "hoe");
     inventory[1] = new Item("Watering Can", 0, 1, false, "water");
     tiles = new Sprite(tileMapFiles.getFiles(), 32);
@@ -131,7 +131,6 @@ public class Inventory {
       itemsGrid.setTileAt(row, col, inventory[i] == null ? -1 : inventory[i].getId());
 
     }
-    System.out.println(itemsMap[6][1]);
     // unhighlight previous
     for (int i = 1; i <= 9; i++) {
       inventoryMap[6][i] = 0;

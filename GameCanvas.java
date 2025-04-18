@@ -356,7 +356,7 @@ public class GameCanvas extends JComponent {
   public void addMouseListener() {
     this.addMouseListener(new MouseAdapter() {
       @Override
-      public void mouseClicked(MouseEvent e) {
+      public void mousePressed(MouseEvent e) {
         double x = (e.getX() - 400) / zoom + anchorX;
         double y = (e.getY() - 300) / zoom + anchorY;
 
@@ -430,12 +430,11 @@ public class GameCanvas extends JComponent {
 
     this.addMouseListener(new MouseAdapter() {
       @Override
-      public void mouseClicked(MouseEvent e) {
+      public void mousePressed(MouseEvent e) {
         double x = e.getX();
         double y = e.getY();
 
         if (inventory.isOpen()) {
-
           int tileX = lastClickedInventoryTile[0];
           int tileY = lastClickedInventoryTile[1];
           
@@ -462,8 +461,9 @@ public class GameCanvas extends JComponent {
               hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth() * hoveredItemSprite.getHScale() / 2,
                   y - hoveredItemSprite.getHeight() * hoveredItemSprite.getVScale() / 2);
             }
-            inventory.setItem(previousItemSlot, null);
+            inventory.setItem(slot, null);
           }
+          System.out.println(hoveredItem);
         }
       }
     });
