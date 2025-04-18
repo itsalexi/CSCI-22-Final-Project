@@ -52,6 +52,16 @@ public class GameCanvas extends JComponent {
       @Override
       public void actionPerformed(ActionEvent e) {
         player.tick();
+
+        Boolean isMoving = false;
+        for (Boolean isActive : player.getActiveDirections().values()) {
+          isMoving = isMoving || isActive;
+        }
+
+        if(isMoving){
+          movePlayer();
+        }
+        
         for (Player ghost : otherPlayers.values()) {
           ghost.tick();
         }
@@ -170,7 +180,6 @@ public class GameCanvas extends JComponent {
 
         if (direction != null) {
           player.setDirectionStatus(direction, true);
-          movePlayer();
         }
       }
 
@@ -200,6 +209,7 @@ public class GameCanvas extends JComponent {
         for (Boolean isActive : player.getActiveDirections().values()) {
           isMoving = isMoving || isActive;
         }
+
         if (!player.isDoingAction() && !isMoving) {
           player.setAnimationState("idle");
           writer.send("MOVE " + client.getPlayerID() + " " + player.getX() + " " + player.getY() + " "
