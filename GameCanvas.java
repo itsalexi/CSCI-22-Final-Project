@@ -336,8 +336,8 @@ public class GameCanvas extends JComponent {
     this.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        double x = e.getX() - (400 - anchorX) / zoom;
-        double y = e.getY() - (300 - anchorY) / zoom;
+        double x = (e.getX() - 400) / zoom + anchorX;
+        double y = (e.getY() - 300) / zoom + anchorY;
 
         double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
@@ -355,9 +355,9 @@ public class GameCanvas extends JComponent {
     this.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseMoved(MouseEvent e) {
-        System.out.printf("%f, %f\n", anchorX, anchorY);
-        double x = e.getX() - (400 - anchorX) / zoom;
-        double y = e.getY() - (300 - anchorY) / zoom;
+        // System.out.printf("%f, %f\n", anchorX, anchorY);
+        double x = (e.getX() - 400) / zoom + anchorX;
+        double y = (e.getY() - 300) / zoom + anchorY;
 
         double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
