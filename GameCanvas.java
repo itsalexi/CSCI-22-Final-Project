@@ -323,7 +323,9 @@ public class GameCanvas extends JComponent {
     this.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
+        if(!inventory.isOpen()){
+          doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
+        }
       }
     });
 
@@ -334,8 +336,8 @@ public class GameCanvas extends JComponent {
         double y = e.getY() - (300 - anchorY);
 
         int tileSize = 32;
-        int tileX = (int) Math.ceil(x / tileSize);
-        int tileY = (int) Math.ceil(y / tileSize);
+        int tileX = (int) Math.floor(x / tileSize);
+        int tileY = (int) Math.floor(y / tileSize);
 
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
@@ -434,8 +436,10 @@ public class GameCanvas extends JComponent {
         other.draw(g2d);
       }
       player.draw(g2d);
-      highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
-      highlight.draw(g2d);
+      if(!inventory.isOpen()){
+        highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
+        highlight.draw(g2d);
+      }
 
       for (Animal an : animals.values()) {
         an.draw(g2d);
