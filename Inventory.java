@@ -168,7 +168,7 @@ public class Inventory {
     if (y == 6) {
       return x - 1;
     }
-    return y * 9 + x - 1;
+    return (y - 1) * 9 + x - 1;
   }
 
   public int getEmptySlot(){
