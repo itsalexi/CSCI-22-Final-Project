@@ -54,6 +54,8 @@ public class GameCanvas extends JComponent {
     invHighlight.setSprite(1);
     addKeyBindings();
     addMouseListener();
+
+    
     repaintTimer = new Timer(1000 / 60, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -71,9 +73,6 @@ public class GameCanvas extends JComponent {
         for (Player ghost : otherPlayers.values()) {
           ghost.tick();
         }
-
-        anchorX = player.getX() + player.getWidth() / 2;
-        anchorY = player.getY() + player.getHeight() / 2;
 
         for (Map.Entry<String, Animal> entry : new ArrayList<>(animals.entrySet())) {
           String id = entry.getKey();
@@ -234,7 +233,6 @@ public class GameCanvas extends JComponent {
 
   private double[] addVector(double x1, double y1, double x2, double y2) {
     double angle = Math.atan( ( 1 - (y1 + y2) ) / -(x1 + x2) );
-    System.out.println(angle * 180 / Math.PI);
     double[] result = { (x1 + x2), (y1 + y2) };
     return result;
   }
@@ -366,6 +364,8 @@ public class GameCanvas extends JComponent {
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
 
+        // System.out.println(tileGrids.get("edge").getTileAt(lastClickedTile[1], lastClickedTile[0]));
+
         if (!inventory.isOpen()) {
           doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
         }
@@ -462,7 +462,7 @@ public class GameCanvas extends JComponent {
             }
             inventory.setItem(slot, null);
           }
-          System.out.println(hoveredItem);
+          // System.out.println(hoveredItem);
         }
       }
     });
@@ -520,6 +520,10 @@ public class GameCanvas extends JComponent {
     Graphics2D g2d = (Graphics2D) g;
 
     if (isMapLoaded) {
+      anchorX = clamp(400 / zoom, tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - 400 / zoom, player.getX() + player.getWidth() / 2);
+      anchorY = clamp(300 / zoom, tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize() - 300 / zoom, player.getY() + player.getHeight() / 2);
+      // System.out.println(tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - 400 / zoom);
+      // System.out.println(tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize() - 300 / zoom);
 
       AffineTransform camera = new AffineTransform();
       camera.translate(400, 300);
@@ -546,6 +550,18 @@ public class GameCanvas extends JComponent {
         an.draw(g2d);
       }
 
+      // draw hitboxes
+      // for (int i = 0; i < tileGrids.get("edge").getHeight(); i++) {
+      //   for (int j = 0; j < tileGrids.get("edge").getWidth(); j++) {
+      //       Rectangle2D hitbox = tileGrids.get("edge").getTileHitBoxAt(i, j);
+      //       if (hitbox != null) {
+      //         g2d.draw(hitbox);
+      //       }
+      //   }
+      // }
+
+      // g2d.draw(player.getHitboxAt(player.getX(), player.getY()));
+
       g2d.setTransform(new AffineTransform());
       inventory.draw(g2d);
       // draw inventory highlight
@@ -558,8 +574,6 @@ public class GameCanvas extends JComponent {
       }
 
       // dialogue.draw(g2d);
-
-      // g2d.draw(player.getHitboxAt(player.getX(), player.getY()));
 
     }
   }
