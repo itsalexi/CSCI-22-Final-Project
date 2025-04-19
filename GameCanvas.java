@@ -400,8 +400,8 @@ public class GameCanvas extends JComponent {
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
 
-        // System.out.println(tileGrids.get("edge").getTileAt(lastClickedTile[1],
-        // lastClickedTile[0]));
+        System.out.println(tileGrids.get("foliage").getTileAt(lastClickedTile[1],
+            lastClickedTile[0]));
 
         if (!inventory.isOpen()) {
           doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
@@ -657,19 +657,20 @@ public class GameCanvas extends JComponent {
 
     if (isMapLoaded) {
 
-      if (!test) {
-        findPathAsync(player.getSpriteDimensions(), new double[] { 0, 0 }, player.getSpeed(), path -> {
-          for (double[] pos : path) {
-            Rectangle2D temp = new Rectangle2D.Double(
-                pos[0] - 1,
-                pos[1] - 1,
-                2,
-                2);
-            currentPath.add(temp);
-          }
-        });
-        test = true;
-      }
+      // if (!test) {
+      // findPathAsync(player.getSpriteDimensions(), new double[] { 0, 0 },
+      // player.getSpeed(), path -> {
+      // for (double[] pos : path) {
+      // Rectangle2D temp = new Rectangle2D.Double(
+      // pos[0] - 1,
+      // pos[1] - 1,
+      // 2,
+      // 2);
+      // currentPath.add(temp);
+      // }
+      // });
+      // test = true;
+      // }
 
       anchorX = clamp(halfViewWidth,
           tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - halfViewWidth,
