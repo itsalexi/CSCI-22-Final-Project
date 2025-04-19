@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.swing.*;
 
@@ -588,7 +589,6 @@ public class GameCanvas extends JComponent {
         continue;
       }
 
-
       Rectangle2D currHitbox = new Rectangle2D.Double(
           lastVisited[0] - obj.getWidth() / 2,
           lastVisited[1] - obj.getHeight() / 2,
@@ -615,7 +615,7 @@ public class GameCanvas extends JComponent {
             nextPosition[1] - obj.getHeight() / 2,
             obj.getWidth(),
             obj.getHeight());
-        
+
         Boolean collides = false;
         for (Rectangle2D collidable : collidableObjects) {
           if (collidable.intersects(nextHitbox)) {
@@ -641,6 +641,13 @@ public class GameCanvas extends JComponent {
     return null;
   }
 
+  public void findPathAsync(Rectangle2D obj, double[] target, double speed, Consumer<ArrayList<double[]>> onResult) {
+    new Thread(() -> {
+      ArrayList<double[]> path = findPath(obj, target, speed);
+      onResult.accept(path);
+    }).start();
+  }
+
   @Override
   public void paintComponent(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
@@ -651,19 +658,18 @@ public class GameCanvas extends JComponent {
     if (isMapLoaded) {
 
       if (!test) {
-        ArrayList<double[]> path = findPath(player.getSpriteDimensions(), new double[] { 0, 0 }, player.getSpeed());
-        for (double[] pos : path) {
-          Rectangle2D temp = new Rectangle2D.Double(
-            pos[0] - 1, 
-            pos[1] - 1,
-            2,
-            2
-          );
-          currentPath.add(temp);
-        }
+        findPathAsync(player.getSpriteDimensions(), new double[] { 0, 0 }, player.getSpeed(), path -> {
+          for (double[] pos : path) {
+            Rectangle2D temp = new Rectangle2D.Double(
+                pos[0] - 1,
+                pos[1] - 1,
+                2,
+                2);
+            currentPath.add(temp);
+          }
+        });
         test = true;
       }
-
 
       anchorX = clamp(halfViewWidth,
           tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - halfViewWidth,
@@ -682,7 +688,7 @@ public class GameCanvas extends JComponent {
       tileGrids.get("edge").draw(g2d);
       tileGrids.get("foliage").draw(g2d);
       tileGrids.get("farm").draw(g2d);
-      
+
       for (Rectangle2D rect : currentPath) {
         g2d.draw(rect);
       }
