@@ -147,6 +147,11 @@ public class GameCanvas extends JComponent {
             writer.send("ACTION " + client.getPlayerID() + " " + actionString[0].toUpperCase() + " " + x
                 + " " + y + " "
                 + player.getDirection());
+            if (actionString[0].equals("hoe")) {
+              if (tileGrids.get("farm").getTileAt(y, x) != -1) {
+                writer.send("FARM HARVEST " + x + " " + y);
+              }
+            }
 
             if (actionString[0].equals("plant")) {
               if (tileGrids.get("ground").getTileAt(y, x) == 354) {

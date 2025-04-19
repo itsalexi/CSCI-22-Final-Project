@@ -65,7 +65,7 @@ public class FarmingSystem {
 
   public String harvest(int x, int y) {
 
-    farmMap[y][x] = 0;
+    farmMap[y][x] = -1;
     return String.format("UPDATE farm %d %d %d", -1, x, y);
 
   }
