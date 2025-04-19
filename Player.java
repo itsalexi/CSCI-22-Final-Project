@@ -139,6 +139,15 @@ public class Player {
                 sprite.getHeight() - sprite.getHeight() * sprite.getVScale() * 8 / 32);
     }
 
+    public Rectangle2D getSpriteDimensions() {
+        return new Rectangle2D.Double(
+            x + getWidth() * 10 / 32,
+            y + getHeight() * 6 / 32,
+            getWidth() * 22 / 32,
+            getHeight() * 26 / 32
+        );
+    }
+
     public double getY() {
         return y;
     }
