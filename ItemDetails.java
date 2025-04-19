@@ -4,7 +4,7 @@ public class ItemDetails {
   private String actionName;
 
   public ItemDetails(String n, boolean s, String aN) {
-    name = name;
+    name = n;
     stackable = s;
     actionName = aN;
   }

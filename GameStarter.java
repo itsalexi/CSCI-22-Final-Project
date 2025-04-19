@@ -145,7 +145,10 @@ public class GameStarter {
                     int tileX = Integer.parseInt(parts[3]);
                     int tileY = Integer.parseInt(parts[4]);
 
-                    canvas.updateTileGrid(layer, tileX, tileY, tileId);
+                    if (canvas.isLoaded()) {
+                        canvas.updateTileGrid(layer, tileX, tileY, tileId);
+                    }
+                    break;
                 case "ANIMAL":
                     action = parts[1];
 
@@ -169,8 +172,10 @@ public class GameStarter {
                             canvas.updateAnimal(animalId, x, y, direction, state);
                         }
                     }
+                    break;
 
             }
+
         }
     }
 

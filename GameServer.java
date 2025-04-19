@@ -175,6 +175,27 @@ public class GameServer {
             -1, -1, -1, -1 }
     };
 
+    new Thread(() -> {
+      while (true) {
+        try {
+          Thread.sleep(1000);
+          int[][] farmMap = farmSystem.getFarmMap();
+          for (int y = 0; y < farmMap.length; y++) {
+            for (int x = 0; x < farmMap[y].length; x++) {
+              if (farmMap[y][x] != -1) {
+                String update = farmSystem.grow(x, y);
+                if (!update.isEmpty()) {
+                  broadcastAll(update);
+                }
+              }
+            }
+          }
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }).start();
+
     try {
       ss = new ServerSocket(25565);
       System.out.println("===== GAME SERVER STARTED =====");
@@ -280,7 +301,8 @@ public class GameServer {
       try {
         while (true) {
           String msg = in.readUTF();
-          System.out.println(playerId + ": " + msg);
+          // System.out.println(playerId + ": " + msg);
+
           handleMessage(msg);
         }
       } catch (IOException e) {
@@ -461,10 +483,13 @@ public class GameServer {
     }
 
     public void send(String msg) {
-      try {
-        out.writeUTF(msg);
-        out.flush();
-      } catch (IOException ignored) {
+      synchronized (out) {
+        try {
+          System.out.println("[Server SEND] " + msg);
+          out.writeUTF(msg);
+          out.flush();
+        } catch (IOException ignored) {
+        }
       }
     }
   }

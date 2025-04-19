@@ -24,9 +24,10 @@ public class FarmingSystem {
       { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }
   };
   private Map<String, Integer> plants;
+  private Map<String, Long> lastGrowthTimestamps;
 
   public FarmingSystem() {
-
+    lastGrowthTimestamps = new HashMap<>();
     plants = new HashMap<>();
     plants.put("blueberry", 0);
     plants.put("carrot", 6);
@@ -41,6 +42,7 @@ public class FarmingSystem {
     if (farmMap[y][x] != -1) {
       return "";
     }
+    lastGrowthTimestamps.put(x + "," + y, System.currentTimeMillis());
     farmMap[y][x] = plants.get(plant);
     return String.format("UPDATE farm %d %d %d", plants.get(plant), x, y);
   }
@@ -50,7 +52,14 @@ public class FarmingSystem {
     if (val < 6 && val == 5 || val >= 6 && val % 6 == 5) {
       return "";
     }
+    long now = System.currentTimeMillis();
+    long last = lastGrowthTimestamps.getOrDefault(x + "," + y, 0L);
+
+    if (now - last < 10000)
+      return "";
+
     farmMap[y][x] += 1;
+    lastGrowthTimestamps.put(x + "," + y, now);
     return String.format("UPDATE farm %d %d %d", val + 1, x, y);
   }
 

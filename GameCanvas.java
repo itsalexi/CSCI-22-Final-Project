@@ -114,6 +114,10 @@ public class GameCanvas extends JComponent {
     otherPlayers = p;
   }
 
+  public boolean isLoaded() {
+    return isMapLoaded;
+  }
+
   public boolean isColliding(Rectangle2D hitbox) {
     for (TileGrid cg : collidableGrids) {
       for (int i = 0; i < cg.getHeight(); i++) {
@@ -289,9 +293,11 @@ public class GameCanvas extends JComponent {
       }
     }
 
-    double newX = clamp(-player.getWidth() * 10 / 32, tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - player.getWidth() * 22 / 32,
+    double newX = clamp(-player.getWidth() * 10 / 32,
+        tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - player.getWidth() * 22 / 32,
         player.getX() + currVector[0]);
-    double newY = clamp(-player.getHeight() * 6 / 32, tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize() - player.getHeight() * 26 / 32,
+    double newY = clamp(-player.getHeight() * 6 / 32,
+        tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize() - player.getHeight() * 26 / 32,
         player.getY() + currVector[1]);
 
     Rectangle2D futureHitbox = player.getHitboxAt(newX, newY);
@@ -538,22 +544,21 @@ public class GameCanvas extends JComponent {
     g2d.translate(-xOffset, -yOffset);
   }
 
-  private ArrayList<double[]> findPath(Rectangle2D obj, double[] target, double speed){
+  private ArrayList<double[]> findPath(Rectangle2D obj, double[] target, double speed) {
 
     double tileSize = tileGrids.get("ground").getTileSize();
     Rectangle2D targetTile = new Rectangle2D.Double(
-      Math.floor( target[0] / tileSize ) * tileSize,
-      Math.floor( target[1] / tileSize ) * tileSize,
-      tileSize,
-      tileSize
-    );
+        Math.floor(target[0] / tileSize) * tileSize,
+        Math.floor(target[1] / tileSize) * tileSize,
+        tileSize,
+        tileSize);
 
     ArrayList<Rectangle2D> collidableObjects = new ArrayList<>();
-    for (TileGrid grid : collidableGrids) { 
+    for (TileGrid grid : collidableGrids) {
       for (int i = 0; i < grid.getHeight(); i++) {
         for (int j = 0; j < grid.getWidth(); j++) {
           Rectangle2D hitbox = grid.getTileHitBoxAt(i, j);
-          if (hitbox != null){
+          if (hitbox != null) {
             collidableObjects.add(hitbox);
           }
         }
@@ -562,11 +567,11 @@ public class GameCanvas extends JComponent {
 
     Deque<ArrayList<double[]>> output = new ArrayDeque<>();
     Set<double[]> visited = new HashSet<>();
-    double[] currPosition = {obj.getCenterX(), obj.getCenterY()};
+    double[] currPosition = { obj.getCenterX(), obj.getCenterY() };
     ArrayList<double[]> initialPath = new ArrayList<>();
     initialPath.add(currPosition);
     output.add(initialPath);
-    while(!output.isEmpty()){
+    while (!output.isEmpty()) {
       ArrayList<double[]> currPath = output.removeFirst();
       double[] lastVisited = currPath.get(currPath.size() - 1);
 
@@ -575,11 +580,10 @@ public class GameCanvas extends JComponent {
       }
 
       Rectangle2D currHitbox = new Rectangle2D.Double(
-        lastVisited[0] - obj.getWidth() / 2,
-        lastVisited[1] - obj.getHeight() / 2,
-        obj.getWidth(),
-        obj.getHeight()
-      );
+          lastVisited[0] - obj.getWidth() / 2,
+          lastVisited[1] - obj.getHeight() / 2,
+          obj.getWidth(),
+          obj.getHeight());
 
       if (currHitbox.intersects(targetTile)) {
         return currPath;
@@ -587,11 +591,11 @@ public class GameCanvas extends JComponent {
 
       visited.add(lastVisited);
 
-      double[] up = {speed, 0};
-      double[] right = {0, speed};
-      double[] down = {-speed, 0};
-      double[] left = {0, -speed};
-      double[][] directions = {up, right, left, down};
+      double[] up = { speed, 0 };
+      double[] right = { 0, speed };
+      double[] down = { -speed, 0 };
+      double[] left = { 0, -speed };
+      double[][] directions = { up, right, left, down };
 
       for (int i = 0; i < 4; i++) {
 
@@ -599,11 +603,10 @@ public class GameCanvas extends JComponent {
         nextPosition[0] += directions[i][0];
         nextPosition[1] += directions[i][1];
         Rectangle2D nextHitbox = new Rectangle2D.Double(
-          nextPosition[0] - obj.getWidth() / 2, 
-          nextPosition[1] - obj.getHeight() / 2, 
-          obj.getWidth(), 
-          obj.getHeight()
-        );
+            nextPosition[0] - obj.getWidth() / 2,
+            nextPosition[1] - obj.getHeight() / 2,
+            obj.getWidth(),
+            obj.getHeight());
         Boolean collides = false;
 
         for (Rectangle2D collidable : collidableObjects) {
@@ -623,11 +626,9 @@ public class GameCanvas extends JComponent {
 
       }
     }
-    
+
     return null;
   }
-
-  
 
   @Override
   public void paintComponent(Graphics g) {
@@ -638,8 +639,8 @@ public class GameCanvas extends JComponent {
 
     if (isMapLoaded) {
 
-      if (!test){
-        System.out.println(findPath(player.getSpriteDimensions(), new double[] {350, 250}, player.getSpeed()));
+      if (!test) {
+        System.out.println(findPath(player.getSpriteDimensions(), new double[] { 350, 250 }, player.getSpeed()));
         test = true;
       }
 
@@ -711,11 +712,13 @@ public class GameCanvas extends JComponent {
     }
 
     public void send(String msg) {
-      try {
-        out.writeUTF(msg);
-        out.flush();
-      } catch (IOException e) {
-        System.out.println("[WriteToServer] Failed to send: " + msg);
+      synchronized (out) {
+        try {
+          out.writeUTF(msg);
+          out.flush();
+        } catch (IOException e) {
+          System.out.println("[WriteToServer] Failed to send: " + msg);
+        }
       }
     }
 
