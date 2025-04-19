@@ -127,13 +127,28 @@ public class GameCanvas extends JComponent {
     if (!player.isDoingAction()) {
       if (inventory.getActiveItem() != null) {
         Item activeItem = inventory.getActiveItem();
+        boolean itemUsed = false;
         for (String action : player.getPlayerActions().keySet()) {
-          if (activeItem.getActionName().equals(action)) {
-            player.useAction(action);
-            writer.send("ACTION " + client.getPlayerID() + " " + activeItem.getActionName().toUpperCase() + " " + x
+          String[] actionString = activeItem.getActionName().split(" ");
+          if (actionString[0].equals(action)) {
+
+            player.useAction(actionString[0]);
+            writer.send("ACTION " + client.getPlayerID() + " " + actionString[0].toUpperCase() + " " + x
                 + " " + y + " "
                 + player.getDirection());
-            activeItem.consume();
+
+            if (actionString[0].equals("plant")) {
+              if (tileGrids.get("ground").getTileAt(y, x) == 354) {
+                if (tileGrids.get("farm").getTileAt(y, x) == -1) {
+                  System.out.println("FARM PLANT " + actionString[1] + " " + x + " " + y);
+                  writer.send("FARM PLANT " + actionString[1] + " " + x + " " + y);
+                  itemUsed = true;
+                }
+              }
+            }
+            if (itemUsed) {
+              activeItem.consume();
+            }
             return;
           }
         }

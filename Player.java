@@ -30,24 +30,25 @@ public class Player {
                 "idle", pathName + "idle",
                 "walk", pathName + "walk",
                 "hoe", pathName + "hoe",
-                "water", pathName + "watering");
+                "water", pathName + "watering", "plant", pathName + "plant");
 
         Map<String, Integer> frames = Map.of(
                 "idle", 4,
                 "walk", 6,
                 "hoe", 6,
-                "water", 8);
+                "water", 8, "plant", 5);
 
         activeDirections = new HashMap<>(Map.of(
-            "UP", false,
-            "DOWN", false,
-            "LEFT", false,
-            "RIGHT", false));
+                "UP", false,
+                "DOWN", false,
+                "LEFT", false,
+                "RIGHT", false));
 
         sprite = new PlayerSprite(animations, frames);
         playerActions = new HashMap<>();
         playerActions.put("hoe", new PlayerAction("hoe", 750));
         playerActions.put("water", new PlayerAction("watering", 750));
+        playerActions.put("plant", new PlayerAction("plant", 750));
 
     }
 
@@ -82,7 +83,7 @@ public class Player {
         return false;
     }
 
-    public Map<String, PlayerAction> getPlayerActions(){
+    public Map<String, PlayerAction> getPlayerActions() {
         return playerActions;
     }
 
@@ -102,7 +103,6 @@ public class Player {
     public void setAnimationState(String state) {
         sprite.setAnimationState(state);
     }
-
 
     public String getAnimationState() {
         return sprite.getAnimationState();
@@ -160,7 +160,7 @@ public class Player {
         y = newY;
     }
 
-    public void setDirectionStatus(String direction, Boolean isMoving){
+    public void setDirectionStatus(String direction, Boolean isMoving) {
         activeDirections.replace(direction, isMoving);
     }
 
