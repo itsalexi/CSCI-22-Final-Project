@@ -267,9 +267,9 @@ public class GameCanvas extends JComponent {
       }
     }
 
-    double newX = clamp(0, tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize(),
+    double newX = clamp(-player.getWidth() * 10 / 32, tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - player.getWidth() * 22 / 32,
         player.getX() + currVector[0]);
-    double newY = clamp(0, tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize(),
+    double newY = clamp(-player.getHeight() * 6 / 32, tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize() - player.getHeight() * 26 / 32,
         player.getY() + currVector[1]);
 
     Rectangle2D futureHitbox = player.getHitboxAt(newX, newY);
