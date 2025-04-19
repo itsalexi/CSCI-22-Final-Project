@@ -95,7 +95,6 @@ public class GameStarter {
                     y = Double.parseDouble(parts[5]);
                     dir = parts[6];
                     state = parts[7];
-                    System.out.println(state);
                     canvas.addPlayer(id, username, skin, x, y, dir, state);
                     break;
                 case "MOVE": {
@@ -127,7 +126,6 @@ public class GameStarter {
                 case "TILEMAP":
                     action = parts[0];
                     String name = parts[1];
-                    System.out.println(name);
 
                     if (name.equals("DONE")) {
                         canvas.initializeWorld();

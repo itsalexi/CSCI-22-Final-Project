@@ -37,6 +37,7 @@ public class GameCanvas extends JComponent {
   private Item hoveredItem;
   private int previousItemSlot;
   private Boolean test;
+  private ArrayList<Rectangle2D> currentPath;
 
   public GameCanvas() {
     isMapLoaded = false;
@@ -48,6 +49,7 @@ public class GameCanvas extends JComponent {
     zoom = 2;
     previousItemSlot = -1;
     test = false;
+    currentPath = new ArrayList<>();
 
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
@@ -571,30 +573,32 @@ public class GameCanvas extends JComponent {
     }
 
     Deque<ArrayList<double[]>> output = new ArrayDeque<>();
-    Set<double[]> visited = new HashSet<>();
+    Set<Position> visited = new HashSet<>();
     double[] currPosition = { obj.getCenterX(), obj.getCenterY() };
     ArrayList<double[]> initialPath = new ArrayList<>();
     initialPath.add(currPosition);
     output.add(initialPath);
+
     while (!output.isEmpty()) {
       ArrayList<double[]> currPath = output.removeFirst();
       double[] lastVisited = currPath.get(currPath.size() - 1);
 
-      if (visited.contains(lastVisited)) {
+      Position lastVisitedPosition = new Position(lastVisited);
+      if (visited.contains(lastVisitedPosition)) {
         continue;
       }
+
 
       Rectangle2D currHitbox = new Rectangle2D.Double(
           lastVisited[0] - obj.getWidth() / 2,
           lastVisited[1] - obj.getHeight() / 2,
           obj.getWidth(),
           obj.getHeight());
-
       if (currHitbox.intersects(targetTile)) {
         return currPath;
       }
 
-      visited.add(lastVisited);
+      visited.add(lastVisitedPosition);
 
       double[] up = { speed, 0 };
       double[] right = { 0, speed };
@@ -603,17 +607,16 @@ public class GameCanvas extends JComponent {
       double[][] directions = { up, right, left, down };
 
       for (int i = 0; i < 4; i++) {
-
-        double[] nextPosition = lastVisited;
-        nextPosition[0] += directions[i][0];
-        nextPosition[1] += directions[i][1];
+        double[] nextPosition = new double[2];
+        nextPosition[0] = lastVisited[0] + directions[i][0];
+        nextPosition[1] = lastVisited[1] + directions[i][1];
         Rectangle2D nextHitbox = new Rectangle2D.Double(
             nextPosition[0] - obj.getWidth() / 2,
             nextPosition[1] - obj.getHeight() / 2,
             obj.getWidth(),
             obj.getHeight());
+        
         Boolean collides = false;
-
         for (Rectangle2D collidable : collidableObjects) {
           if (collidable.intersects(nextHitbox)) {
             collides = true;
@@ -625,9 +628,12 @@ public class GameCanvas extends JComponent {
           continue;
         }
 
-        currPath.add(nextPosition);
-        output.add(currPath);
-        currPath.remove(currPath.size() - 1);
+        ArrayList<double[]> newPath = new ArrayList<>();
+        for (double[] pos : currPath) {
+          newPath.add(pos);
+        }
+        newPath.add(nextPosition);
+        output.add(newPath);
 
       }
     }
@@ -645,9 +651,19 @@ public class GameCanvas extends JComponent {
     if (isMapLoaded) {
 
       if (!test) {
-        System.out.println(findPath(player.getSpriteDimensions(), new double[] { 350, 250 }, player.getSpeed()));
+        ArrayList<double[]> path = findPath(player.getSpriteDimensions(), new double[] { 0, 0 }, player.getSpeed());
+        for (double[] pos : path) {
+          Rectangle2D temp = new Rectangle2D.Double(
+            pos[0] - 1, 
+            pos[1] - 1,
+            2,
+            2
+          );
+          currentPath.add(temp);
+        }
         test = true;
       }
+
 
       anchorX = clamp(halfViewWidth,
           tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - halfViewWidth,
@@ -666,6 +682,10 @@ public class GameCanvas extends JComponent {
       tileGrids.get("edge").draw(g2d);
       tileGrids.get("foliage").draw(g2d);
       tileGrids.get("farm").draw(g2d);
+      
+      for (Rectangle2D rect : currentPath) {
+        g2d.draw(rect);
+      }
 
       for (Player other : otherPlayers.values()) {
         other.draw(g2d);
