@@ -70,6 +70,33 @@ public class Inventory {
 
   }
 
+  public Item findItem(Item item) {
+    for (int i = 0; i < inventory.length; i++) {
+      if (inventory[i] == null)
+        continue;
+      if (inventory[i].getId() == item.getId()) {
+        return inventory[i];
+      }
+    }
+    return null;
+  }
+
+  public void addItem(int id, int quantity) {
+
+    Item item = new Item(id, quantity);
+
+    if (item.isStackable()) {
+      Item inventoryItem = findItem(item);
+      if (inventoryItem != null) {
+        inventoryItem.setQuantity(inventoryItem.getQuantity() + quantity);
+        return;
+      }
+    }
+
+    inventory[getEmptySlot()] = item;
+
+  }
+
   public void setItem(int slot, Item item) {
     inventory[slot] = item;
   }
@@ -140,9 +167,63 @@ public class Inventory {
     return grid;
   }
 
-  public void draw(Graphics2D g2d) {
+  public void drawQuantities(Graphics2D g2d) {
+    int tileSize = 32;
 
     for (int i = 0; i < inventory.length; i++) {
+      if (!isOpen && i > 8) {
+        return;
+      }
+      Item item = inventory[i];
+
+      int[] coords = getGridFromInventory(i);
+      if (coords == null)
+        continue;
+
+      int row = coords[1];
+      int col = coords[0] + 1;
+
+      itemsGrid.setTileAt(row, col, inventory[i] == null ? -1 : inventory[i].getId());
+      int quantityLabelX = (col + 1) * tileSize;
+      int quantityLabelY = (row + 1) * tileSize;
+      if (item != null) {
+        if (!item.isStackable()) continue;
+
+        String quantityString = Integer.toString(inventory[i].getQuantity());
+
+        g2d.setColor(Color.BLACK);
+        g2d.setFont(new Font("Arial", 1, 25));
+
+        FontMetrics fm = g2d.getFontMetrics();
+
+        int stringWidth = fm.stringWidth(quantityString);
+        int stringHeight = fm.getHeight();
+        g2d.drawString(quantityString, quantityLabelX - stringWidth, quantityLabelY);
+
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Arial", 1, 20));
+
+        fm = g2d.getFontMetrics();
+
+        stringWidth = fm.stringWidth(quantityString);
+        stringHeight = fm.getHeight();
+        g2d.drawString(quantityString, quantityLabelX - stringWidth, quantityLabelY);
+
+      }
+    }
+  }
+
+  public void draw(Graphics2D g2d) {
+    int tileSize = 32;
+    int gridWidth = inventoryMap[0].length * tileSize;
+    int gridHeight = inventoryMap.length * tileSize;
+
+    int x = (canvas.getWidth() - gridWidth) / 2;
+    int y = canvas.getHeight() - gridHeight;
+
+    for (int i = 0; i < inventory.length; i++) {
+
+      Item item = inventory[i];
 
       int[] coords = getGridFromInventory(i);
       if (coords == null)
@@ -153,6 +234,12 @@ public class Inventory {
 
       itemsGrid.setTileAt(row, col, inventory[i] == null ? -1 : inventory[i].getId());
 
+      if (item != null) {
+        if (item.getQuantity() <= 0) {
+          inventory[i] = null;
+        }
+      }
+
     }
     // unhighlight previous
     for (int i = 1; i <= 9; i++) {
@@ -162,12 +249,6 @@ public class Inventory {
     // highlight hotbar slot
     inventoryMap[6][1 + activeHotbarSlot] = 1;
 
-    int tileSize = 32;
-    int gridWidth = inventoryMap[0].length * tileSize;
-    int gridHeight = inventoryMap.length * tileSize;
-
-    int x = (canvas.getWidth() - gridWidth) / 2;
-    int y = canvas.getHeight() - gridHeight;
     // System.out.printf("%d, %d\n", x, y);
 
     g2d.translate(x, y);
@@ -175,9 +256,11 @@ public class Inventory {
     if (isOpen) {
       inventoryGrid.draw(g2d);
       itemsGrid.draw(g2d);
+      drawQuantities(g2d);
     } else {
       inventoryGrid.drawRows(g2d, 5, 7);
       itemsGrid.drawRows(g2d, 5, 7);
+      drawQuantities(g2d);
     }
 
     g2d.translate(-x, -y);

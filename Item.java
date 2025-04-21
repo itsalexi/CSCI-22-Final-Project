@@ -10,6 +10,10 @@ public class Item {
     quantity = q;
   }
 
+  public void setQuantity(int q) {
+    quantity = q;
+  }
+
   public int getId() {
     return id;
   }

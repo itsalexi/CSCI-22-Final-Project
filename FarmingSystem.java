@@ -6,6 +6,7 @@ public class FarmingSystem {
   private int[][] farmMap;
   private Map<String, Integer> plants;
   private Map<String, Long> lastGrowthTimestamps;
+  private Map<String, Integer> drops;
 
   public FarmingSystem(int size) {
     farmMap = new int[size][size];
@@ -16,6 +17,8 @@ public class FarmingSystem {
     }
     lastGrowthTimestamps = new HashMap<>();
     plants = new HashMap<>();
+    drops = new HashMap<>();
+
     plants.put("blueberry", 0);
     plants.put("carrot", 6);
     plants.put("onion", 12);
@@ -23,6 +26,22 @@ public class FarmingSystem {
     plants.put("strawberry", 24);
     plants.put("wheat", 30);
 
+    drops.put("blueberry", 10);
+    drops.put("carrot", 8);
+    drops.put("onion", 4);
+    drops.put("potato", 6);
+    drops.put("strawberry", 2);
+    drops.put("wheat", 12);
+  }
+
+  public int getPlantFromIndex(int val) {
+    String[] plantNames = { "blueberry", "carrot", "onion", "potato", "strawberry", "wheat" };
+
+    int index = (int) Math.floor(val / 6);
+    if (index >= plantNames.length)
+      return -1;
+
+    return drops.get(plantNames[index]);
   }
 
   public String plant(int x, int y, String plant) {
@@ -42,7 +61,7 @@ public class FarmingSystem {
     long now = System.currentTimeMillis();
     long last = lastGrowthTimestamps.getOrDefault(x + "," + y, 0L);
 
-    if (now - last < 10000)
+    if (now - last < 10)
       return "";
 
     farmMap[y][x] += 1;
@@ -51,10 +70,8 @@ public class FarmingSystem {
   }
 
   public String harvest(int x, int y) {
-
     farmMap[y][x] = -1;
     return String.format("UPDATE farm %d %d %d", -1, x, y);
-
   }
 
   public int[][] getFarmMap() {

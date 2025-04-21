@@ -147,6 +147,16 @@ public class GameStarter {
                         canvas.updateTileGrid(layer, tileX, tileY, tileId);
                     }
                     break;
+                case "INVENTORY":
+                    action = parts[1];
+                    System.out.println(msg);
+                    if (action.equals("ADD")) {
+                        int itemId = Integer.parseInt(parts[3]);
+                        int quantity = Integer.parseInt(parts[4]);
+                        System.out.println("test");
+                        canvas.getInventory().addItem(itemId, quantity);
+                    }
+                    break;
                 case "ANIMAL":
                     action = parts[1];
 

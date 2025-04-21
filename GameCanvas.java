@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-
 import javax.swing.*;
 
 public class GameCanvas extends JComponent {
@@ -147,7 +146,14 @@ public class GameCanvas extends JComponent {
         Item activeItem = inventory.getActiveItem();
         boolean itemUsed = false;
         for (String action : player.getPlayerActions().keySet()) {
+          if (activeItem == null) {
+            return;
+          }
+          if (activeItem.getActionName().equals("")) {
+            return;
+          }
           String[] actionString = activeItem.getActionName().split(" ");
+
           if (actionString[0].equals(action)) {
 
             player.useAction(actionString[0]);
@@ -157,7 +163,7 @@ public class GameCanvas extends JComponent {
                 + player.getDirection());
             if (actionString[0].equals("hoe")) {
               if (tileGrids.get("farm").getTileAt(y, x) != -1) {
-                writer.send("FARM HARVEST " + x + " " + y);
+                writer.send("FARM HARVEST " + x + " " + y + " " + client.getPlayerID());
               }
             }
 
@@ -174,6 +180,7 @@ public class GameCanvas extends JComponent {
               }
             }
             if (itemUsed) {
+              System.out.println("yes");
               activeItem.consume();
             }
             return;
@@ -186,6 +193,10 @@ public class GameCanvas extends JComponent {
 
   public Map<String, Animal> getAnimals() {
     return animals;
+  }
+
+  public Inventory getInventory() {
+    return inventory;
   }
 
   public void addKeyBindings() {
@@ -428,7 +439,6 @@ public class GameCanvas extends JComponent {
       public void mouseMoved(MouseEvent e) {
         double x = (e.getX() - (getWidth() / 2)) / zoom + anchorX;
         double y = (e.getY() - (getHeight() / 2)) / zoom + anchorY;
-        System.out.printf("%d, %d\n", e.getX(), e.getY());
 
         double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
@@ -706,8 +716,6 @@ public class GameCanvas extends JComponent {
           tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize()
               - halfViewHeight,
           player.getY() + player.getHeight() / 2);
-
-      System.out.printf("%f, %f\n", anchorX, anchorY);
 
       AffineTransform camera = new AffineTransform();
       camera.translate(getWidth() / 2, getHeight() / 2);
