@@ -273,8 +273,10 @@ public class GameCanvas extends JComponent {
   }
 
   private double[] addVector(double x1, double y1, double x2, double y2) {
-    double angle = Math.atan((1 - (y1 + y2)) / -(x1 + x2));
-    double[] result = { (x1 + x2), (y1 + y2) };
+    double x = x1 + x2;
+    double y = y1 + y2;
+    double magnitude = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    double[] result = { x / magnitude, y / magnitude };
     return result;
   }
 
@@ -313,11 +315,11 @@ public class GameCanvas extends JComponent {
     double newX = clamp(-player.getWidth() * 10 / 32,
         tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize()
             - player.getWidth() * 22 / 32,
-        player.getX() + currVector[0]);
+        player.getX() + currVector[0] * speed);
     double newY = clamp(-player.getHeight() * 6 / 32,
         tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize()
             - player.getHeight() * 26 / 32,
-        player.getY() + currVector[1]);
+        player.getY() + currVector[1] * speed);
 
     Rectangle2D futureHitbox = player.getHitboxAt(newX, newY);
 

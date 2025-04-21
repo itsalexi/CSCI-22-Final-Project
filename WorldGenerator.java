@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class WorldGenerator {
   private int seed;
@@ -75,6 +76,45 @@ public class WorldGenerator {
       }
       System.out.printf("\n");
 
+    }
+
+
+    
+  }
+
+  private void generateWaterEdges() {
+    ArrayList<int[]> possibleEdges = new ArrayList<>();
+    for (int i = 0; i < height; i++) {
+      for (int j = 0; j < width; j++) {
+        if (groundMap[i][j] == 153) {
+          int x = i;
+          int y = j;
+
+          int[][] directions = new int[][] {
+            new int[] {0, 1},
+            new int[] {1, 0},
+            new int[] {0, -1},
+            new int[] {-1, 0},
+            new int[] {-1, -1},
+            new int[] {1, 1},
+            new int[] {-1, 1},
+            new int[] {1, -1}
+          };
+
+          for (int[] dir : directions) {
+            int currX = x + dir[0];
+            int currY = y + dir[1];
+
+            try {
+              if (groundMap[currX][currY] != 153) {
+                possibleEdges.add(new int[] {currX, currY});
+              }
+            } catch (Exception e) {
+              continue;
+            }
+          }
+        }
+      }
     }
   }
 
