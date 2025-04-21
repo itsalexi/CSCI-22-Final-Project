@@ -190,6 +190,7 @@ public class GameStarter {
     }
 
     public static void main(String[] args) {
+        System.setProperty("sun.java2d.uiScale", "1.0");
         if (args.length == 2) {
             username = args[0];
             skin = Integer.parseInt(args[1]);

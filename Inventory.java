@@ -168,6 +168,8 @@ public class Inventory {
 
     int x = (canvas.getWidth() - gridWidth) / 2;
     int y = canvas.getHeight() - gridHeight;
+    // System.out.printf("%d, %d\n", x, y);
+
     g2d.translate(x, y);
 
     if (isOpen) {

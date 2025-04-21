@@ -51,7 +51,6 @@ public class GameCanvas extends JComponent {
     previousItemSlot = -1;
     test = false;
     currentPath = new ArrayList<>();
-
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
     hoveredItemSprite = new Sprite(itemFiles.getFiles(), 32);
@@ -63,6 +62,10 @@ public class GameCanvas extends JComponent {
     invHighlight.setSprite(1);
     addKeyBindings();
     addMouseListener();
+    System.out.println("Width:");
+    System.out.println(getWidth());
+    System.out.println("Height:");
+    System.out.println(getHeight());
 
     repaintTimer = new Timer(1000 / 60, new ActionListener() {
       @Override
@@ -91,7 +94,8 @@ public class GameCanvas extends JComponent {
           animal.randomAction(GameCanvas.this);
 
           writer.send("ANIMAL MOVE " + id + " " + animal.getX() + " " + animal.getY()
-              + " " + animal.getDirection() + " " + animal.getAnimationState());
+              + " " + animal.getDirection() + " "
+              + animal.getAnimationState());
 
         }
         repaint();
@@ -147,7 +151,8 @@ public class GameCanvas extends JComponent {
           if (actionString[0].equals(action)) {
 
             player.useAction(actionString[0]);
-            writer.send("ACTION " + client.getPlayerID() + " " + actionString[0].toUpperCase() + " " + x
+            writer.send("ACTION " + client.getPlayerID() + " "
+                + actionString[0].toUpperCase() + " " + x
                 + " " + y + " "
                 + player.getDirection());
             if (actionString[0].equals("hoe")) {
@@ -159,8 +164,11 @@ public class GameCanvas extends JComponent {
             if (actionString[0].equals("plant")) {
               if (tileGrids.get("ground").getTileAt(y, x) == 354) {
                 if (tileGrids.get("farm").getTileAt(y, x) == -1) {
-                  System.out.println("FARM PLANT " + actionString[1] + " " + x + " " + y);
-                  writer.send("FARM PLANT " + actionString[1] + " " + x + " " + y);
+                  System.out.println("FARM PLANT "
+                      + actionString[1] + " " + x
+                      + " " + y);
+                  writer.send("FARM PLANT " + actionString[1]
+                      + " " + x + " " + y);
                   itemUsed = true;
                 }
               }
@@ -254,7 +262,8 @@ public class GameCanvas extends JComponent {
 
         if (!player.isDoingAction() && !isMoving) {
           player.setAnimationState("idle");
-          writer.send("MOVE " + client.getPlayerID() + " " + player.getX() + " " + player.getY() + " "
+          writer.send("MOVE " + client.getPlayerID() + " " + player.getX() + " "
+              + player.getY() + " "
               + player.getDirection() + " " + "idle");
 
         }
@@ -302,16 +311,19 @@ public class GameCanvas extends JComponent {
     }
 
     double newX = clamp(-player.getWidth() * 10 / 32,
-        tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - player.getWidth() * 22 / 32,
+        tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize()
+            - player.getWidth() * 22 / 32,
         player.getX() + currVector[0]);
     double newY = clamp(-player.getHeight() * 6 / 32,
-        tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize() - player.getHeight() * 26 / 32,
+        tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize()
+            - player.getHeight() * 26 / 32,
         player.getY() + currVector[1]);
 
     Rectangle2D futureHitbox = player.getHitboxAt(newX, newY);
 
     if (!isColliding(futureHitbox)) {
-      writer.send("MOVE " + client.getPlayerID() + " " + newX + " " + newY + " " + direction + " " + "walk");
+      writer.send("MOVE " + client.getPlayerID() + " " + newX + " " + newY + " " + direction + " "
+          + "walk");
       player.setDirection(direction);
       player.setAnimationState("walk");
       player.setPosition(newX, newY);
@@ -412,9 +424,9 @@ public class GameCanvas extends JComponent {
     this.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseMoved(MouseEvent e) {
-        // System.out.printf("%f, %f\n", anchorX, anchorY);
         double x = (e.getX() - (getWidth() / 2)) / zoom + anchorX;
         double y = (e.getY() - (getHeight() / 2)) / zoom + anchorY;
+        System.out.printf("%d, %d\n", e.getX(), e.getY());
 
         double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
@@ -480,22 +492,30 @@ public class GameCanvas extends JComponent {
           int slot = inventory.getSlotFromGrid(tileX, tileY);
 
           if (hoveredItem != null) {
-            Item temp = inventory.getItem(slot) != null ? inventory.getItem(slot) : null;
+            Item temp = inventory.getItem(slot) != null ? inventory.getItem(slot)
+                : null;
             inventory.setItem(slot, hoveredItem);
             hoveredItem = temp;
-            previousItemSlot = inventory.getEmptySlot(); // TODO: make item drop instead
+            previousItemSlot = inventory.getEmptySlot(); // TODO: make item drop
+                                                         // instead
             if (hoveredItem != null) {
               hoveredItemSprite.setSprite(hoveredItem.getId());
-              hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth() * hoveredItemSprite.getHScale() / 2,
-                  y - hoveredItemSprite.getHeight() * hoveredItemSprite.getVScale() / 2);
+              hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth()
+                  * hoveredItemSprite.getHScale() / 2,
+                  y - hoveredItemSprite.getHeight()
+                      * hoveredItemSprite.getVScale()
+                      / 2);
             }
           } else {
             hoveredItem = inventory.getItem(slot);
             if (hoveredItem != null) {
               previousItemSlot = slot;
               hoveredItemSprite.setSprite(hoveredItem.getId());
-              hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth() * hoveredItemSprite.getHScale() / 2,
-                  y - hoveredItemSprite.getHeight() * hoveredItemSprite.getVScale() / 2);
+              hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth()
+                  * hoveredItemSprite.getHScale() / 2,
+                  y - hoveredItemSprite.getHeight()
+                      * hoveredItemSprite.getVScale()
+                      / 2);
             }
             inventory.setItem(slot, null);
           }
@@ -511,8 +531,11 @@ public class GameCanvas extends JComponent {
         double y = e.getY();
 
         if (hoveredItem != null) {
-          hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth() * hoveredItemSprite.getHScale() / 2,
-              y - hoveredItemSprite.getHeight() * hoveredItemSprite.getVScale() / 2);
+          hoveredItemSprite.setPosition(
+              x - hoveredItemSprite.getWidth() * hoveredItemSprite.getHScale()
+                  / 2,
+              y - hoveredItemSprite.getHeight()
+                  * hoveredItemSprite.getVScale() / 2);
         }
       }
     });
@@ -641,7 +664,8 @@ public class GameCanvas extends JComponent {
     return null;
   }
 
-  public void findPathAsync(Rectangle2D obj, double[] target, double speed, Consumer<ArrayList<double[]>> onResult) {
+  public void findPathAsync(Rectangle2D obj, double[] target, double speed,
+      Consumer<ArrayList<double[]>> onResult) {
     new Thread(() -> {
       ArrayList<double[]> path = findPath(obj, target, speed);
       onResult.accept(path);
@@ -673,11 +697,15 @@ public class GameCanvas extends JComponent {
       // }
 
       anchorX = clamp(halfViewWidth,
-          tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize() - halfViewWidth,
+          tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize()
+              - halfViewWidth,
           player.getX() + player.getWidth() / 2);
       anchorY = clamp(halfViewHeight,
-          tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize() - halfViewHeight,
+          tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize()
+              - halfViewHeight,
           player.getY() + player.getHeight() / 2);
+
+      System.out.printf("%f, %f\n", anchorX, anchorY);
 
       AffineTransform camera = new AffineTransform();
       camera.translate(getWidth() / 2, getHeight() / 2);
