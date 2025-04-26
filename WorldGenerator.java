@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
 public class WorldGenerator {
   private int seed;
@@ -7,6 +9,7 @@ public class WorldGenerator {
   private int[][] groundMap;
   private int[][] foliageMap;
   private int[][] edgeMap;
+  private Map<WaterEdgeMatrix, Integer> validEdgeMatrices;
 
   public WorldGenerator(int s, int w, int h) {
     seed = s;
@@ -15,6 +18,16 @@ public class WorldGenerator {
     groundMap = new int[h][w];
     foliageMap = new int[h][w];
     edgeMap = new int[h][w];
+
+    validEdgeMatrices.put(
+      new WaterEdgeMatrix(
+        n ew Boolean[][] {
+          new Boolean[] {false, true, false},
+          new Boolean[] {true, false, false},
+          new Boolean[] {false, false, false}
+        }
+      ), 101
+    );
 
     regenerateWorld();
   }
