@@ -1,6 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class WorldGenerator {
   private int seed;
@@ -18,16 +18,15 @@ public class WorldGenerator {
     groundMap = new int[h][w];
     foliageMap = new int[h][w];
     edgeMap = new int[h][w];
-
+    validEdgeMatrices = new HashMap<>();
     validEdgeMatrices.put(
-      new WaterEdgeMatrix(
-        n ew Boolean[][] {
-          new Boolean[] {false, true, false},
-          new Boolean[] {true, false, false},
-          new Boolean[] {false, false, false}
-        }
-      ), 101
-    );
+        new WaterEdgeMatrix(
+            new Boolean[][] {
+                new Boolean[] { false, true, false },
+                new Boolean[] { true, false, false },
+                new Boolean[] { false, false, false }
+            }),
+        101);
 
     regenerateWorld();
   }
@@ -91,8 +90,6 @@ public class WorldGenerator {
 
     }
 
-
-    
   }
 
   private void generateWaterEdges() {
@@ -104,14 +101,14 @@ public class WorldGenerator {
           int y = j;
 
           int[][] directions = new int[][] {
-            new int[] {0, 1},
-            new int[] {1, 0},
-            new int[] {0, -1},
-            new int[] {-1, 0},
-            new int[] {-1, -1},
-            new int[] {1, 1},
-            new int[] {-1, 1},
-            new int[] {1, -1}
+              new int[] { 0, 1 },
+              new int[] { 1, 0 },
+              new int[] { 0, -1 },
+              new int[] { -1, 0 },
+              new int[] { -1, -1 },
+              new int[] { 1, 1 },
+              new int[] { -1, 1 },
+              new int[] { 1, -1 }
           };
 
           for (int[] dir : directions) {
@@ -120,7 +117,7 @@ public class WorldGenerator {
 
             try {
               if (groundMap[currX][currY] != 153) {
-                possibleEdges.add(new int[] {currX, currY});
+                possibleEdges.add(new int[] { currX, currY });
               }
             } catch (Exception e) {
               continue;

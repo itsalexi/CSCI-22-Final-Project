@@ -149,6 +149,9 @@ public class GameCanvas extends JComponent {
           if (activeItem == null) {
             return;
           }
+          if (activeItem.getActionName() == null) {
+            return;
+          }
           if (activeItem.getActionName().equals("")) {
             return;
           }
@@ -230,12 +233,6 @@ public class GameCanvas extends JComponent {
               previousItemSlot = -1;
             }
             inventory.setOpen(!inventory.isOpen());
-            break;
-          case KeyEvent.VK_Y:
-            player.setActiveTool("hoe");
-            break;
-          case KeyEvent.VK_R:
-            player.setActiveTool("water");
             break;
         }
 
@@ -353,6 +350,7 @@ public class GameCanvas extends JComponent {
     switch (action) {
       case "HOE" -> newPlayer.useAction("hoe");
       case "WATER" -> newPlayer.useAction("water");
+      case "PLANT" -> newPlayer.useAction("plant");
     }
     otherPlayers.put(id, newPlayer);
 

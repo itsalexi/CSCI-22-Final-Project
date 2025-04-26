@@ -184,10 +184,10 @@ public class Inventory {
       int col = coords[0] + 1;
 
       itemsGrid.setTileAt(row, col, inventory[i] == null ? -1 : inventory[i].getId());
-      int quantityLabelX = (col + 1) * tileSize;
-      int quantityLabelY = (row + 1) * tileSize;
+
       if (item != null) {
-        if (!item.isStackable()) continue;
+        if (!item.isStackable())
+          continue;
 
         String quantityString = Integer.toString(inventory[i].getQuantity());
 
@@ -197,17 +197,17 @@ public class Inventory {
         FontMetrics fm = g2d.getFontMetrics();
 
         int stringWidth = fm.stringWidth(quantityString);
-        int stringHeight = fm.getHeight();
-        g2d.drawString(quantityString, quantityLabelX - stringWidth, quantityLabelY);
+        int quantityLabelX = ((col + 1) * tileSize) - stringWidth;
+        int quantityLabelY = (row + 1) * tileSize;
 
+        g2d.setColor(Color.BLACK);
+        g2d.drawString(quantityString, quantityLabelX + 1, quantityLabelY - 1);
+        g2d.drawString(quantityString, quantityLabelX + 1, quantityLabelY + 1);
+        g2d.drawString(quantityString, quantityLabelX - 1, quantityLabelY - 1);
+        g2d.drawString(quantityString, quantityLabelX - 1, quantityLabelY + 1);
         g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", 1, 20));
 
-        fm = g2d.getFontMetrics();
-
-        stringWidth = fm.stringWidth(quantityString);
-        stringHeight = fm.getHeight();
-        g2d.drawString(quantityString, quantityLabelX - stringWidth, quantityLabelY);
+        g2d.drawString(quantityString, quantityLabelX, quantityLabelY);
 
       }
     }
@@ -220,6 +220,26 @@ public class Inventory {
 
     int x = (canvas.getWidth() - gridWidth) / 2;
     int y = canvas.getHeight() - gridHeight;
+
+    if (getActiveItem() != null) {
+
+      g2d.setColor(Color.WHITE);
+      g2d.setFont(new Font("Arial", 1, 20));
+      String text = getActiveItem().getName();
+      int textWidth = g2d.getFontMetrics().stringWidth(text);
+
+      int itemTextX = x + (gridWidth / 2) - (textWidth / 2);
+      int itemTextY = y + (gridHeight / 2) + 40;
+
+      g2d.setColor(Color.BLACK);
+      g2d.drawString(text, itemTextX + 1, itemTextY - 1);
+      g2d.drawString(text, itemTextX + 1, itemTextY + 1);
+      g2d.drawString(text, itemTextX - 1, itemTextY - 1);
+      g2d.drawString(text, itemTextX - 1, itemTextY + 1);
+      g2d.setColor(Color.WHITE);
+
+      g2d.drawString(text, itemTextX, itemTextY);
+    }
 
     for (int i = 0; i < inventory.length; i++) {
 
