@@ -56,12 +56,13 @@ public class Inventory {
 
     inventory[0] = new Item(1, 1);
     inventory[1] = new Item(0, 1);
-    inventory[2] = new Item(3, 1);
+    inventory[2] = new Item(3, 32);
     inventory[3] = new Item(5, 1);
     inventory[4] = new Item(7, 1);
     inventory[5] = new Item(9, 1);
     inventory[6] = new Item(11, 1);
     inventory[7] = new Item(13, 1);
+    inventory[8] = new Item(2, 63);
 
     tiles = new Sprite(tileMapFiles.getFiles(), 32);
     isOpen = false;
@@ -81,14 +82,39 @@ public class Inventory {
     return null;
   }
 
+  public Item findUnfilledStack(Item item) {
+    for (int i = 0; i < inventory.length; i++) {
+      if (inventory[i] == null)
+        continue;
+      if (inventory[i].getId() == item.getId()) {
+        if (inventory[i].getQuantity() < 64) {
+          return inventory[i];
+        }
+      }
+    }
+    return null;
+  }
+
   public void addItem(int id, int quantity) {
+    if (getEmptySlot() == -1) {
+      // drop item, discard for now lol
+      return;
+    }
 
     Item item = new Item(id, quantity);
 
     if (item.isStackable()) {
-      Item inventoryItem = findItem(item);
+      Item inventoryItem = findUnfilledStack(item);
       if (inventoryItem != null) {
-        inventoryItem.setQuantity(inventoryItem.getQuantity() + quantity);
+        int stackQuantity = inventoryItem.getQuantity();
+
+        if (stackQuantity + quantity > 64) {
+          inventoryItem.setQuantity(stackQuantity + (64 - quantity));
+          item.setQuantity(item.getQuantity() - (64 - quantity));
+          inventory[getEmptySlot()] = item;
+        } else {
+          inventoryItem.setQuantity(stackQuantity + quantity);
+        }
         return;
       }
     }
