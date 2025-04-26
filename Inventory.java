@@ -63,7 +63,9 @@ public class Inventory {
     inventory[6] = new Item(11, 1);
     inventory[7] = new Item(13, 1);
     inventory[8] = new Item(2, 63);
-
+    addItem(2, 200);
+    removeItem(2, 100);
+    System.out.println(getQuantity(2));
     tiles = new Sprite(tileMapFiles.getFiles(), 32);
     isOpen = false;
     inventoryGrid = new TileGrid(tiles, inventoryMap);
@@ -75,7 +77,8 @@ public class Inventory {
     for (int i = 0; i < inventory.length; i++) {
       if (inventory[i] == null)
         continue;
-      if (inventory[i].getId() == item.getId()) {
+      if (inventory[i].getId() == item.getId() && !(inventory[i].getQuantity() <= 0)) {
+        System.out.println(inventory[i]);
         return inventory[i];
       }
     }
@@ -95,6 +98,50 @@ public class Inventory {
     return null;
   }
 
+  public int getQuantity(int id) {
+    Item item = new Item(id, 0);
+    int quantity = 0;
+    for (int i = 0; i < inventory.length; i++) {
+      if (inventory[i] == null)
+        continue;
+      if (inventory[i].getId() == item.getId()) {
+        quantity += inventory[i].getQuantity();
+      }
+    }
+    return quantity;
+  }
+
+  // remove item doesnt work yet
+  public void removeItem(int id, int quantity) {
+
+    Item item = new Item(id, quantity);
+
+    if (item.isStackable()) {
+      Item inventoryItem = findUnfilledStack(item);
+      if (inventoryItem != null) {
+        int stackQuantity = inventoryItem.getQuantity();
+
+        if (stackQuantity - quantity < 0) {
+          item.setQuantity(item.getQuantity() - stackQuantity);
+          inventoryItem.setQuantity(0);
+          int stacks = (int) Math.floor(item.getQuantity() / 64);
+          for (int i = 0; i < stacks; i++) {
+            if (findItem(item) != null)
+              findItem(item).setQuantity(0);
+          }
+          removeItem(id, item.getQuantity());
+
+        } else {
+          inventoryItem.setQuantity(stackQuantity - quantity);
+        }
+        return;
+      }
+    }
+    for (int i = 0; i < quantity; i++) {
+      findItem(item).setQuantity(0);
+    }
+  }
+
   public void addItem(int id, int quantity) {
     if (getEmptySlot() == -1) {
       // drop item, discard for now lol
@@ -109,9 +156,14 @@ public class Inventory {
         int stackQuantity = inventoryItem.getQuantity();
 
         if (stackQuantity + quantity > 64) {
-          inventoryItem.setQuantity(stackQuantity + (64 - quantity));
-          item.setQuantity(item.getQuantity() - (64 - quantity));
-          inventory[getEmptySlot()] = item;
+          inventoryItem.setQuantity(stackQuantity + Math.min(quantity, 64 - stackQuantity));
+          item.setQuantity(item.getQuantity() - Math.min(quantity, 64 - stackQuantity));
+          int stacks = (int) Math.floor(item.getQuantity() / 64);
+          for (int i = 0; i < stacks; i++) {
+            inventory[getEmptySlot()] = new Item(id, 64);
+          }
+          inventory[getEmptySlot()] = new Item(id, item.getQuantity() % 64);
+
         } else {
           inventoryItem.setQuantity(stackQuantity + quantity);
         }
