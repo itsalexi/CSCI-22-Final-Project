@@ -256,7 +256,7 @@ public class Inventory {
         String quantityString = Integer.toString(inventory[i].getQuantity());
 
         g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("Arial", 1, 25));
+        g2d.setFont(new Font("Arial", 1, (int) (25 * tileSize / 32)));
 
         FontMetrics fm = g2d.getFontMetrics();
 
@@ -278,7 +278,12 @@ public class Inventory {
   }
 
   public void draw(Graphics2D g2d) {
-    double tileSize = inventoryGrid.getTileSize();
+    double tileSize = canvas.getWidth() * 32 / 800;
+    tiles.setSize(tileSize);
+    items.setSize(tileSize);
+    inventoryGrid.setTileSize(tileSize);
+    itemsGrid.setTileSize(tileSize);
+
     double gridWidth = inventoryMap[0].length * tileSize;
     double gridHeight = inventoryMap.length * tileSize;
 
@@ -288,12 +293,12 @@ public class Inventory {
     if (getActiveItem() != null) {
 
       g2d.setColor(Color.WHITE);
-      g2d.setFont(new Font("Arial", 1, 20));
+      g2d.setFont(new Font("Arial", 1, (int) (20 * tileSize / 32)));
       String text = getActiveItem().getName();
       int textWidth = g2d.getFontMetrics().stringWidth(text);
 
       float itemTextX = (float) (x + (gridWidth / 2) - (textWidth / 2));
-      float itemTextY = (float) (y + (gridHeight / 2) + 40);
+      float itemTextY = (float) (y + (gridHeight / 2) + 40 / 32 * tileSize);
 
       g2d.setColor(Color.BLACK);
       g2d.drawString(text, itemTextX + 1, itemTextY - 1);

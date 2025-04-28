@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+
 import javax.swing.*;
 
 public class GameCanvas extends JComponent {
@@ -146,17 +147,7 @@ public class GameCanvas extends JComponent {
         Item activeItem = inventory.getActiveItem();
         boolean itemUsed = false;
         for (String action : player.getPlayerActions().keySet()) {
-          if (activeItem == null) {
-            return;
-          }
-          if (activeItem.getActionName() == null) {
-            return;
-          }
-          if (activeItem.getActionName().equals("")) {
-            return;
-          }
           String[] actionString = activeItem.getActionName().split(" ");
-
           if (actionString[0].equals(action)) {
 
             player.useAction(actionString[0]);
@@ -166,7 +157,7 @@ public class GameCanvas extends JComponent {
                 + player.getDirection());
             if (actionString[0].equals("hoe")) {
               if (tileGrids.get("farm").getTileAt(y, x) != -1) {
-                writer.send("FARM HARVEST " + x + " " + y + " " + client.getPlayerID());
+                writer.send("FARM HARVEST " + x + " " + y);
               }
             }
 
@@ -183,7 +174,6 @@ public class GameCanvas extends JComponent {
               }
             }
             if (itemUsed) {
-              System.out.println("yes");
               activeItem.consume();
             }
             return;
@@ -196,10 +186,6 @@ public class GameCanvas extends JComponent {
 
   public Map<String, Animal> getAnimals() {
     return animals;
-  }
-
-  public Inventory getInventory() {
-    return inventory;
   }
 
   public void addKeyBindings() {
@@ -233,6 +219,12 @@ public class GameCanvas extends JComponent {
               previousItemSlot = -1;
             }
             inventory.setOpen(!inventory.isOpen());
+            break;
+          case KeyEvent.VK_Y:
+            player.setActiveTool("hoe");
+            break;
+          case KeyEvent.VK_R:
+            player.setActiveTool("water");
             break;
         }
 
@@ -350,7 +342,6 @@ public class GameCanvas extends JComponent {
     switch (action) {
       case "HOE" -> newPlayer.useAction("hoe");
       case "WATER" -> newPlayer.useAction("water");
-      case "PLANT" -> newPlayer.useAction("plant");
     }
     otherPlayers.put(id, newPlayer);
 
@@ -437,6 +428,7 @@ public class GameCanvas extends JComponent {
       public void mouseMoved(MouseEvent e) {
         double x = (e.getX() - (getWidth() / 2)) / zoom + anchorX;
         double y = (e.getY() - (getHeight() / 2)) / zoom + anchorY;
+        System.out.printf("%d, %d\n", e.getX(), e.getY());
 
         double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
@@ -552,6 +544,10 @@ public class GameCanvas extends JComponent {
 
   }
 
+  public Inventory getInventory() {
+    return inventory;
+  }
+
   public Player getPlayer() {
     return player;
   }
@@ -571,7 +567,8 @@ public class GameCanvas extends JComponent {
     if (lastClickedInventoryTile[0] == -1 || lastClickedInventoryTile[1] == -1)
       return;
 
-    int tileSize = 32;
+    int tileSize = getWidth() * 32 / 800;
+    invHighlight.setSize(tileSize);
     int tileX = lastClickedInventoryTile[0];
     int tileY = lastClickedInventoryTile[1];
 
@@ -691,20 +688,20 @@ public class GameCanvas extends JComponent {
 
     if (isMapLoaded) {
 
-      // if (!test) {
-      // findPathAsync(player.getSpriteDimensions(), new double[] { 0, 0 },
-      // player.getSpeed(), path -> {
-      // for (double[] pos : path) {
-      // Rectangle2D temp = new Rectangle2D.Double(
-      // pos[0] - 1,
-      // pos[1] - 1,
-      // 2,
-      // 2);
-      // currentPath.add(temp);
-      // }
-      // });
-      // test = true;
-      // }
+      if (!test) {
+        findPathAsync(player.getSpriteDimensions(), new double[] { 0, 0 },
+            player.getSpeed(), path -> {
+              for (double[] pos : path) {
+                Rectangle2D temp = new Rectangle2D.Double(
+                    pos[0] - 1,
+                    pos[1] - 1,
+                    2,
+                    2);
+                currentPath.add(temp);
+              }
+            });
+        test = true;
+      }
 
       anchorX = clamp(halfViewWidth,
           tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize()
@@ -714,6 +711,8 @@ public class GameCanvas extends JComponent {
           tileGrids.get("ground").getHeight() * tileGrids.get("ground").getTileSize()
               - halfViewHeight,
           player.getY() + player.getHeight() / 2);
+
+      System.out.printf("%f, %f\n", anchorX, anchorY);
 
       AffineTransform camera = new AffineTransform();
       camera.translate(getWidth() / 2, getHeight() / 2);
@@ -763,7 +762,27 @@ public class GameCanvas extends JComponent {
         drawInventoryHighlight(g2d);
 
         if (hoveredItem != null) {
+          String quantityString = Integer.toString(hoveredItem.getQuantity());
+
+          g2d.setColor(Color.BLACK);
+          g2d.setFont(new Font("Arial", 1, (int) (25 * getWidth() / 800)));
+          FontMetrics fm = g2d.getFontMetrics();
+          int stringWidth = fm.stringWidth(quantityString);
+
+          hoveredItemSprite.setSize(32 * getWidth() / 800);
           hoveredItemSprite.draw(g2d);
+
+          float quantityLabelX = (float) (hoveredItemSprite.getX() + 32 * getWidth() / 800 - stringWidth);
+          float quantityLabelY = (float) (hoveredItemSprite.getY() + 32 * getWidth() / 800);
+
+          g2d.setColor(Color.BLACK);
+          g2d.drawString(quantityString, quantityLabelX + 1, quantityLabelY - 1);
+          g2d.drawString(quantityString, quantityLabelX + 1, quantityLabelY + 1);
+          g2d.drawString(quantityString, quantityLabelX - 1, quantityLabelY - 1);
+          g2d.drawString(quantityString, quantityLabelX - 1, quantityLabelY + 1);
+          g2d.setColor(Color.WHITE);
+
+          g2d.drawString(quantityString, quantityLabelX, quantityLabelY);
         }
       }
 

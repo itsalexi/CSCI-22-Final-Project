@@ -103,4 +103,7 @@ public class TileGrid {
         return tileSize;
     }
 
+    public void setTileSize(double s) {
+        tileSize = s;
+    }
 }
