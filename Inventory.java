@@ -2,7 +2,6 @@ import java.awt.*;
 
 public class Inventory {
   private TileGrid inventoryGrid;
-  private TileGrid hotbarGrid;
   private TileGrid itemsGrid;
 
   private Sprite tiles;
@@ -129,6 +128,7 @@ public class Inventory {
   }
 
   public void addItem(int id, int quantity) {
+    System.out.println("trying to add item " + id + " " + quantity);
     if (getEmptySlot() == -1) {
       // drop item, discard for now lol
       return;
@@ -190,12 +190,12 @@ public class Inventory {
   }
 
   public int[] getTileAtMouse(double mouseX, double mouseY) {
-    int tileSize = 32;
-    int gridWidth = inventoryMap[0].length * tileSize;
-    int gridHeight = inventoryMap.length * tileSize;
+    double tileSize = inventoryGrid.getTileSize();
+    double gridWidth = inventoryMap[0].length * tileSize;
+    double gridHeight = inventoryMap.length * tileSize;
 
-    int xOffset = (canvas.getWidth() - gridWidth) / 2;
-    int yOffsetHotbar = canvas.getHeight() - gridHeight;
+    double xOffset = (canvas.getWidth() - gridWidth) / 2;
+    double yOffsetHotbar = canvas.getHeight() - gridHeight;
 
     double localX = mouseX - xOffset;
     double localY = mouseY - yOffsetHotbar;
@@ -207,7 +207,7 @@ public class Inventory {
     }
 
     if (isOpen) {
-      int yOffsetInventory = yOffsetHotbar + 30;
+      double yOffsetInventory = yOffsetHotbar + 30;
       localY = mouseY - yOffsetInventory;
       tileY = (int) (localY / tileSize);
 
@@ -232,7 +232,7 @@ public class Inventory {
   }
 
   public void drawQuantities(Graphics2D g2d) {
-    int tileSize = 32;
+    double tileSize = inventoryGrid.getTileSize();
 
     for (int i = 0; i < inventory.length; i++) {
       if (!isOpen && i > 8) {
@@ -261,8 +261,8 @@ public class Inventory {
         FontMetrics fm = g2d.getFontMetrics();
 
         int stringWidth = fm.stringWidth(quantityString);
-        int quantityLabelX = ((col + 1) * tileSize) - stringWidth;
-        int quantityLabelY = (row + 1) * tileSize;
+        float quantityLabelX = (float) ((col + 1) * tileSize) - stringWidth;
+        float quantityLabelY = (float) ((row + 1) * tileSize);
 
         g2d.setColor(Color.BLACK);
         g2d.drawString(quantityString, quantityLabelX + 1, quantityLabelY - 1);
@@ -278,12 +278,12 @@ public class Inventory {
   }
 
   public void draw(Graphics2D g2d) {
-    int tileSize = 32;
-    int gridWidth = inventoryMap[0].length * tileSize;
-    int gridHeight = inventoryMap.length * tileSize;
+    double tileSize = inventoryGrid.getTileSize();
+    double gridWidth = inventoryMap[0].length * tileSize;
+    double gridHeight = inventoryMap.length * tileSize;
 
-    int x = (canvas.getWidth() - gridWidth) / 2;
-    int y = canvas.getHeight() - gridHeight;
+    double x = (canvas.getWidth() - gridWidth) / 2;
+    double y = canvas.getHeight() - gridHeight;
 
     if (getActiveItem() != null) {
 
@@ -292,8 +292,8 @@ public class Inventory {
       String text = getActiveItem().getName();
       int textWidth = g2d.getFontMetrics().stringWidth(text);
 
-      int itemTextX = x + (gridWidth / 2) - (textWidth / 2);
-      int itemTextY = y + (gridHeight / 2) + 40;
+      float itemTextX = (float) (x + (gridWidth / 2) - (textWidth / 2));
+      float itemTextY = (float) (y + (gridHeight / 2) + 40);
 
       g2d.setColor(Color.BLACK);
       g2d.drawString(text, itemTextX + 1, itemTextY - 1);
