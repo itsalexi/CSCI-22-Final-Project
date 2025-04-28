@@ -78,7 +78,6 @@ public class Inventory {
       if (inventory[i] == null)
         continue;
       if (inventory[i].getId() == item.getId() && !(inventory[i].getQuantity() <= 0)) {
-        System.out.println(inventory[i]);
         return inventory[i];
       }
     }
@@ -116,29 +115,16 @@ public class Inventory {
 
     Item item = new Item(id, quantity);
 
-    if (item.isStackable()) {
-      Item inventoryItem = findUnfilledStack(item);
-      if (inventoryItem != null) {
-        int stackQuantity = inventoryItem.getQuantity();
-
-        if (stackQuantity - quantity < 0) {
-          item.setQuantity(item.getQuantity() - stackQuantity);
-          inventoryItem.setQuantity(0);
-          int stacks = (int) Math.floor(item.getQuantity() / 64);
-          for (int i = 0; i < stacks; i++) {
-            if (findItem(item) != null)
-              findItem(item).setQuantity(0);
-          }
-          removeItem(id, item.getQuantity());
-
-        } else {
-          inventoryItem.setQuantity(stackQuantity - quantity);
-        }
+    Item curr = findItem(item);
+    while (quantity > 0 && curr != null) {
+      if (curr.getQuantity() < quantity) {
+        quantity -= curr.getQuantity();
+        curr.setQuantity(0);
+      } else {
+        curr.setQuantity(curr.getQuantity() - quantity);
         return;
       }
-    }
-    for (int i = 0; i < quantity; i++) {
-      findItem(item).setQuantity(0);
+      curr = findItem(item);
     }
   }
 
