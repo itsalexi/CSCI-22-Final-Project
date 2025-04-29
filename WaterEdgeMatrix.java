@@ -39,7 +39,17 @@ public class WaterEdgeMatrix {
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(waterPositions);
+        Boolean[][] normalizedWaterPositions = new Boolean[3][3];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (waterPositions[i][j] == null) {
+                    normalizedWaterPositions[i][j] = true;
+                } else {
+                    normalizedWaterPositions[i][j] = waterPositions[i][j];
+                }
+            }
+        }
+        return Arrays.deepHashCode(normalizedWaterPositions);
     }
 
     public Boolean[][] getWaterPositions(){
