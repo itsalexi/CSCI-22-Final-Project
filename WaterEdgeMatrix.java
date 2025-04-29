@@ -26,6 +26,9 @@ public class WaterEdgeMatrix {
         WaterEdgeMatrix other = (WaterEdgeMatrix) another;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
+                if (waterPositions[i][j] == null || other.getWaterPositions()[i][j] == null) {
+                    continue;
+                }
                 if (waterPositions[i][j] != other.getWaterPositions()[i][j]) {
                     return false;
                 }
