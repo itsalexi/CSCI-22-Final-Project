@@ -55,4 +55,16 @@ public class WaterEdgeMatrix {
     public Boolean[][] getWaterPositions(){
         return waterPositions;
     }
+
+    @Override
+    public String toString() {
+        String out = "";
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                out += waterPositions[i][j] ? "true " : "false ";
+            }
+            out += "\n";
+        }
+        return out;
+    }
 }

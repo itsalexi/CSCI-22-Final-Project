@@ -19,16 +19,117 @@ public class WorldGenerator {
     foliageMap = new int[h][w];
     edgeMap = new int[h][w];
     validEdgeMatrices = new HashMap<>();
-    validEdgeMatrices.put(
-        new WaterEdgeMatrix(
-            new Boolean[][] {
-                new Boolean[] { false, true, false },
-                new Boolean[] { true, false, false },
-                new Boolean[] { false, false, false }
-            }),
-        101);
 
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { null, true, null },
+        { true, false, false },
+        { null, false, false }
+      }),
+    101);
+    
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { null, true, null },
+        { true, false, true },
+        { false, false, null }
+      }),
+    102);
+    
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { null, false, false },
+        { true, false, false },
+        { null, true, null }
+      }),
+    117);
+    
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { false, false, null },
+        { false, false, true },
+        { null, true, null }
+      }),
+    118);
+    
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { false, false, false },
+        { false, false, false },
+        { false, false, true }
+      }),
+    138);
+    
+    validEdgeMatrices.put(
+      new WaterEdgeMatrix(
+        new Boolean[][] {
+          { false, false, false },
+          { false, false, false },
+          { null, true, null }
+        }),
+    139);
+    
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { false, false, false },
+        { false, false, false },
+        { true, false, false }
+      }),
+    140);
+
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { false, false, null },
+        { false, false, true },
+        { false, false, null }
+      }),
+    147);
+
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { null, false, false },
+        { true, false, false },
+        { null, false, false }
+      }),
+    148);
+
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { false, false, true },
+        { false, false, false },
+        { false, false, false }
+      }),
+    162);
+
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { null, true, null },
+        { false, false, false },
+        { false, false, false }
+      }),
+    163);
+
+    validEdgeMatrices.put(
+    new WaterEdgeMatrix(
+      new Boolean[][] {
+        { true, false, false },
+        { false, false, false },
+        { false, false, false }
+      }),
+    164);
+    
     regenerateWorld();
+    // generateWaterEdges();
   }
 
   private void regenerateWorld() {
@@ -55,7 +156,6 @@ public class WorldGenerator {
 
             double f = foliageGen.noise(x / 0.5, y / 0.5);
             f = (f + 1) / 2;
-            System.out.printf("%.2f ", f);
             int grassFoliageType = (int) (Math.random() * 4);
             switch (grassFoliageType) {
               case 0 -> foliageMap[y][x] = 85;
@@ -86,45 +186,75 @@ public class WorldGenerator {
           }
         }
       }
-      System.out.printf("\n");
 
     }
 
   }
 
   private void generateWaterEdges() {
+    Boolean valid = false;
     ArrayList<int[]> possibleEdges = new ArrayList<>();
-    for (int i = 0; i < height; i++) {
-      for (int j = 0; j < width; j++) {
-        if (groundMap[i][j] == 153) {
-          int x = i;
-          int y = j;
+    ArrayList<WaterEdgeMatrix> edgeMatrices = new ArrayList<>();
+    while (!valid) {
+      System.out.println("ANOTHA ONE");
+      valid = true;
+      possibleEdges = new ArrayList<>();
+      edgeMatrices = new ArrayList<>();
+      for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+          if (groundMap[i][j] == 153) {
+            int x = i;
+            int y = j;
 
-          int[][] directions = new int[][] {
-              new int[] { 0, 1 },
-              new int[] { 1, 0 },
-              new int[] { 0, -1 },
-              new int[] { -1, 0 },
-              new int[] { -1, -1 },
-              new int[] { 1, 1 },
-              new int[] { -1, 1 },
-              new int[] { 1, -1 }
-          };
-
-          for (int[] dir : directions) {
-            int currX = x + dir[0];
-            int currY = y + dir[1];
-
-            try {
-              if (groundMap[currX][currY] != 153) {
-                possibleEdges.add(new int[] { currX, currY });
+            for (int dx = -1; dx < 2; dx++) {
+              for (int dy = -1; dy < 2; dy++) {
+                if (dx == 0 && dy == 0) {
+                  continue;
+                }
+                int currX = x + dx;
+                int currY = y + dy;
+                try {
+                  if (groundMap[currX][currY] != 153) {
+                    possibleEdges.add(new int[] { currX, currY });
+                  }
+                } catch (Exception e) {
+                  continue;
+                }
               }
-            } catch (Exception e) {
-              continue;
             }
           }
         }
       }
+      for (int[] edge : possibleEdges) {
+        Boolean [][] waterMatrix = new Boolean[3][3];
+        int x = edge[0];
+        int y = edge[1];
+        for(int i = -1; i < 2; i++) {
+          for (int j = -1; j < 2; j++) {
+            int currX = x + i;
+            int currY = y + j;
+            try {
+              waterMatrix[i + 1][j + 1] = groundMap[currX][currY] == 153;
+            } catch (Exception e) {
+              waterMatrix[i + 1][j + 1] = false;
+            }
+          }
+        }
+        WaterEdgeMatrix currMatrix = new WaterEdgeMatrix(waterMatrix);
+        if (!validEdgeMatrices.containsKey(currMatrix)) {
+          valid = false;
+          groundMap[x][y] = 153;
+          foliageMap[x][y] = -1;
+        } else {
+          edgeMatrices.add(currMatrix);
+        }
+      }
+    }
+    for (int i = 0; i < possibleEdges.size(); i++) {
+      int x = possibleEdges.get(i)[0];
+      int y = possibleEdges.get(i)[1];
+      groundMap[x][y] = validEdgeMatrices.get(edgeMatrices.get(i));
+      foliageMap[x][y] = -1;
     }
   }
 
