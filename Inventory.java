@@ -10,15 +10,17 @@ public class Inventory {
   private int activeHotbarSlot;
   private GameCanvas canvas;
 
+  private CraftingSystem craftingSystem;
+
   private int[][] inventoryMap = {
-      { 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10 },
-      { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-      { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-      { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-      { 4, 7, 7, 7, 7, 7, 7, 7, 7, 7, 6 },
-      { 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10 },
-      { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-      { 4, 7, 7, 7, 7, 7, 7, 7, 7, 7, 6 }
+      { 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6 },
+      { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7 },
+      { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7 },
+      { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7 },
+      { 4, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8 },
+      { 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6 },
+      { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7 },
+      { 4, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8 }
   };
 
   private int[][] itemsMap = { { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
@@ -31,6 +33,7 @@ public class Inventory {
   private Item[] inventory;
 
   public Inventory(GameCanvas c) {
+
     SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap/inventory");
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
     items = new Sprite(itemFiles.getFiles(), 32);
@@ -62,8 +65,7 @@ public class Inventory {
     inventory[6] = new Item(11, 1);
     inventory[7] = new Item(13, 1);
     inventory[8] = new Item(2, 63);
-    addItem(2, 200);
-    removeItem(2, 100);
+
     System.out.println(getQuantity(2));
     tiles = new Sprite(tileMapFiles.getFiles(), 32);
     isOpen = false;
