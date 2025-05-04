@@ -26,12 +26,12 @@ public class FarmingSystem {
     plants.put("strawberry", 24);
     plants.put("wheat", 30);
 
-    drops.put("blueberry", 10);
-    drops.put("carrot", 8);
-    drops.put("onion", 4);
-    drops.put("potato", 6);
-    drops.put("strawberry", 2);
-    drops.put("wheat", 12);
+    drops.put("blueberry", 12);
+    drops.put("carrot", 6);
+    drops.put("onion", 8);
+    drops.put("potato", 4);
+    drops.put("strawberry", 10);
+    drops.put("wheat", 2);
   }
 
   public int getPlantFromIndex(int val) {

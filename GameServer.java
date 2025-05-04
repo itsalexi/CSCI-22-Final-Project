@@ -390,6 +390,7 @@ public class GameServer {
     }
 
     private void handleMessage(String msg) {
+      System.out.println(msg);
       String[] parts = msg.split(" ");
       String type = parts[0];
 
@@ -538,7 +539,7 @@ public class GameServer {
 
             if ((val < 6 && val == 5) || (val >= 6 && val % 6 == 5)) {
               System.out.println("its mature");
-              broadcastSelf("INVENTORY ADD " + id + " " + farmSystem.getPlantFromIndex(val) + " 4", playerId);
+              broadcastSelf("INVENTORY ADD " + id + " " + farmSystem.getPlantFromIndex(val) + " 2", playerId);
             }
             broadcastAll(farmSystem.harvest(x, y));
           }

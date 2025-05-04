@@ -3,12 +3,11 @@ import java.util.Arrays;
 public class WaterEdgeMatrix {
 
     private Boolean[][] waterPositions;
-    
+
     public WaterEdgeMatrix(Boolean[][] wp) {
         waterPositions = wp;
     }
 
-    
     @Override
     public boolean equals(Object another) {
         if (another == this) {
@@ -52,7 +51,7 @@ public class WaterEdgeMatrix {
         return Arrays.deepHashCode(normalizedWaterPositions);
     }
 
-    public Boolean[][] getWaterPositions(){
+    public Boolean[][] getWaterPositions() {
         return waterPositions;
     }
 

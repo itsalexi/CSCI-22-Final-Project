@@ -30,20 +30,27 @@ public class GameCanvas extends JComponent {
   private int[] lastClickedTile;
   private int[] lastClickedInventoryTile;
   private int[] lastClickedCraftingTile;
+  private int[] lastClickedShopTile;
 
   private boolean isMapLoaded;
   private double anchorX, anchorY;
   private Inventory inventory;
-  private CraftingGrid craftingGrid;
   private double zoom;
   private Sprite hoveredItemSprite;
   private Item hoveredItem;
   private int previousItemSlot;
   private Boolean test;
   private ArrayList<Rectangle2D> currentPath;
+
+  private CraftingGrid craftingGrid;
+  private CraftingGrid shopGrid;
+
   private CraftingSystem craftingSystem;
+  private EconomySystem economySystem;
+  private ShopSystem shopSystem;
 
   private ArrayList<Recipe> recipes;
+  private ArrayList<Recipe> trades;
 
   public GameCanvas() {
     isMapLoaded = false;
@@ -51,10 +58,11 @@ public class GameCanvas extends JComponent {
     tileGrids = new HashMap<>();
     animals = new HashMap<>();
     inventory = new Inventory(this);
-    craftingGrid = new CraftingGrid(this);
+
     collidableGrids = new ArrayList<>();
 
     recipes = new ArrayList<>();
+    trades = new ArrayList<>();
 
     recipes.add(new Recipe(new Item(2, 1), new Item(3, 2)));
     recipes.add(new Recipe(new Item(4, 1), new Item(5, 2)));
@@ -63,8 +71,24 @@ public class GameCanvas extends JComponent {
     recipes.add(new Recipe(new Item(10, 1), new Item(11, 2)));
     recipes.add(new Recipe(new Item(12, 1), new Item(13, 2)));
 
+    trades.add(new Recipe(new Item(2, 1), new Item(14, 4)));
+    trades.add(new Recipe(new Item(4, 1), new Item(14, 8)));
+    trades.add(new Recipe(new Item(6, 1), new Item(14, 10)));
+    trades.add(new Recipe(new Item(8, 1), new Item(14, 15)));
+    trades.add(new Recipe(new Item(10, 1), new Item(14, 25)));
+    trades.add(new Recipe(new Item(12, 1), new Item(14, 35)));
+
+    trades.add(new Recipe(new Item(14, 50), new Item(5, 1)));
+    trades.add(new Recipe(new Item(14, 100), new Item(7, 1)));
+    trades.add(new Recipe(new Item(14, 200), new Item(9, 1)));
+    trades.add(new Recipe(new Item(14, 400), new Item(11, 1)));
+    trades.add(new Recipe(new Item(14, 800), new Item(13, 1)));
+    economySystem = new EconomySystem(1000);
+
+    craftingGrid = new CraftingGrid(recipes, this, false);
+    shopGrid = new CraftingGrid(trades, this, true);
     craftingSystem = new CraftingSystem(recipes, inventory);
-    craftingSystem.craft(0);
+    shopSystem = new ShopSystem(trades, inventory, economySystem);
 
     zoom = 2;
     previousItemSlot = -1;
@@ -77,6 +101,7 @@ public class GameCanvas extends JComponent {
     lastClickedTile = new int[2];
     lastClickedInventoryTile = new int[] { 6, 1 };
     lastClickedCraftingTile = new int[2];
+    lastClickedShopTile = new int[2];
 
     highlight = new Sprite(selectorFiles.getFiles(), 32);
     invHighlight = new Sprite(selectorFiles.getFiles(), 32);
@@ -164,6 +189,8 @@ public class GameCanvas extends JComponent {
         Item activeItem = inventory.getActiveItem();
         boolean itemUsed = false;
         for (String action : player.getPlayerActions().keySet()) {
+          if (activeItem.getActionName() == null)
+            return;
           String[] actionString = activeItem.getActionName().split(" ");
           if (actionString[0].equals(action)) {
 
@@ -174,7 +201,7 @@ public class GameCanvas extends JComponent {
                 + player.getDirection());
             if (actionString[0].equals("hoe")) {
               if (tileGrids.get("farm").getTileAt(y, x) != -1) {
-                writer.send("FARM HARVEST " + x + " " + y);
+                writer.send("FARM HARVEST " + x + " " + y + " " + client.getPlayerID());
               }
             }
 
@@ -431,9 +458,6 @@ public class GameCanvas extends JComponent {
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
 
-        System.out.println(tileGrids.get("foliage").getTileAt(lastClickedTile[1],
-            lastClickedTile[0]));
-
         if (!inventory.isOpen()) {
           doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
         }
@@ -461,9 +485,13 @@ public class GameCanvas extends JComponent {
         double x = e.getX();
         double y = e.getY();
         int[] craftingTile = craftingGrid.getTileAtMouse(x, y);
+        int[] shopTile = shopGrid.getTileAtMouse(x, y);
 
         lastClickedCraftingTile[0] = craftingTile[0];
         lastClickedCraftingTile[1] = craftingTile[1];
+
+        lastClickedShopTile[0] = shopTile[0];
+        lastClickedShopTile[1] = shopTile[1];
 
         int[] coords = inventory.getTileAtMouse(x, y);
         if (coords != null) {
@@ -509,6 +537,7 @@ public class GameCanvas extends JComponent {
         if (inventory.isOpen()) {
 
           handleCraftingGrid(lastClickedCraftingTile[0], lastClickedCraftingTile[1]);
+          handleShopGrid(lastClickedShopTile[0], lastClickedShopTile[1]);
 
           int tileX = lastClickedInventoryTile[0];
           int tileY = lastClickedInventoryTile[1];
@@ -587,6 +616,28 @@ public class GameCanvas extends JComponent {
         int recipeIndex = craftingGrid.getCurrentPage() * 4 + recipeRow;
         if (recipeIndex >= 0 && recipeIndex < recipes.size()) {
           craftingSystem.craft(recipeIndex);
+        }
+      }
+    }
+  }
+
+  public void handleShopGrid(int tileX, int tileY) {
+    if (tileY == 7) {
+      if (tileX == 1) {
+        shopGrid.backwardPage();
+        return;
+      } else if (tileX == 3) {
+        shopGrid.forwardPage();
+        return;
+      }
+    }
+
+    if (tileY >= 2 && tileY <= 5) {
+      if (tileX == 3) {
+        int tradeRow = tileY - 2;
+        int tradeIndex = shopGrid.getCurrentPage() * 4 + tradeRow;
+        if (tradeIndex >= 0 && tradeIndex < trades.size()) {
+          shopSystem.trade(tradeIndex);
         }
       }
     }
@@ -808,6 +859,7 @@ public class GameCanvas extends JComponent {
       g2d.setTransform(new AffineTransform());
       inventory.draw(g2d);
       craftingGrid.draw(g2d);
+      shopGrid.draw(g2d);
       // draw inventory highlight
       if (inventory.isOpen()) {
         drawInventoryHighlight(g2d);

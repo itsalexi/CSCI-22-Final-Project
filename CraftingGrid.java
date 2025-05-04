@@ -9,11 +9,16 @@ public class CraftingGrid {
   private TileGrid craftingGrid;
   private TileGrid craftingGridTop;
   private TileGrid craftingItemsGrid;
+
+  private ArrayList<Recipe> recipes;
   private GameCanvas canvas;
   private int currentPage = 0;
 
   private Sprite tilesSprites;
   private Sprite itemsSprites;
+
+  private boolean isShop;
+
   private int[][] craftingGridMap = {
       { 2, 5, 5, 5, 6 },
       { 3, 10, 10, 10, 7 },
@@ -50,7 +55,7 @@ public class CraftingGrid {
       { -1, -1, -1, -1, -1 }
   };
 
-  public CraftingGrid(GameCanvas c) {
+  public CraftingGrid(ArrayList<Recipe> r, GameCanvas c, boolean s) {
     SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap/inventory");
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
     tilesSprites = new Sprite(tileMapFiles.getFiles(), 32);
@@ -60,14 +65,14 @@ public class CraftingGrid {
     craftingGridTop = new TileGrid(tilesSprites, craftingGridTopMap);
     craftingItemsGrid = new TileGrid(itemsSprites, craftingItemsMap);
     canvas = c;
+    isShop = s;
+    recipes = r;
 
   }
 
   private void updateCraftingItemsGrid() {
-    ArrayList<Recipe> recipes = canvas.getRecipes();
     int start = currentPage * 4;
     int end = Math.min(start + 4, recipes.size());
-
     for (int r = 0; r < 4; r++) {
       int baseRow = 2 + r;
       craftingItemsMap[baseRow][1] = -1;
@@ -99,7 +104,6 @@ public class CraftingGrid {
 
   public void drawCraftingQuantities(Graphics2D g2d) {
     double tileSize = craftingItemsGrid.getTileSize();
-    ArrayList<Recipe> recipes = canvas.getRecipes();
 
     int start = currentPage * 4;
     int end = Math.min(start + 4, recipes.size());
@@ -151,7 +155,7 @@ public class CraftingGrid {
     double gridWidth = craftingGridMap[0].length * tileSize;
     double gridHeight = craftingGridMap.length * tileSize;
 
-    double xOffset = (canvas.getWidth() - gridWidth);
+    double xOffset = isShop ? 0 : (canvas.getWidth() - gridWidth);
     double yOffset = canvas.getHeight() - gridHeight;
     double localX = mouseX - xOffset;
     double localY = mouseY - yOffset;
@@ -162,14 +166,13 @@ public class CraftingGrid {
   }
 
   public void forwardPage() {
-    int totalPages = (int) Math.ceil(canvas.getRecipes().size() / 4.0);
+    int totalPages = (int) Math.ceil(recipes.size() / 4.0);
     if (currentPage + 1 >= totalPages)
       return;
     currentPage++;
   }
 
   public void backwardPage() {
-
     if (currentPage <= 0)
       return;
     currentPage--;
@@ -187,7 +190,7 @@ public class CraftingGrid {
     craftingGridTop.setTileSize(tileSize);
     craftingItemsGrid.setTileSize(tileSize);
 
-    double x = (canvas.getWidth() - gridWidth);
+    double x = isShop ? 0 : (canvas.getWidth() - gridWidth);
     double y = canvas.getHeight() - gridHeight;
 
     if (canvas.getInventory().isOpen()) {

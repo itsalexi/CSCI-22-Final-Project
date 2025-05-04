@@ -9,4 +9,7 @@ public class EconomySystem {
     return balance;
   }
 
+  public void setBalance(int b) {
+    balance = b;
+  }
 }

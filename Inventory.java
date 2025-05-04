@@ -10,8 +10,6 @@ public class Inventory {
   private int activeHotbarSlot;
   private GameCanvas canvas;
 
-  private CraftingSystem craftingSystem;
-
   private int[][] inventoryMap = {
       { 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6 },
       { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7 },
@@ -41,20 +39,22 @@ public class Inventory {
     activeHotbarSlot = 0;
 
     inventory = new Item[36];
+
     Item.registerItem(0, new ItemDetails("Watering Can", false, "water"));
     Item.registerItem(1, new ItemDetails("Hoe", false, "hoe"));
-    Item.registerItem(2, new ItemDetails("Strawberry", true, null));
-    Item.registerItem(3, new ItemDetails("Strawberry Seeds", true, "plant strawberry"));
-    Item.registerItem(4, new ItemDetails("Onion", true, null));
-    Item.registerItem(5, new ItemDetails("Onion Seeds", true, "plant onion"));
-    Item.registerItem(6, new ItemDetails("Potato", true, null));
-    Item.registerItem(7, new ItemDetails("Potato Seeds", true, "plant potato"));
-    Item.registerItem(8, new ItemDetails("Carrot", true, null));
-    Item.registerItem(9, new ItemDetails("Carrot Seeds", true, "plant carrot"));
-    Item.registerItem(10, new ItemDetails("Blueberry", true, null));
-    Item.registerItem(11, new ItemDetails("Blueberry Seeds", true, "plant blueberry"));
-    Item.registerItem(12, new ItemDetails("Wheat", true, null));
-    Item.registerItem(13, new ItemDetails("Wheat Seeds", true, "plant wheat"));
+    Item.registerItem(2, new ItemDetails("Wheat", true, null));
+    Item.registerItem(3, new ItemDetails("Wheat Seeds", true, "plant wheat"));
+    Item.registerItem(4, new ItemDetails("Potato", true, null));
+    Item.registerItem(5, new ItemDetails("Potato Seeds", true, "plant potato"));
+    Item.registerItem(6, new ItemDetails("Carrot", true, null));
+    Item.registerItem(7, new ItemDetails("Carrot Seeds", true, "plant carrot"));
+    Item.registerItem(8, new ItemDetails("Onion", true, null));
+    Item.registerItem(9, new ItemDetails("Onion Seeds", true, "plant onion"));
+    Item.registerItem(10, new ItemDetails("Strawberry", true, null));
+    Item.registerItem(11, new ItemDetails("Strawberry Seeds", true, "plant strawberry"));
+    Item.registerItem(12, new ItemDetails("Blueberry", true, null));
+    Item.registerItem(13, new ItemDetails("Blueberry Seeds", true, "plant blueberry"));
+    Item.registerItem(14, new ItemDetails("Coins", true, ""));
 
     inventory[0] = new Item(1, 1);
     inventory[1] = new Item(0, 1);
@@ -64,9 +64,7 @@ public class Inventory {
     inventory[5] = new Item(9, 1);
     inventory[6] = new Item(11, 1);
     inventory[7] = new Item(13, 1);
-    inventory[8] = new Item(2, 63);
 
-    System.out.println(getQuantity(2));
     tiles = new Sprite(tileMapFiles.getFiles(), 32);
     isOpen = false;
     inventoryGrid = new TileGrid(tiles, inventoryMap);
