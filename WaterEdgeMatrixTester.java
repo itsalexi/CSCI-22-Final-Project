@@ -13,7 +13,7 @@ public class WaterEdgeMatrixTester {
 
         WaterEdgeMatrix test = new WaterEdgeMatrix(
             new Boolean[][] {
-                {true, false, false},
+                {false, false, false},
                 {true, false, false},
                 {true, false, false}
             }

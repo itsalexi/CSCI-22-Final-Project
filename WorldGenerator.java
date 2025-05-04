@@ -9,7 +9,8 @@ public class WorldGenerator {
   private int[][] groundMap;
   private int[][] foliageMap;
   private int[][] edgeMap;
-  private Map<WaterEdgeMatrix, Integer> validEdgeMatrices;
+  private ArrayList<WaterEdgeMatrix> validEdgeMatrices;
+  private ArrayList<Integer> edgeIDs;
 
   public WorldGenerator(int s, int w, int h) {
     seed = s;
@@ -18,117 +19,119 @@ public class WorldGenerator {
     groundMap = new int[h][w];
     foliageMap = new int[h][w];
     edgeMap = new int[h][w];
-    validEdgeMatrices = new HashMap<>();
+    validEdgeMatrices = new ArrayList<>();
+    edgeIDs = new ArrayList<>();
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { null, true, null },
                 { true, false, false },
                 { null, false, false }
-            }),
-        101);
+            }));
+    edgeIDs.add(101);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { null, true, null },
-                { true, false, true },
+                { false, false, true },
                 { false, false, null }
-            }),
-        102);
+            }));
+    edgeIDs.add(102);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { null, false, false },
                 { true, false, false },
                 { null, true, null }
-            }),
-        117);
+            }));
+    edgeIDs.add(117);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { false, false, null },
                 { false, false, true },
                 { null, true, null }
-            }),
-        118);
+            }));
+    edgeIDs.add(118);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { false, false, false },
                 { false, false, false },
                 { false, false, true }
-            }),
-        138);
+            }));
+    edgeIDs.add(138);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { false, false, false },
                 { false, false, false },
                 { null, true, null }
-            }),
-        139);
+            }));
+    edgeIDs.add(139);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { false, false, false },
                 { false, false, false },
                 { true, false, false }
-            }),
-        140);
+            }));
+    edgeIDs.add(140);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { false, false, null },
                 { false, false, true },
                 { false, false, null }
-            }),
-        147);
+            }));
+    edgeIDs.add(147);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { null, false, false },
                 { true, false, false },
                 { null, false, false }
-            }),
-        148);
+            }));
+    edgeIDs.add(148);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { false, false, true },
                 { false, false, false },
                 { false, false, false }
-            }),
-        162);
+            }));
+    edgeIDs.add(162);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { null, true, null },
                 { false, false, false },
                 { false, false, false }
-            }),
-        163);
+            }));
+    edgeIDs.add(163);
 
-    validEdgeMatrices.put(
+    validEdgeMatrices.add(
         new WaterEdgeMatrix(
             new Boolean[][] {
                 { true, false, false },
                 { false, false, false },
                 { false, false, false }
-            }),
-        164);
+            }));
+    edgeIDs.add(164);
 
     regenerateWorld();
+    test();
   }
 
   private void regenerateWorld() {
@@ -190,82 +193,142 @@ public class WorldGenerator {
 
   }
 
-  private void generateWaterEdges() {
-    Boolean valid = false;
+  private void test(){
     ArrayList<int[]> possibleEdges = new ArrayList<>();
-    ArrayList<WaterEdgeMatrix> edgeMatrices = new ArrayList<>();
-    while (!valid) {
-      valid = true;
-      possibleEdges = new ArrayList<>();
-      edgeMatrices = new ArrayList<>();
-      for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-          // Check for existing water tiles
-          if (groundMap[i][j] == 153) {
-            int x = i;
-            int y = j;
+    for (int i = 0; i < height; i++) {
+      for (int j = 0; j < width; j++) {
+        // Check for existing water tiles
+        if (groundMap[i][j] == 153) {
+          int x = i;
+          int y = j;
 
-            for (int dx = -1; dx < 2; dx++) {
-              for (int dy = -1; dy < 2; dy++) {
-                if (dx == 0 && dy == 0) {
-                  continue;
-                }
-                int currX = x + dx;
-                int currY = y + dy;
+          for (int dx = -1; dx < 2; dx++) {
+            for (int dy = -1; dy < 2; dy++) {
+              if (dx == 0 && dy == 0) {
+                continue;
+              }
+              int currX = x + dx;
+              int currY = y + dy;
 
-                // Ensure we are not modifying an already water cell
-                try {
-                  if (groundMap[currX][currY] != 153) {
-                    possibleEdges.add(new int[] { currX, currY });
-                  }
-                } catch (Exception e) {
-                  continue; // Ignore out-of-bound errors
+              // Ensure we are not modifying an already water cell
+              try {
+                if (groundMap[currX][currY] != 153) {
+                  possibleEdges.add(new int[] { currX, currY });
                 }
+              } catch (Exception e) {
+                continue; // Ignore out-of-bound errors
               }
             }
           }
         }
       }
+    }
+    for (int[] edge : possibleEdges) {
+      Boolean[][] waterMatrix = new Boolean[3][3];
+      int x = edge[0];
+      int y = edge[1];
 
-      // Handle possible edges and check if they form valid water edge matrices
-      for (int[] edge : possibleEdges) {
-        Boolean[][] waterMatrix = new Boolean[3][3];
-        int x = edge[0];
-        int y = edge[1];
-
-        // Form water matrix around the edge
-        for (int i = -1; i < 2; i++) {
-          for (int j = -1; j < 2; j++) {
-            int currX = x + i;
-            int currY = y + j;
-            try {
-              waterMatrix[i + 1][j + 1] = groundMap[currX][currY] == 153;
-            } catch (Exception e) {
-              waterMatrix[i + 1][j + 1] = false;
-            }
+      // Form water matrix around the edge
+      for (int i = -1; i < 2; i++) {
+        for (int j = -1; j < 2; j++) {
+          int currX = x + i;
+          int currY = y + j;
+          try {
+            waterMatrix[i + 1][j + 1] = groundMap[currX][currY] == 153;
+          } catch (Exception e) {
+            waterMatrix[i + 1][j + 1] = false;
           }
         }
+      }
 
-        // Check if the water matrix is valid
-        WaterEdgeMatrix currMatrix = new WaterEdgeMatrix(waterMatrix);
-        if (!validEdgeMatrices.containsKey(currMatrix)) {
-          valid = false; // Invalid edge, reset
-          groundMap[x][y] = 153;
-          foliageMap[x][y] = -1; // Ensure foliage is cleared
-        } else {
-          edgeMatrices.add(currMatrix); // Add valid edge matrix
+      // Check if the water matrix is valid
+      WaterEdgeMatrix currMatrix = new WaterEdgeMatrix(waterMatrix);
+      for (int i = 0; i < validEdgeMatrices.size(); i++) {
+        if (currMatrix.equals(validEdgeMatrices.get(i))) {
+          groundMap[x][y] = edgeIDs.get(i);
+          edgeMap[x][y] = edgeIDs.get(i);
+          foliageMap[x][y] = -1;
         }
       }
     }
-
-    // Update the groundMap and foliageMap with valid edges
-    for (int i = 0; i < possibleEdges.size(); i++) {
-      int x = possibleEdges.get(i)[0];
-      int y = possibleEdges.get(i)[1];
-      groundMap[x][y] = validEdgeMatrices.get(edgeMatrices.get(i));
-      foliageMap[x][y] = -1;
-    }
   }
+
+  // private void generateWaterEdges() {
+  //   Boolean valid = false;
+  //   ArrayList<int[]> possibleEdges = new ArrayList<>();
+  //   ArrayList<WaterEdgeMatrix> edgeMatrices = new ArrayList<>();
+  //   while (!valid) {
+  //     valid = true;
+  //     possibleEdges = new ArrayList<>();
+  //     edgeMatrices = new ArrayList<>();
+  //     for (int i = 0; i < height; i++) {
+  //       for (int j = 0; j < width; j++) {
+  //         // Check for existing water tiles
+  //         if (groundMap[i][j] == 153) {
+  //           int x = i;
+  //           int y = j;
+
+  //           for (int dx = -1; dx < 2; dx++) {
+  //             for (int dy = -1; dy < 2; dy++) {
+  //               if (dx == 0 && dy == 0) {
+  //                 continue;
+  //               }
+  //               int currX = x + dx;
+  //               int currY = y + dy;
+
+  //               // Ensure we are not modifying an already water cell
+  //               try {
+  //                 if (groundMap[currX][currY] != 153) {
+  //                   possibleEdges.add(new int[] { currX, currY });
+  //                 }
+  //               } catch (Exception e) {
+  //                 continue; // Ignore out-of-bound errors
+  //               }
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+
+  //     // Handle possible edges and check if they form valid water edge matrices
+  //     for (int[] edge : possibleEdges) {
+  //       Boolean[][] waterMatrix = new Boolean[3][3];
+  //       int x = edge[0];
+  //       int y = edge[1];
+
+  //       // Form water matrix around the edge
+  //       for (int i = -1; i < 2; i++) {
+  //         for (int j = -1; j < 2; j++) {
+  //           int currX = x + i;
+  //           int currY = y + j;
+  //           try {
+  //             waterMatrix[i + 1][j + 1] = groundMap[currX][currY] == 153;
+  //           } catch (Exception e) {
+  //             waterMatrix[i + 1][j + 1] = false;
+  //           }
+  //         }
+  //       }
+
+  //       // Check if the water matrix is valid
+  //       WaterEdgeMatrix currMatrix = new WaterEdgeMatrix(waterMatrix);
+  //       if (!validEdgeMatrices.containsKey(currMatrix)) {
+  //         valid = false; // Invalid edge, reset
+  //         groundMap[x][y] = 153;
+  //         foliageMap[x][y] = -1; // Ensure foliage is cleared
+  //       } else {
+  //         edgeMatrices.add(currMatrix); // Add valid edge matrix
+  //       }
+  //     }
+  //   }
+
+  //   // Update the groundMap and foliageMap with valid edges
+  //   for (int i = 0; i < possibleEdges.size(); i++) {
+  //     int x = possibleEdges.get(i)[0];
+  //     int y = possibleEdges.get(i)[1];
+  //     groundMap[x][y] = validEdgeMatrices.get(edgeMatrices.get(i));
+  //     foliageMap[x][y] = -1;
+  //   }
+  // }
 
   public int[][] getGroundMap() {
     return groundMap;
