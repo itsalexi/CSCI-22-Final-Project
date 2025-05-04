@@ -42,6 +42,8 @@ public class GameCanvas extends JComponent {
   private Boolean test;
   private ArrayList<Rectangle2D> currentPath;
 
+  private GoldCounter goldCounter;
+
   private CraftingGrid craftingGrid;
   private CraftingGrid shopGrid;
 
@@ -89,6 +91,8 @@ public class GameCanvas extends JComponent {
     shopGrid = new CraftingGrid(trades, this, true);
     craftingSystem = new CraftingSystem(recipes, inventory);
     shopSystem = new ShopSystem(trades, inventory, economySystem);
+
+    goldCounter = new GoldCounter(this);
 
     zoom = 2;
     previousItemSlot = -1;
@@ -782,6 +786,10 @@ public class GameCanvas extends JComponent {
     }).start();
   }
 
+  public EconomySystem getEconomySystem() {
+    return economySystem;
+  }
+
   @Override
   public void paintComponent(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
@@ -860,6 +868,7 @@ public class GameCanvas extends JComponent {
       inventory.draw(g2d);
       craftingGrid.draw(g2d);
       shopGrid.draw(g2d);
+      goldCounter.draw(g2d);
       // draw inventory highlight
       if (inventory.isOpen()) {
         drawInventoryHighlight(g2d);
