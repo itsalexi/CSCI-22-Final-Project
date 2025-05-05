@@ -34,5 +34,7 @@ public class GoldCounter {
     g2d.setColor(Color.WHITE);
 
     g2d.drawString(goldString, goldLabelX, goldLabelY);
+
+    g2d.translate(-x, 0);
   }
 }
