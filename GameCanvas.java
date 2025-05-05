@@ -25,6 +25,8 @@ public class GameCanvas extends JComponent {
   private Map<String, Player> otherPlayers;
   private Map<String, Animal> animals;
   private Map<String, TileGrid> tileGrids;
+  private Map<Integer, DroppedItem> droppedItems;
+
   private GameStarter client;
   private WriteToServer writer;
   private int[] lastClickedTile;
@@ -59,6 +61,7 @@ public class GameCanvas extends JComponent {
     otherPlayers = new HashMap<>();
     tileGrids = new HashMap<>();
     animals = new HashMap<>();
+    droppedItems = new HashMap<>();
     inventory = new Inventory(this);
 
     collidableGrids = new ArrayList<>();
@@ -188,6 +191,31 @@ public class GameCanvas extends JComponent {
     return false;
   }
 
+  private void dropItem(int q) {
+    Item item = inventory.getActiveItem();
+    if (item == null)
+      return;
+    if (item.getQuantity() - q >= 0) {
+      item.setQuantity(item.getQuantity() - q);
+    }
+    // TODO: check area around player if there is a stack with the same id, then add
+    // to that stack nalang :D
+
+    // FIX: THIS DOESNT WORK
+    for (DroppedItem droppedItem : droppedItems.values()) {
+      if (Math.sqrt(Math.pow((player.getX() - droppedItem.getX()), 2)
+          + Math.pow(player.getY() - droppedItem.getY(), 2)) < 3 * 32) {
+        if (droppedItem.getDroppedItemId() == item.getId()) {
+          writer.send(String.format("ITEMDROP EDIT %f %f %d %d %d", player.getX(), player.getY(), item.getId(),
+              droppedItem.getQuantity() + q, droppedItem.getDroppedItemId()));
+          return;
+        }
+      }
+    }
+    writer.send(String.format("ITEMDROP CREATE %f %f %d %d", player.getX(), player.getY(), item.getId(), q));
+
+  }
+
   private void doPlayerAction(int x, int y) {
     if (!player.isDoingAction()) {
       if (inventory.getActiveItem() != null) {
@@ -274,6 +302,9 @@ public class GameCanvas extends JComponent {
             break;
           case KeyEvent.VK_R:
             player.setActiveTool("water");
+            break;
+          case KeyEvent.VK_Q:
+            dropItem(1);
             break;
         }
 
@@ -423,6 +454,19 @@ public class GameCanvas extends JComponent {
     otherPlayers.put(id, newPlayer);
   }
 
+  public void addDroppedItem(double x, double y, int itemId, int quantity, int droppedItemId) {
+    DroppedItem droppedItem = new DroppedItem(x, y, itemId, quantity, droppedItemId);
+    droppedItems.put(droppedItemId, droppedItem);
+  }
+
+  public void updateDroppedItem(double x, double y, int itemId, int quantity, int droppedItemId) {
+    DroppedItem droppedItem = droppedItems.get(droppedItemId);
+    droppedItem.setPosition(x, y);
+    droppedItem.setQuantity(quantity);
+
+    droppedItems.put(droppedItemId, droppedItem);
+  }
+
   public void addAnimal(String id, String animalName, int type, double x, double y, int size, String dir,
       String state) {
     Animal newAnimal = new Animal(x, y, animalName, type, size);
@@ -459,7 +503,7 @@ public class GameCanvas extends JComponent {
         double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
         int tileY = (int) Math.floor(y / tileSize);
-
+        System.out.printf("%d\n", tileGrids.get("edge").getTileAt(tileY, tileX));
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
 
@@ -853,16 +897,21 @@ public class GameCanvas extends JComponent {
       for (Animal an : animals.values()) {
         an.draw(g2d);
       }
+      for (DroppedItem item : droppedItems.values()) {
+        item.draw(g2d);
+      }
 
       // draw hitboxes
-      // for (int i = 0; i < tileGrids.get("edge").getHeight(); i++) {
-      // for (int j = 0; j < tileGrids.get("edge").getWidth(); j++) {
-      // Rectangle2D hitbox = tileGrids.get("edge").getTileHitBoxAt(i, j);
-      // if (hitbox != null) {
-      // g2d.draw(hitbox);
-      // }
-      // }
-      // }
+      for (int i = 0; i < tileGrids.get("edge").getHeight(); i++) {
+        for (int j = 0; j < tileGrids.get("edge").getWidth(); j++) {
+          for (TileGrid collidable : collidableGrids) {
+            Rectangle2D hitbox = collidable.getTileHitBoxAt(i, j);
+            if (hitbox != null) {
+              g2d.draw(hitbox);
+            }
+          }
+        }
+      }
 
       // g2d.draw(player.getHitboxAt(player.getX(), player.getY()));
 

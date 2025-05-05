@@ -23,13 +23,14 @@ public class TileGrid {
         hitboxes[162] = new Rectangle2D.Double(14, 0, 17.77, 20.77);
         hitboxes[133] = new Rectangle2D.Double(0, 12, 32, 20);
         hitboxes[148] = new Rectangle2D.Double(0, 0, 14, 32);
-        hitboxes[162] = new Rectangle2D.Double(14, 0, 16, 18);
+        hitboxes[162] = new Rectangle2D.Double(14, 0, 16, 16.5);
+        hitboxes[147] = new Rectangle2D.Double(14, 0, 16, 32);
         hitboxes[163] = new Rectangle2D.Double(0, 0, 32, 16.5);
-        hitboxes[164] = new Rectangle2D.Double(0, 0, 14, 18);
+        hitboxes[164] = new Rectangle2D.Double(0, 0, 14, 16.5);
         hitboxes[117] = new Rectangle2D.Double(0, 12, 32, 19.51);
-        hitboxes[116] = new Rectangle2D.Double(0, 12, 32, 16.88);
+        hitboxes[116] = new Rectangle2D.Double(0, 12, 32, 16.5);
         hitboxes[101] = new Rectangle2D.Double(0, 0, 32, 16.5);
-        hitboxes[102] = new Rectangle2D.Double(0, 0, 32, 18);
+        hitboxes[102] = new Rectangle2D.Double(0, 0, 32, 16.5);
         hitboxes[140] = new Rectangle2D.Double(0, 12, 14, 20);
     }
 
@@ -99,7 +100,7 @@ public class TileGrid {
         }
     }
 
-    public double getTileSize(){
+    public double getTileSize() {
         return tileSize;
     }
 

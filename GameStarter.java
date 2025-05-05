@@ -76,6 +76,7 @@ public class GameStarter {
             String type = parts[0];
             String id, dir, state, action;
             double x, y;
+            System.out.println(msg);
 
             switch (type) {
                 case "JOIN_SUCCESS":
@@ -142,7 +143,7 @@ public class GameStarter {
                         Sprite tiles;
 
                         if (name.equals("tree")) {
-                            tiles = new Sprite(tileMapFiles.getFiles(), true);
+                            tiles = new Sprite(tileMapFiles.getFiles(), true, true);
                         } else {
                             tiles = new Sprite(tileMapFiles.getFiles(), 32);
                         }
@@ -194,7 +195,25 @@ public class GameStarter {
                         }
                     }
                     break;
-
+                case "ITEMDROP":
+                    action = parts[1];
+                    if (action.equals("CREATE")) {
+                        x = Double.parseDouble(parts[2]);
+                        y = Double.parseDouble(parts[3]);
+                        int itemId = Integer.parseInt(parts[4]);
+                        int quantity = Integer.parseInt(parts[5]);
+                        int droppedItemId = Integer.parseInt(parts[6]);
+                        canvas.addDroppedItem(x, y, itemId, quantity, droppedItemId);
+                    }
+                    if (action.equals("EDIT")) {
+                        x = Double.parseDouble(parts[2]);
+                        y = Double.parseDouble(parts[3]);
+                        int itemId = Integer.parseInt(parts[4]);
+                        int quantity = Integer.parseInt(parts[5]);
+                        int droppedItemId = Integer.parseInt(parts[6]);
+                        canvas.updateDroppedItem(x, y, itemId, quantity, droppedItemId);
+                    }
+                    break;
             }
 
         }
