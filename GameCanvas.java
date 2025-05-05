@@ -876,7 +876,6 @@ public class GameCanvas extends JComponent {
       tileGrids.get("ground").draw(g2d);
       tileGrids.get("edge").draw(g2d);
       tileGrids.get("foliage").draw(g2d);
-      player.draw(g2d);
       tileGrids.get("farm").draw(g2d);
       tileGrids.get("tree").draw(g2d);
 
@@ -887,6 +886,8 @@ public class GameCanvas extends JComponent {
       for (Player other : otherPlayers.values()) {
         other.draw(g2d);
       }
+
+      player.draw(g2d);
 
       if (!inventory.isOpen()) {
         highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
@@ -901,16 +902,16 @@ public class GameCanvas extends JComponent {
       }
 
       // draw hitboxes
-      for (int i = 0; i < tileGrids.get("edge").getHeight(); i++) {
-        for (int j = 0; j < tileGrids.get("edge").getWidth(); j++) {
-          for (TileGrid collidable : collidableGrids) {
-            Rectangle2D hitbox = collidable.getTileHitBoxAt(i, j);
-            if (hitbox != null) {
-              g2d.draw(hitbox);
-            }
-          }
-        }
-      }
+      // for (int i = 0; i < tileGrids.get("edge").getHeight(); i++) {
+      // for (int j = 0; j < tileGrids.get("edge").getWidth(); j++) {
+      // for (TileGrid collidable : collidableGrids) {
+      // Rectangle2D hitbox = collidable.getTileHitBoxAt(i, j);
+      // if (hitbox != null) {
+      // g2d.draw(hitbox);
+      // }
+      // }
+      // }
+      // }
 
       // g2d.draw(player.getHitboxAt(player.getX(), player.getY()));
 

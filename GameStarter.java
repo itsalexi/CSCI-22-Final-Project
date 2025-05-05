@@ -174,7 +174,7 @@ public class GameStarter {
                         Sprite tiles;
 
                         if (name.equals("tree")) {
-                            tiles = new Sprite(tileMapFiles.getFiles(), true);
+                            tiles = new Sprite(tileMapFiles.getFiles(), true, true);
                             System.out.println(tiles.getHeight());
                             System.out.println(tiles.getWidth());
 

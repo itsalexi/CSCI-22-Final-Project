@@ -13,23 +13,38 @@ public class Sprite {
     private double size;
     private boolean flippedHorizontal;
     private boolean noScaling;
+    private boolean anchorBottomLeft;
 
     public Sprite(ArrayList<File> f) {
         initializeSprite(f);
         size = 32;
         noScaling = false;
+        anchorBottomLeft = false;
     }
 
     public Sprite(ArrayList<File> f, double s) {
         initializeSprite(f);
         size = s;
         noScaling = false;
+        anchorBottomLeft = false;
     }
 
     public Sprite(ArrayList<File> f, boolean n) {
         initializeSprite(f);
         size = 32;
         noScaling = n;
+        anchorBottomLeft = false;
+    }
+
+    public Sprite(ArrayList<File> f, boolean n, boolean a) {
+        initializeSprite(f);
+        size = 32;
+        noScaling = n;
+        anchorBottomLeft = a;
+
+        if (anchorBottomLeft) {
+            y += getHeight() - size;
+        }
     }
 
     private void initializeSprite(ArrayList<File> f) {
