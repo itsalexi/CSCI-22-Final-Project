@@ -553,6 +553,17 @@ public class GameServer {
           }
           break;
         }
+
+        case "ITEM": {
+          String action = parts[1];
+          if (action.equals("DROP")) {
+            int x = Integer.parseInt(parts[2]);
+            int y = Integer.parseInt(parts[3]);
+            int itemId = Integer.parseInt(parts[4]);
+            int quantity = Integer.parseInt(parts[5]);
+
+          }
+        }
       }
     }
 
