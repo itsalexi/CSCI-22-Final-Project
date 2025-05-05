@@ -29,7 +29,7 @@ public class Item {
   }
 
   public int getQuantity() {
-    return isStackable() ? quantity : 1;
+    return quantity;
   }
 
   public void consume() {

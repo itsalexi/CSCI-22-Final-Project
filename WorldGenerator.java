@@ -143,14 +143,21 @@ public class WorldGenerator {
     int[] coords = { 0, 0 };
     for (int y = height / 2; y < height; y++) {
       for (int x = width / 2; x < width; x++) {
-        if (groundMap[x][y] == 36) {
-          Boolean nearTree = false;
-          for (int i = -2; i < 3; i++) {
-            for (int j = -2; j < 3; j++) {
-              if (treeMap[y + i][x + j] != -1) {
-                nearTree = true;
+        if (groundMap[x][y] == 36 && treeMap[y][x] == -1) {
+          boolean nearTree = false;
+          for (int i = -2; i <= 2; i++) {
+            for (int j = -2; j <= 2; j++) {
+              int checkY = y + i;
+              int checkX = x + j;
+              if (checkX >= 0 && checkX < width && checkY >= 0 && checkY < height) {
+                if (treeMap[checkY][checkX] != -1) {
+                  nearTree = true;
+                  break;
+                }
               }
             }
+            if (nearTree)
+              break;
           }
           if (nearTree) {
             continue;

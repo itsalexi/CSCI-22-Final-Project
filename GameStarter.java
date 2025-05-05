@@ -1,4 +1,5 @@
 
+import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.net.*;
 
@@ -76,7 +77,6 @@ public class GameStarter {
             String type = parts[0];
             String id, dir, state, action;
             double x, y;
-            System.out.println(msg);
 
             switch (type) {
                 case "JOIN_SUCCESS":
@@ -133,21 +133,56 @@ public class GameStarter {
                     } else {
                         String tilemapType;
 
+                        Rectangle2D[] defaultBox = new Rectangle2D[512];
+                        defaultBox[138] = new Rectangle2D.Double(14, 13.3, 18.45, 22.03);
+                        defaultBox[139] = new Rectangle2D.Double(0, 14, 32, 18.45);
+                        defaultBox[182] = new Rectangle2D.Double(14, 0, 18.03, 32);
+                        defaultBox[162] = new Rectangle2D.Double(14, 0, 17.77, 20.77);
+                        defaultBox[133] = new Rectangle2D.Double(0, 12, 32, 20);
+                        defaultBox[148] = new Rectangle2D.Double(0, 0, 14, 32);
+                        defaultBox[162] = new Rectangle2D.Double(14, 0, 16, 16.5);
+                        defaultBox[147] = new Rectangle2D.Double(14, 0, 16, 32);
+                        defaultBox[163] = new Rectangle2D.Double(0, 0, 32, 16.5);
+                        defaultBox[164] = new Rectangle2D.Double(0, 0, 14, 16.5);
+                        defaultBox[117] = new Rectangle2D.Double(0, 12, 32, 19.51);
+                        defaultBox[116] = new Rectangle2D.Double(0, 12, 32, 16.5);
+                        defaultBox[101] = new Rectangle2D.Double(0, 0, 32, 16.5);
+                        defaultBox[102] = new Rectangle2D.Double(0, 0, 32, 16.5);
+                        defaultBox[140] = new Rectangle2D.Double(0, 12, 14, 20);
+
+                        Rectangle2D[] treeBox = new Rectangle2D[512];
+                        treeBox[0] = new Rectangle2D.Double(10, 25, 14, 18);
+                        treeBox[1] = new Rectangle2D.Double(10, 25, 14, 18);
+
+                        Rectangle2D[] hitboxes = new Rectangle2D[512];
+
                         switch (name) {
-                            case "farm" -> tilemapType = "assets/tilemap/crops";
-                            case "tree" -> tilemapType = "assets/tilemap/tree";
-                            default -> tilemapType = "assets/tilemap/world";
+                            case "farm":
+                                tilemapType = "assets/tilemap/crops";
+                                break;
+                            case "tree":
+                                tilemapType = "assets/tilemap/tree";
+                                hitboxes = treeBox;
+                                break;
+                            default:
+                                tilemapType = "assets/tilemap/world";
+                                hitboxes = defaultBox;
+                                break;
                         }
                         System.out.println(tilemapType);
                         SpriteFiles tileMapFiles = new SpriteFiles(tilemapType);
                         Sprite tiles;
 
                         if (name.equals("tree")) {
-                            tiles = new Sprite(tileMapFiles.getFiles(), true, true);
+                            tiles = new Sprite(tileMapFiles.getFiles(), true);
+                            System.out.println(tiles.getHeight());
+                            System.out.println(tiles.getWidth());
+
                         } else {
                             tiles = new Sprite(tileMapFiles.getFiles(), 32);
                         }
-                        TileGrid tg = new TileGrid(tiles, parseTileMapString(msg));
+
+                        TileGrid tg = new TileGrid(tiles, parseTileMapString(msg), hitboxes);
                         canvas.setTileGrid(name, tg);
                     }
                     break;
@@ -163,7 +198,6 @@ public class GameStarter {
                     break;
                 case "INVENTORY":
                     action = parts[1];
-                    System.out.println(msg);
                     if (action.equals("ADD")) {
                         int itemId = Integer.parseInt(parts[3]);
                         int quantity = Integer.parseInt(parts[4]);

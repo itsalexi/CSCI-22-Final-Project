@@ -9,6 +9,15 @@ public class TileGrid {
     private int[][] map;
     private Rectangle2D[] hitboxes;
 
+    public TileGrid(Sprite tiles, int[][] map, Rectangle2D[] hb) {
+        this.tiles = tiles;
+        this.map = map;
+        height = map.length;
+        width = map[0].length;
+        tileSize = tiles.getSize();
+        hitboxes = hb;
+    }
+
     public TileGrid(Sprite tiles, int[][] map) {
         this.tiles = tiles;
         this.map = map;
@@ -16,22 +25,6 @@ public class TileGrid {
         width = map[0].length;
         tileSize = tiles.getSize();
         hitboxes = new Rectangle2D[512];
-
-        hitboxes[138] = new Rectangle2D.Double(14, 13.3, 18.45, 22.03);
-        hitboxes[139] = new Rectangle2D.Double(0, 14, 32, 18.45);
-        hitboxes[182] = new Rectangle2D.Double(14, 0, 18.03, 32);
-        hitboxes[162] = new Rectangle2D.Double(14, 0, 17.77, 20.77);
-        hitboxes[133] = new Rectangle2D.Double(0, 12, 32, 20);
-        hitboxes[148] = new Rectangle2D.Double(0, 0, 14, 32);
-        hitboxes[162] = new Rectangle2D.Double(14, 0, 16, 16.5);
-        hitboxes[147] = new Rectangle2D.Double(14, 0, 16, 32);
-        hitboxes[163] = new Rectangle2D.Double(0, 0, 32, 16.5);
-        hitboxes[164] = new Rectangle2D.Double(0, 0, 14, 16.5);
-        hitboxes[117] = new Rectangle2D.Double(0, 12, 32, 19.51);
-        hitboxes[116] = new Rectangle2D.Double(0, 12, 32, 16.5);
-        hitboxes[101] = new Rectangle2D.Double(0, 0, 32, 16.5);
-        hitboxes[102] = new Rectangle2D.Double(0, 0, 32, 16.5);
-        hitboxes[140] = new Rectangle2D.Double(0, 12, 14, 20);
     }
 
     public int getWidth() {
@@ -74,6 +67,10 @@ public class TileGrid {
             return new Rectangle2D.Double(x + hitbox.getX(), y + hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
         }
 
+        if (tiles.isNoScaling()) {
+            return new Rectangle2D.Double(x, y, tiles.getWidth(), tiles.getHeight());
+
+        }
         return new Rectangle2D.Double(x, y, tileSize, tileSize);
     }
 

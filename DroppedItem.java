@@ -9,7 +9,7 @@ public class DroppedItem {
   public DroppedItem(double x, double y, int iId, int q, int dId) {
 
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
-    itemSprites = new Sprite(itemFiles.getFiles(), 32);
+    itemSprites = new Sprite(itemFiles.getFiles(), 24);
     posX = x;
     posY = y;
     id = dId;
@@ -49,5 +49,9 @@ public class DroppedItem {
 
   public int getDroppedItemId() {
     return id;
+  }
+
+  public int getItemId() {
+    return itemId;
   }
 }

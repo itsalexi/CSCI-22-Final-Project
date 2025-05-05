@@ -222,8 +222,8 @@ public class GameServer {
 
           int[] coords = worldGen.getValidSpawn();
 
-          int spawnX = coords[0] * 32 + 16;
-          int spawnY = coords[1] * 32 + 16;
+          int spawnX = coords[0] * 32;
+          int spawnY = coords[1] * 32;
 
           PlayerState ps = new PlayerState();
           ps.x = spawnX;
@@ -392,6 +392,22 @@ public class GameServer {
 
             droppedItemStates.put(droppedItemId, dis);
             broadcastAll(String.format("ITEMDROP CREATE %f %f %d %d %d", x, y, itemId, quantity, droppedItemId));
+          } else if (action.equals("EDIT")) {
+            double x = Double.parseDouble(parts[2]);
+            double y = Double.parseDouble(parts[3]);
+            int itemId = Integer.parseInt(parts[4]);
+            int quantity = Integer.parseInt(parts[5]);
+            int droppedItemId = Integer.parseInt(parts[6]);
+
+            DroppedItemState dis = new DroppedItemState();
+            dis.x = x;
+            dis.y = y;
+            dis.itemId = itemId;
+            dis.quantity = quantity;
+            dis.id = droppedItemId;
+            droppedItemStates.put(droppedItemId, dis);
+            broadcast(String.format("ITEMDROP EDIT %f %f %d %d %d", x, y, itemId,
+                quantity, droppedItemId), playerId);
           }
         }
       }

@@ -198,16 +198,15 @@ public class GameCanvas extends JComponent {
     if (item.getQuantity() - q >= 0) {
       item.setQuantity(item.getQuantity() - q);
     }
-    // TODO: check area around player if there is a stack with the same id, then add
-    // to that stack nalang :D
 
-    // FIX: THIS DOESNT WORK
     for (DroppedItem droppedItem : droppedItems.values()) {
       if (Math.sqrt(Math.pow((player.getX() - droppedItem.getX()), 2)
-          + Math.pow(player.getY() - droppedItem.getY(), 2)) < 3 * 32) {
-        if (droppedItem.getDroppedItemId() == item.getId()) {
+          + Math.pow(player.getY() - droppedItem.getY(), 2)) < 2 * 32) {
+        if (droppedItem.getItemId() == item.getId()) {
           writer.send(String.format("ITEMDROP EDIT %f %f %d %d %d", player.getX(), player.getY(), item.getId(),
               droppedItem.getQuantity() + q, droppedItem.getDroppedItemId()));
+          droppedItem.setPosition(player.getX(), player.getY());
+          droppedItem.setQuantity(droppedItem.getQuantity() + q);
           return;
         }
       }
@@ -877,6 +876,7 @@ public class GameCanvas extends JComponent {
       tileGrids.get("ground").draw(g2d);
       tileGrids.get("edge").draw(g2d);
       tileGrids.get("foliage").draw(g2d);
+      player.draw(g2d);
       tileGrids.get("farm").draw(g2d);
       tileGrids.get("tree").draw(g2d);
 
@@ -888,7 +888,6 @@ public class GameCanvas extends JComponent {
         other.draw(g2d);
       }
 
-      player.draw(g2d);
       if (!inventory.isOpen()) {
         highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
         highlight.draw(g2d);
