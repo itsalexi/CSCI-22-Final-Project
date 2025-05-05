@@ -31,6 +31,8 @@ public class GameServer {
   private static Map<String, AnimalState> animalStates;
   private String animalControllerId = null;
 
+  private WorldGenerator worldGen;
+
   public GameServer() {
     numPlayers = 0;
     maxPlayers = 15;
@@ -39,8 +41,8 @@ public class GameServer {
     animalStates = new HashMap<>();
     Random rand = new Random();
 
-    farmSystem = new FarmingSystem(50);
-    WorldGenerator worldGen = new WorldGenerator(rand.nextInt(), 100, 100);
+    farmSystem = new FarmingSystem(100);
+    worldGen = new WorldGenerator(rand.nextInt(), 100, 100);
     groundMap = worldGen.getGroundMap();
     edgeMap = worldGen.getEdgeMap();
     foliageMap = worldGen.getFoliageMap();
@@ -401,8 +403,10 @@ public class GameServer {
           String username = parts[1];
           int skin = Integer.parseInt(parts[2]);
 
-          int spawnX = 400;
-          int spawnY = 300;
+          int[] coords = worldGen.getValidSpawn();
+
+          int spawnX = coords[0] * 32 + 16;
+          int spawnY = coords[1] * 32 + 16;
 
           PlayerState ps = new PlayerState();
           ps.x = spawnX;

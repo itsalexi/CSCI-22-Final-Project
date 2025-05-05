@@ -12,6 +12,8 @@ public class WorldGenerator {
   private ArrayList<WaterEdgeMatrix> validEdgeMatrices;
   private ArrayList<Integer> edgeIDs;
 
+  private int[] validSpawn;
+
   public WorldGenerator(int s, int w, int h) {
     seed = s;
     width = w;
@@ -133,6 +135,37 @@ public class WorldGenerator {
 
     regenerateWorld();
     generateWaterEdges();
+    validSpawn = findValidSpawn();
+
+  }
+
+  private int[] findValidSpawn() {
+    int[] coords = { 0, 0 };
+    for (int y = height / 2; y < height; y++) {
+      for (int x = width / 2; x < width; x++) {
+        if (groundMap[x][y] == 36) {
+          Boolean nearTree = false;
+          for (int i = -2; i < 3; i++) {
+            for (int j = -2; j < 3; j++) {
+              if (treeMap[y + i][x + j] != -1) {
+                nearTree = true;
+              }
+            }
+          }
+          if (nearTree) {
+            continue;
+          }
+          coords[0] = y;
+          coords[1] = x;
+          return coords;
+        }
+      }
+    }
+    return null;
+  }
+
+  public int[] getValidSpawn() {
+    return validSpawn;
   }
 
   private void regenerateWorld() {
@@ -153,11 +186,14 @@ public class WorldGenerator {
           groundMap[y][x] = 153;
           foliageMap[y][x] = -1;
         } else {
+          double rand = Math.random();
 
           groundMap[y][x] = 36;
+          if (rand > 0.8) {
+            treeMap[y][x] = 0;
+          }
+
           if (g > foliageThreshold) {
-            double rand = Math.random();
-            System.out.println(rand);
             double f = foliageGen.noise(x / 0.5, y / 0.5);
             f = (f + 1) / 2;
             int grassFoliageType = (int) (Math.random() * 4);
@@ -182,9 +218,6 @@ public class WorldGenerator {
                 case 9 -> foliageMap[y][x] = 363;
                 case 10 -> foliageMap[y][x] = 364;
               }
-            }
-            if (rand > 0.65) {
-              treeMap[y][x] = 0;
             }
 
           } else {
@@ -299,12 +332,6 @@ public class WorldGenerator {
   }
 
   public int[][] getTreeMap() {
-    for (int i = 0; i < treeMap.length; i++) {
-      for (int j = 0; j < treeMap[0].length; j++) {
-        System.out.printf("%d ", treeMap[i][j]);
-      }
-      System.out.printf("\n");
-    }
     return treeMap;
   }
 }

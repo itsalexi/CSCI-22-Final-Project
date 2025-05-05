@@ -139,7 +139,13 @@ public class GameStarter {
                         }
                         System.out.println(tilemapType);
                         SpriteFiles tileMapFiles = new SpriteFiles(tilemapType);
-                        Sprite tiles = new Sprite(tileMapFiles.getFiles(), 32);
+                        Sprite tiles;
+
+                        if (name.equals("tree")) {
+                            tiles = new Sprite(tileMapFiles.getFiles(), true);
+                        } else {
+                            tiles = new Sprite(tileMapFiles.getFiles(), 32);
+                        }
                         TileGrid tg = new TileGrid(tiles, parseTileMapString(msg));
                         canvas.setTileGrid(name, tg);
                     }

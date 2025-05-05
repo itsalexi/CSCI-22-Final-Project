@@ -160,6 +160,7 @@ public class GameCanvas extends JComponent {
 
   public void initializeWorld() {
     collidableGrids.add(tileGrids.get("edge"));
+    collidableGrids.add(tileGrids.get("tree"));
     setMapLoaded(true);
   }
 
