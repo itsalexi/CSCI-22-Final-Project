@@ -12,6 +12,7 @@ public class GameServer {
   private int[][] groundMap;
   private int[][] edgeMap;
   private int[][] foliageMap;
+  private int[][] treeMap;
   private FarmingSystem farmSystem;
 
   private static class PlayerState {
@@ -43,6 +44,7 @@ public class GameServer {
     groundMap = worldGen.getGroundMap();
     edgeMap = worldGen.getEdgeMap();
     foliageMap = worldGen.getFoliageMap();
+    treeMap = worldGen.getTreeMap();
 
     // // Layer: Ground
     // groundMap = new int[][] {
@@ -419,6 +421,8 @@ public class GameServer {
           send(tileMapToString("edge", edgeMap));
           send(tileMapToString("foliage", foliageMap));
           send(tileMapToString("farm", farmSystem.getFarmMap()));
+          send(tileMapToString("tree", treeMap));
+
           send("TILEMAP DONE");
           for (Map.Entry<String, PlayerState> entry : playerStates.entrySet()) {
             String otherId = entry.getKey();

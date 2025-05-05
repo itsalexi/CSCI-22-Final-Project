@@ -130,7 +130,14 @@ public class GameStarter {
                     if (name.equals("DONE")) {
                         canvas.initializeWorld();
                     } else {
-                        String tilemapType = name.equals("farm") ? "assets/tilemap/crops" : "assets/tilemap/world";
+                        String tilemapType;
+
+                        switch (name) {
+                            case "farm" -> tilemapType = "assets/tilemap/crops";
+                            case "tree" -> tilemapType = "assets/tilemap/tree";
+                            default -> tilemapType = "assets/tilemap/world";
+                        }
+                        System.out.println(tilemapType);
                         SpriteFiles tileMapFiles = new SpriteFiles(tilemapType);
                         Sprite tiles = new Sprite(tileMapFiles.getFiles(), 32);
                         TileGrid tg = new TileGrid(tiles, parseTileMapString(msg));

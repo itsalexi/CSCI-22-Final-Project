@@ -833,6 +833,7 @@ public class GameCanvas extends JComponent {
       tileGrids.get("edge").draw(g2d);
       tileGrids.get("foliage").draw(g2d);
       tileGrids.get("farm").draw(g2d);
+      tileGrids.get("tree").draw(g2d);
 
       for (Rectangle2D rect : currentPath) {
         g2d.draw(rect);
