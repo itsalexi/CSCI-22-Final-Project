@@ -27,6 +27,12 @@ public class GameServer {
     int type, size;
   }
 
+  private static class DroppedItemState {
+    double x, y;
+    String itemId;
+    int quantity;
+  }
+
   private static Map<String, PlayerState> playerStates;
   private static Map<String, AnimalState> animalStates;
   private String animalControllerId = null;
