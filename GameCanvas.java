@@ -162,7 +162,6 @@ public class GameCanvas extends JComponent {
   }
 
   public void initializeWorld() {
-    collidableGrids.add(tileGrids.get("edge"));
     collidableGrids.add(tileGrids.get("tree"));
     setMapLoaded(true);
   }
@@ -339,11 +338,13 @@ public class GameCanvas extends JComponent {
           isMoving = isMoving || isActive;
         }
 
+        String idleState = isPlayerInWater() ? "swim_idle" : "idle";
+
         if (!player.isDoingAction() && !isMoving) {
-          player.setAnimationState("idle");
+          player.setAnimationState(idleState);
           writer.send("MOVE " + client.getPlayerID() + " " + player.getX() + " "
               + player.getY() + " "
-              + player.getDirection() + " " + "idle");
+              + player.getDirection() + " " + idleState);
 
         }
       }
@@ -362,11 +363,21 @@ public class GameCanvas extends JComponent {
   public void movePlayer() {
     if (player.isDoingAction())
       return;
+    boolean isInWater = isPlayerInWater();
+
     double speed = player.getSpeed();
+    if (isInWater) {
+      player.setSpeed(2);
+    } else {
+      player.setSpeed(3);
+    }
+
     Map<String, Boolean> activeDirections = player.getActiveDirections();
 
     String direction = "DOWN";
     double[] currVector = { 0, 0 };
+
+    String walkState = isInWater ? "swim" : "walk";
 
     for (Map.Entry<String, Boolean> entry : activeDirections.entrySet()) {
       String currentDirection = entry.getKey();
@@ -404,9 +415,10 @@ public class GameCanvas extends JComponent {
 
     if (!isColliding(futureHitbox)) {
       writer.send("MOVE " + client.getPlayerID() + " " + newX + " " + newY + " " + direction + " "
-          + "walk");
+          + walkState);
       player.setDirection(direction);
-      player.setAnimationState("walk");
+      player.setAnimationState(walkState);
+
       player.setPosition(newX, newY);
     }
 
@@ -416,11 +428,29 @@ public class GameCanvas extends JComponent {
     tileGrids.get(name).setTileAt(y, x, val);
   }
 
+  public boolean isPlayerInWater() {
+    TileGrid cg = tileGrids.get("ground");
+    for (int i = 0; i < cg.getHeight(); i++) {
+      for (int j = 0; j < cg.getWidth(); j++) {
+        if (cg.getTileAt(i, j) == 153) {
+          Rectangle2D collidableHitbox = cg.getTileHitBoxAt(i, j);
+          if (collidableHitbox != null) {
+            if (player.getHitboxAt(player.getX(), player.getY()).intersects(collidableHitbox)) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   public void actionPlayer(String id, int x, int y, String dir, String action) {
     Player newPlayer = otherPlayers.get(id);
     switch (action) {
       case "HOE" -> newPlayer.useAction("hoe");
       case "WATER" -> newPlayer.useAction("water");
+      case "PLANT" -> newPlayer.useAction("plant");
     }
     otherPlayers.put(id, newPlayer);
 

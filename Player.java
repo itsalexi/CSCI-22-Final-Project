@@ -30,13 +30,14 @@ public class Player {
                 "idle", pathName + "idle",
                 "walk", pathName + "walk",
                 "hoe", pathName + "hoe",
-                "water", pathName + "watering", "plant", pathName + "plant");
+                "water", pathName + "watering", "plant", pathName + "plant", "swim", pathName + "swim", "swim_idle",
+                pathName + "swim_idle");
 
         Map<String, Integer> frames = Map.of(
                 "idle", 4,
                 "walk", 6,
                 "hoe", 6,
-                "water", 8, "plant", 5);
+                "water", 8, "plant", 5, "swim", 4, "swim_idle", 4);
 
         activeDirections = new HashMap<>(Map.of(
                 "UP", false,
@@ -141,11 +142,10 @@ public class Player {
 
     public Rectangle2D getSpriteDimensions() {
         return new Rectangle2D.Double(
-            x + getWidth() * 10 / 32,
-            y + getHeight() * 6 / 32,
-            getWidth() * 22 / 32,
-            getHeight() * 26 / 32
-        );
+                x + getWidth() * 10 / 32,
+                y + getHeight() * 6 / 32,
+                getWidth() * 22 / 32,
+                getHeight() * 26 / 32);
     }
 
     public double getY() {
