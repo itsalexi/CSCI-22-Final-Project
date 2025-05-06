@@ -270,7 +270,10 @@ public class GameCanvas extends JComponent {
       public void keyPressed(KeyEvent e) {
         char c = e.getKeyChar();
         if ((Character.isDigit(c))) {
-          inventory.setActiveHotbarSlot(Character.getNumericValue(c) - 1);
+          int slot = Character.getNumericValue(c) - 1;
+          if (slot >= 0 && slot <= 9) {
+            inventory.setActiveHotbarSlot(Character.getNumericValue(c) - 1);
+          }
           return;
         }
         String direction = null;
