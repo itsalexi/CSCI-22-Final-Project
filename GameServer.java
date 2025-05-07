@@ -408,6 +408,11 @@ public class GameServer {
             droppedItemStates.put(droppedItemId, dis);
             broadcast(String.format("ITEMDROP EDIT %f %f %d %d %d", x, y, itemId,
                 quantity, droppedItemId), playerId);
+          } else if (action.equals("PICKUP")) {
+            // TODO: PREVENT DUPE GLITCH WITH TIMESTAMPS?
+            int droppedItemId = Integer.parseInt(parts[2]);
+            droppedItemStates.remove(droppedItemId);
+            broadcast(String.format("ITEMDROP PICKUP %d", droppedItemId), playerId);
           }
         }
       }

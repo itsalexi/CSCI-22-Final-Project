@@ -54,4 +54,8 @@ public class DroppedItem {
   public int getItemId() {
     return itemId;
   }
+
+  public double getSpriteSize() {
+    return itemSprites.getSize();
+  }
 }

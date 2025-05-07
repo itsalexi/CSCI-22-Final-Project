@@ -247,6 +247,10 @@ public class GameStarter {
                         int droppedItemId = Integer.parseInt(parts[6]);
                         canvas.updateDroppedItem(x, y, itemId, quantity, droppedItemId);
                     }
+                    if (action.equals("PICKUP")) {
+                        int droppedItemId = Integer.parseInt(parts[2]);
+                        canvas.getDroppedItems().remove(droppedItemId);
+                    }
                     break;
             }
 

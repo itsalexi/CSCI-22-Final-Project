@@ -128,6 +128,7 @@ public class GameCanvas extends JComponent {
 
         if (isMoving) {
           movePlayer();
+          pickUpCollidingItems();
         }
 
         for (Player ghost : otherPlayers.values()) {
@@ -190,6 +191,19 @@ public class GameCanvas extends JComponent {
     return false;
   }
 
+  public void pickUpCollidingItems() {
+    Rectangle2D playerHitbox = player.getHitboxAt(player.getX(), player.getY());
+
+    // BUG: CONCURRENT MODIFICATION EXCEPTION, FIX BY COPYING THE ARRAY
+    for (DroppedItem item : droppedItems.values()) {
+      Rectangle2D itemHitbox = new Rectangle2D.Double(item.getX(), item.getY(), item.getSpriteSize(),
+          item.getSpriteSize());
+      if (playerHitbox.intersects(itemHitbox)) {
+        pickupDroppedItem(item.getDroppedItemId());
+      }
+    }
+  }
+
   private void dropItem(int q) {
     Item item = inventory.getActiveItem();
     if (item == null)
@@ -212,6 +226,19 @@ public class GameCanvas extends JComponent {
     }
     writer.send(String.format("ITEMDROP CREATE %f %f %d %d", player.getX(), player.getY(), item.getId(), q));
 
+  }
+
+  private void pickupDroppedItem(int droppedItemId) {
+    DroppedItem item = droppedItems.get(droppedItemId);
+    if (item != null) {
+      inventory.addItem(item.getItemId(), item.getQuantity());
+      droppedItems.remove(droppedItemId);
+      writer.send(String.format("ITEMDROP PICKUP %d", droppedItemId));
+    }
+  }
+
+  public Map<Integer, DroppedItem> getDroppedItems() {
+    return droppedItems;
   }
 
   private void doPlayerAction(int x, int y) {
