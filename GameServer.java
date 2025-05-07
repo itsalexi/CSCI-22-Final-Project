@@ -274,17 +274,28 @@ public class GameServer {
             send("ITEMDROP CREATE " + i.x + " " + i.y + " " + i.itemId + " " + i.quantity + " " + i.id);
           }
 
+          Item[] inv = new Item[36];
+          inv[0] = new Item(1, 1);
+          // inv[1] = new Item(0, 1);
+          // inv[2] = new Item(3, 32);
+          // inv[3] = new Item(5, 1);
+          // inv[4] = new Item(7, 1);
+          // inv[5] = new Item(9, 1);
+          // inv[6] = new Item(11, 1);
+          // inv[7] = new Item(13, 1);
+
           if (savedInventories.containsKey(playerId)) {
-            Item[] inv = savedInventories.get(playerId);
-            StringBuilder sb = new StringBuilder("INVENTORY LOAD " + playerId);
-            for (int i = 0; i < inv.length; i++) {
-              Item item = inv[i];
-              int itemId = (item != null) ? item.getId() : -1;
-              int quantity = (item != null) ? item.getQuantity() : 0;
-              sb.append(" ").append(i).append(",").append(itemId).append(",").append(quantity);
-            }
-            send(sb.toString());
+            System.out.println("test");
+            inv = savedInventories.get(playerId);
           }
+          StringBuilder sb = new StringBuilder("INVENTORY LOAD " + playerId);
+          for (int i = 0; i < inv.length; i++) {
+            Item item = inv[i];
+            int itemId = (item != null) ? item.getId() : -1;
+            int quantity = (item != null) ? item.getQuantity() : 0;
+            sb.append(" ").append(i).append(",").append(itemId).append(",").append(quantity);
+          }
+          send(sb.toString());
 
           send("TILEMAP DONE");
 

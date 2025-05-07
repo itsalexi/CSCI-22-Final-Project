@@ -56,14 +56,6 @@ public class Inventory {
     Item.registerItem(13, new ItemDetails("Blueberry Seeds", true, "plant blueberry"));
     Item.registerItem(14, new ItemDetails("Coins", true, ""));
 
-    inventory[0] = new Item(1, 1);
-    inventory[1] = new Item(0, 1);
-    inventory[2] = new Item(3, 32);
-    inventory[3] = new Item(5, 1);
-    inventory[4] = new Item(7, 1);
-    inventory[5] = new Item(9, 1);
-    inventory[6] = new Item(11, 1);
-    inventory[7] = new Item(13, 1);
     tiles = new Sprite(tileMapFiles.getFiles(), 32);
     isOpen = false;
     inventoryGrid = new TileGrid(tiles, inventoryMap);
