@@ -71,6 +71,10 @@ public class Inventory {
 
   }
 
+  public Item[] getInventory() {
+    return inventory;
+  }
+
   public Item findItem(Item item) {
     for (int i = 0; i < inventory.length; i++) {
       if (inventory[i] == null)
@@ -123,6 +127,8 @@ public class Inventory {
       }
       curr = findItem(item);
     }
+    canvas.syncInventoryBulk();
+
   }
 
   public void addItem(int id, int quantity) {
@@ -168,6 +174,8 @@ public class Inventory {
         }
       }
     }
+    canvas.syncInventoryBulk();
+
   }
 
   public void setItem(int slot, Item item) {

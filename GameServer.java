@@ -19,7 +19,7 @@ public class GameServer {
   private static class PlayerState {
     double x, y;
     String direction, state, username;
-    int skin;
+    int skin, balance;
   }
 
   private static class AnimalState {
@@ -36,6 +36,8 @@ public class GameServer {
   private static Map<String, PlayerState> playerStates;
   private static Map<String, AnimalState> animalStates;
   private static Map<Integer, DroppedItemState> droppedItemStates;
+  private Map<String, PlayerState> savedPlayerStates = new HashMap<>();
+  private Map<String, Item[]> savedInventories = new HashMap<>();
 
   private String animalControllerId = null;
 
@@ -84,6 +86,13 @@ public class GameServer {
       System.out.println("===== GAME SERVER STARTED =====");
     } catch (IOException e) {
       System.out.println("IOException from GameServer");
+    }
+  }
+
+  private void savePlayerToMemory(String playerId) {
+    PlayerState ps = playerStates.get(playerId);
+    if (ps != null) {
+      savedPlayerStates.put(playerId, ps);
     }
   }
 
@@ -184,27 +193,29 @@ public class GameServer {
       try {
         while (true) {
           String msg = in.readUTF();
-          // System.out.println(playerId + ": " + msg);
 
           handleMessage(msg);
         }
       } catch (IOException e) {
-        System.out.println(playerId + " disconnected.");
-        players.remove(playerId);
-        playerStates.remove(playerId);
-
-        if (playerId.equals(animalControllerId)) {
-          animalControllerId = null;
-
-          for (String id : players.keySet()) {
-            animalControllerId = id;
-            break;
-          }
-        }
-
-        broadcast("LEAVE " + playerId, playerId);
+        System.out.println(playerId + " disconnected due to IOException.");
       } finally {
         try {
+          if (playerId != null) {
+            savePlayerToMemory(playerId);
+            players.remove(playerId);
+            playerStates.remove(playerId);
+
+            if (playerId.equals(animalControllerId)) {
+              animalControllerId = null;
+              for (String id : players.keySet()) {
+                animalControllerId = id;
+                break;
+              }
+            }
+
+            broadcast("LEAVE " + playerId, playerId);
+          }
+
           socket.close();
         } catch (IOException ignored) {
         }
@@ -217,27 +228,42 @@ public class GameServer {
 
       switch (type) {
         case "JOIN": {
+          System.out.println(msg);
           String username = parts[1];
           int skin = Integer.parseInt(parts[2]);
 
-          int[] coords = worldGen.getValidSpawn();
+          if (players.containsKey(username)) {
+            send("JOIN_FAILED Username already connected.");
+            return;
+          }
 
-          int spawnX = coords[0] * 32;
-          int spawnY = coords[1] * 32;
+          playerId = username;
+          players.put(playerId, this);
 
-          PlayerState ps = new PlayerState();
-          ps.x = spawnX;
-          ps.y = spawnY;
-          ps.direction = "DOWN";
-          ps.state = "idle";
+          PlayerState ps;
+          if (savedPlayerStates.containsKey(username)) {
+            ps = savedPlayerStates.get(username);
+          } else {
+            int[] coords = worldGen.getValidSpawn();
+            ps = new PlayerState();
+            ps.x = coords[0] * 32;
+            ps.y = coords[1] * 32;
+            ps.direction = "DOWN";
+            ps.state = "idle";
+            ps.balance = 200;
+          }
+
           ps.username = username;
           ps.skin = skin;
+
           playerStates.put(playerId, ps);
 
-          send("JOIN_SUCCESS " + playerId + " " + spawnX + " " + spawnY);
+          send("JOIN_SUCCESS " + playerId + " " + ps.x + " " + ps.y + " " + ps.balance);
+
           if (animalControllerId == null) {
             animalControllerId = playerId;
           }
+
           send(tileMapToString("ground", groundMap));
           send(tileMapToString("edge", edgeMap));
           send(tileMapToString("foliage", foliageMap));
@@ -247,28 +273,38 @@ public class GameServer {
           for (DroppedItemState i : droppedItemStates.values()) {
             send("ITEMDROP CREATE " + i.x + " " + i.y + " " + i.itemId + " " + i.quantity + " " + i.id);
           }
+
+          if (savedInventories.containsKey(playerId)) {
+            Item[] inv = savedInventories.get(playerId);
+            StringBuilder sb = new StringBuilder("INVENTORY LOAD " + playerId);
+            for (int i = 0; i < inv.length; i++) {
+              Item item = inv[i];
+              int itemId = (item != null) ? item.getId() : -1;
+              int quantity = (item != null) ? item.getQuantity() : 0;
+              sb.append(" ").append(i).append(",").append(itemId).append(",").append(quantity);
+            }
+            send(sb.toString());
+          }
+
           send("TILEMAP DONE");
+
           for (Map.Entry<String, PlayerState> entry : playerStates.entrySet()) {
             String otherId = entry.getKey();
             if (!otherId.equals(playerId)) {
               PlayerState other = entry.getValue();
-              send("JOIN_ANNOUNCE " + otherId + " " + other.username + " "
-                  + other.skin + " "
-                  + other.x + " " + other.y + " "
-                  + other.direction
-                  + " " + other.state);
+              send("JOIN_ANNOUNCE " + otherId + " " + other.username + " " + other.skin + " "
+                  + other.x + " " + other.y + " " + other.direction + " " + other.state);
             }
           }
+
           for (AnimalState a : animalStates.values()) {
             send("ANIMAL ADD " + a.id + " " + a.name + " " + a.type + " "
                 + a.x + " " + a.y + " " + a.size + " " + a.direction + " " + a.state);
           }
 
-          broadcast(
-              "JOIN_ANNOUNCE " + playerId + " " + username + " " + skin + " "
-                  + spawnX + " "
-                  + spawnY + " DOWN idle",
-              playerId);
+          broadcast("JOIN_ANNOUNCE " + playerId + " " + username + " " + skin + " "
+              + ps.x + " " + ps.y + " " + ps.direction + " " + ps.state, playerId);
+
           break;
         }
 
@@ -321,6 +357,18 @@ public class GameServer {
           break;
         }
 
+        case "ECONOMY": {
+          String action = parts[1];
+          String id = parts[2];
+          int newBalance = Integer.parseInt(parts[3]);
+
+          if (action.equals("SET")) {
+            PlayerState player = playerStates.get(id);
+            player.balance = newBalance;
+          }
+          break;
+        }
+
         case "ANIMAL": {
           String action = parts[1];
           if (!playerId.equals(animalControllerId))
@@ -348,6 +396,26 @@ public class GameServer {
 
         }
 
+        case "INVENTORY": {
+          String action = parts[1];
+          if (action.equals("BULK")) {
+            String id = parts[2];
+            Item[] inventory = new Item[36];
+            for (int i = 3; i < parts.length; i++) {
+              String[] entry = parts[i].split(",");
+              int slot = Integer.parseInt(entry[0]);
+              int itemId = Integer.parseInt(entry[1]);
+              int quantity = Integer.parseInt(entry[2]);
+              if (itemId != -1 && quantity > 0) {
+                inventory[slot] = new Item(itemId, quantity);
+              }
+            }
+            savedInventories.put(id, inventory);
+          }
+          break;
+
+        }
+
         case "FARM": {
           String action = parts[1];
           if (action.equals("PLANT")) {
@@ -366,8 +434,24 @@ public class GameServer {
             System.out.println(val);
 
             if ((val < 6 && val == 5) || (val >= 6 && val % 6 == 5)) {
-              System.out.println("its mature");
-              broadcastSelf("INVENTORY ADD " + id + " " + farmSystem.getPlantFromIndex(val) + " 2", playerId);
+
+              int itemId = farmSystem.getPlantFromIndex(val);
+              int quantity = 2;
+              int droppedItemId = numItemsDropped++;
+
+              double dropX = (x * 32) + 8;
+              double dropY = (y * 32) + 8;
+
+              DroppedItemState dis = new DroppedItemState();
+              dis.x = dropX;
+              dis.y = dropY;
+              dis.itemId = itemId;
+              dis.quantity = quantity;
+              dis.id = droppedItemId;
+
+              droppedItemStates.put(droppedItemId, dis);
+              broadcastAll(
+                  String.format("ITEMDROP CREATE %f %f %d %d %d", dropX, dropY, itemId, quantity, droppedItemId));
             }
             broadcastAll(farmSystem.harvest(x, y));
           }
@@ -413,9 +497,9 @@ public class GameServer {
             int droppedItemId = Integer.parseInt(parts[3]);
             DroppedItemState dis = droppedItemStates.get(droppedItemId);
             if (dis != null) {
+              System.out.println("test1");
               broadcast(String.format("ITEMDROP PICKUP %s %d", playerPickupId, droppedItemId), playerId);
-              broadcastSelf(String.format("INVENTORY ADD %s %d %d", playerPickupId, dis.itemId, dis.quantity),
-                  playerId);
+              send(String.format("INVENTORY ADD %s %d %d", playerPickupId, dis.itemId, dis.quantity));
               droppedItemStates.remove(droppedItemId);
 
             }
@@ -438,14 +522,6 @@ public class GameServer {
   private void broadcast(String msg, String senderId) {
     for (PlayerConnection pc : players.values()) {
       if (!pc.playerId.equals(senderId)) {
-        pc.send(msg);
-      }
-    }
-  }
-
-  private void broadcastSelf(String msg, String selfId) {
-    for (PlayerConnection pc : players.values()) {
-      if (pc.playerId.equals(selfId)) {
         pc.send(msg);
       }
     }

@@ -89,7 +89,7 @@ public class GameCanvas extends JComponent {
     trades.add(new Recipe(new Item(14, 200), new Item(9, 1)));
     trades.add(new Recipe(new Item(14, 400), new Item(11, 1)));
     trades.add(new Recipe(new Item(14, 800), new Item(13, 1)));
-    economySystem = new EconomySystem(1000);
+    economySystem = new EconomySystem(this);
 
     craftingGrid = new CraftingGrid(recipes, this, false);
     shopGrid = new CraftingGrid(trades, this, true);
@@ -155,6 +155,10 @@ public class GameCanvas extends JComponent {
 
   }
 
+  public GameStarter getClient() {
+    return client;
+  }
+
   public void setServerOut(DataOutputStream out) {
     writer = new WriteToServer(out);
   }
@@ -191,6 +195,23 @@ public class GameCanvas extends JComponent {
       }
     }
     return false;
+  }
+
+  public void syncInventoryBulk() {
+    String playerId = client.getPlayerID();
+
+    try {
+      StringBuilder sb = new StringBuilder("INVENTORY BULK " + playerId);
+      for (int i = 0; i < inventory.getInventory().length; i++) {
+        Item item = inventory.getItem(i);
+        int itemId = (item != null) ? item.getId() : -1;
+        int quantity = (item != null) ? item.getQuantity() : 0;
+        sb.append(" ").append(i).append(",").append(itemId).append(",").append(quantity);
+      }
+      writer.send(sb.toString());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   public void pickUpCollidingItems() {
@@ -748,6 +769,8 @@ public class GameCanvas extends JComponent {
             inventory.setItem(slot, null);
           }
         }
+        syncInventoryBulk();
+
       }
 
     });
@@ -790,6 +813,10 @@ public class GameCanvas extends JComponent {
         }
       }
     }
+  }
+
+  public WriteToServer getWriter() {
+    return writer;
   }
 
   public void handleShopGrid(int tileX, int tileY) {

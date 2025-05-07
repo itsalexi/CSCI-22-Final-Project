@@ -83,6 +83,8 @@ public class GameStarter {
                     playerId = parts[1];
                     x = Double.parseDouble(parts[2]);
                     y = Double.parseDouble(parts[3]);
+                    int balance = Integer.parseInt(parts[4]);
+                    canvas.getEconomySystem().setBalance(balance);
                     canvas.getPlayer().setPosition(x, y);
                     break;
 
@@ -203,10 +205,26 @@ public class GameStarter {
                         int quantity = Integer.parseInt(parts[4]);
                         canvas.getInventory().addItem(itemId, quantity);
                     }
+
+                    if (action.equals("LOAD")) {
+                        int i = 3;
+                        while (i < parts.length) {
+                            String[] data = parts[i].split(",");
+                            int slot = Integer.parseInt(data[0]);
+                            int itemId = Integer.parseInt(data[1]);
+                            int quantity = Integer.parseInt(data[2]);
+
+                            if (itemId == -1 || quantity <= 0) {
+                                canvas.getInventory().setItem(slot, null);
+                            } else {
+                                canvas.getInventory().setItem(slot, new Item(itemId, quantity));
+                            }
+                            i++;
+                        }
+                    }
                     break;
                 case "ANIMAL":
                     action = parts[1];
-
                     if (action.equals("ADD")) {
                         String animalId = parts[2];
                         String animalName = parts[3];
@@ -227,6 +245,10 @@ public class GameStarter {
                             canvas.updateAnimal(animalId, x, y, direction, state);
                         }
                     }
+                    break;
+                case "JOIN_FAILED":
+                    System.out.println("[Client] Failed to join: " + msg.substring(12));
+                    System.exit(0);
                     break;
                 case "ITEMDROP":
                     action = parts[1];
