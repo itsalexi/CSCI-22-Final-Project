@@ -18,7 +18,6 @@ public class DroppedItem {
   }
 
   public void draw(Graphics2D g2d) {
-    System.out.println(quantity);
     g2d.translate(posX, posY);
     itemSprites.setSprite(itemId);
     itemSprites.draw(g2d);
