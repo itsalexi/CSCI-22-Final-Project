@@ -201,7 +201,6 @@ public class GameStarter {
                     if (action.equals("ADD")) {
                         int itemId = Integer.parseInt(parts[3]);
                         int quantity = Integer.parseInt(parts[4]);
-                        System.out.println("test");
                         canvas.getInventory().addItem(itemId, quantity);
                     }
                     break;
@@ -248,7 +247,7 @@ public class GameStarter {
                         canvas.updateDroppedItem(x, y, itemId, quantity, droppedItemId);
                     }
                     if (action.equals("PICKUP")) {
-                        int droppedItemId = Integer.parseInt(parts[2]);
+                        int droppedItemId = Integer.parseInt(parts[3]);
                         canvas.getDroppedItems().remove(droppedItemId);
                     }
                     break;

@@ -42,6 +42,7 @@ public class GameCanvas extends JComponent {
   private Item hoveredItem;
   private int previousItemSlot;
   private Boolean test;
+  private boolean isCtrlPressed;
   private ArrayList<Rectangle2D> currentPath;
 
   private GoldCounter goldCounter;
@@ -165,6 +166,7 @@ public class GameCanvas extends JComponent {
   public void initializeWorld() {
     collidableGrids.add(tileGrids.get("tree"));
     setMapLoaded(true);
+
   }
 
   public void setOtherPlayers(Map<String, Player> p) {
@@ -194,46 +196,85 @@ public class GameCanvas extends JComponent {
   public void pickUpCollidingItems() {
     Rectangle2D playerHitbox = player.getHitboxAt(player.getX(), player.getY());
 
-    // BUG: CONCURRENT MODIFICATION EXCEPTION, FIX BY COPYING THE ARRAY
-    for (DroppedItem item : droppedItems.values()) {
+    ArrayList<Integer> itemsToPickup = new ArrayList<>();
+
+    for (DroppedItem item : new ArrayList<>(droppedItems.values())) {
       Rectangle2D itemHitbox = new Rectangle2D.Double(item.getX(), item.getY(), item.getSpriteSize(),
           item.getSpriteSize());
       if (playerHitbox.intersects(itemHitbox)) {
-        pickupDroppedItem(item.getDroppedItemId());
+        itemsToPickup.add(item.getDroppedItemId());
       }
+    }
+
+    for (Integer itemId : itemsToPickup) {
+      pickupDroppedItem(itemId);
     }
   }
 
-  private void dropItem(int q) {
+  public void dropActiveItem() {
     Item item = inventory.getActiveItem();
     if (item == null)
       return;
+    int q = 1;
+    if (isCtrlPressed) {
+      q = item.getQuantity();
+    }
+
     if (item.getQuantity() - q >= 0) {
       item.setQuantity(item.getQuantity() - q);
+    }
+
+    dropItem(item, q);
+
+  }
+
+  public void dropItem(Item item, int q) {
+    String playerDirection = player.getDirection();
+    double droppedItemX = player.getX() + (player.getWidth() / 2);
+    double droppedItemY = player.getY() + (player.getHeight() / 2);
+
+    switch (playerDirection) {
+      case "UP":
+        droppedItemY -= 40;
+        droppedItemX -= 10;
+        break;
+      case "DOWN":
+        droppedItemY += 25;
+        droppedItemX -= 10;
+        break;
+      case "LEFT":
+        droppedItemX -= 40;
+        break;
+      case "RIGHT":
+        droppedItemX += 16;
+        break;
     }
 
     for (DroppedItem droppedItem : droppedItems.values()) {
       if (Math.sqrt(Math.pow((player.getX() - droppedItem.getX()), 2)
           + Math.pow(player.getY() - droppedItem.getY(), 2)) < 2 * 32) {
         if (droppedItem.getItemId() == item.getId()) {
-          writer.send(String.format("ITEMDROP EDIT %f %f %d %d %d", player.getX(), player.getY(), item.getId(),
-              droppedItem.getQuantity() + q, droppedItem.getDroppedItemId()));
-          droppedItem.setPosition(player.getX(), player.getY());
+
+          droppedItem.setPosition(droppedItemX, droppedItemY);
           droppedItem.setQuantity(droppedItem.getQuantity() + q);
+
+          writer.send(String.format("ITEMDROP EDIT %f %f %d %d %d", droppedItemX, droppedItemY, item.getId(),
+              droppedItem.getQuantity(), droppedItem.getDroppedItemId()));
           return;
         }
       }
     }
-    writer.send(String.format("ITEMDROP CREATE %f %f %d %d", player.getX(), player.getY(), item.getId(), q));
-
+    writer.send(String.format("ITEMDROP CREATE %f %f %d %d", droppedItemX, droppedItemY, item.getId(), q));
   }
 
   private void pickupDroppedItem(int droppedItemId) {
     DroppedItem item = droppedItems.get(droppedItemId);
+    if (inventory.getEmptySlot() == -1) {
+      return;
+    }
     if (item != null) {
-      inventory.addItem(item.getItemId(), item.getQuantity());
       droppedItems.remove(droppedItemId);
-      writer.send(String.format("ITEMDROP PICKUP %d", droppedItemId));
+      writer.send(String.format("ITEMDROP PICKUP %s %d", client.getPlayerID(), droppedItemId));
     }
   }
 
@@ -319,21 +360,37 @@ public class GameCanvas extends JComponent {
             break;
           case KeyEvent.VK_E:
             if (inventory.isOpen() && previousItemSlot != -1) {
-              inventory.setItem(previousItemSlot, hoveredItem);
-              hoveredItem = null;
-              previousItemSlot = -1;
+              if (hoveredItem != null) {
+                dropItem(hoveredItem, hoveredItem.getQuantity());
+                hoveredItem = null;
+                previousItemSlot = -1;
+              }
             }
             inventory.setOpen(!inventory.isOpen());
             break;
-          case KeyEvent.VK_Y:
-            player.setActiveTool("hoe");
-            break;
-          case KeyEvent.VK_R:
-            player.setActiveTool("water");
+          case KeyEvent.VK_CONTROL:
+            isCtrlPressed = true;
             break;
           case KeyEvent.VK_Q:
-            dropItem(1);
+            if (!inventory.isOpen()) {
+              dropActiveItem();
+            } else {
+              int slot = inventory.getSlotFromGrid(lastClickedInventoryTile[0], lastClickedInventoryTile[1]);
+              Item item = inventory.getItem(slot);
+
+              if (slot != -1) {
+                if (item != null) {
+                  int q = 1;
+                  if (isCtrlPressed) {
+                    q = item.getQuantity();
+                  }
+                  dropItem(item, q);
+                  inventory.removeItem(item.getId(), q);
+                }
+              }
+            }
             break;
+
         }
 
         if (direction != null) {
@@ -356,6 +413,9 @@ public class GameCanvas extends JComponent {
             break;
           case KeyEvent.VK_D:
             direction = "RIGHT";
+            break;
+          case KeyEvent.VK_CONTROL:
+            isCtrlPressed = false;
             break;
         }
 
@@ -650,8 +710,13 @@ public class GameCanvas extends JComponent {
           int tileX = lastClickedInventoryTile[0];
           int tileY = lastClickedInventoryTile[1];
 
-          if (tileX == -1)
+          if (tileX == -1) {
+            if (hoveredItem != null) {
+              dropItem(hoveredItem, hoveredItem.getQuantity());
+              hoveredItem = null;
+            }
             return;
+          }
 
           int slot = inventory.getSlotFromGrid(tileX, tileY);
 
@@ -660,8 +725,7 @@ public class GameCanvas extends JComponent {
                 : null;
             inventory.setItem(slot, hoveredItem);
             hoveredItem = temp;
-            previousItemSlot = inventory.getEmptySlot(); // TODO: make item drop
-                                                         // instead
+            previousItemSlot = inventory.getEmptySlot();
             if (hoveredItem != null) {
               hoveredItemSprite.setSprite(hoveredItem.getId());
               hoveredItemSprite.setPosition(x - hoveredItemSprite.getWidth()
@@ -683,7 +747,6 @@ public class GameCanvas extends JComponent {
             }
             inventory.setItem(slot, null);
           }
-          // System.out.println(hoveredItem);
         }
       }
 
@@ -957,6 +1020,7 @@ public class GameCanvas extends JComponent {
       for (Animal an : animals.values()) {
         an.draw(g2d);
       }
+
       for (DroppedItem item : droppedItems.values()) {
         item.draw(g2d);
       }
@@ -1027,7 +1091,6 @@ public class GameCanvas extends JComponent {
           out.writeUTF(msg);
           out.flush();
         } catch (IOException e) {
-          System.out.println("[WriteToServer] Failed to send: " + msg);
         }
       }
     }

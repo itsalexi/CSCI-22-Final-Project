@@ -64,7 +64,6 @@ public class Inventory {
     inventory[5] = new Item(9, 1);
     inventory[6] = new Item(11, 1);
     inventory[7] = new Item(13, 1);
-
     tiles = new Sprite(tileMapFiles.getFiles(), 32);
     isOpen = false;
     inventoryGrid = new TileGrid(tiles, inventoryMap);
@@ -109,7 +108,6 @@ public class Inventory {
     return quantity;
   }
 
-  // remove item doesnt work yet
   public void removeItem(int id, int quantity) {
 
     Item item = new Item(id, quantity);
@@ -128,37 +126,48 @@ public class Inventory {
   }
 
   public void addItem(int id, int quantity) {
-    System.out.println("trying to add item " + id + " " + quantity);
-    if (getEmptySlot() == -1) {
-      // drop item, discard for now lol
-      return;
-    }
-
     Item item = new Item(id, quantity);
 
     if (item.isStackable()) {
       Item inventoryItem = findUnfilledStack(item);
       if (inventoryItem != null) {
         int stackQuantity = inventoryItem.getQuantity();
+        int spaceLeft = 64 - stackQuantity;
 
-        if (stackQuantity + quantity > 64) {
-          inventoryItem.setQuantity(stackQuantity + Math.min(quantity, 64 - stackQuantity));
-          item.setQuantity(item.getQuantity() - Math.min(quantity, 64 - stackQuantity));
-          int stacks = (int) Math.floor(item.getQuantity() / 64);
-          for (int i = 0; i < stacks; i++) {
-            inventory[getEmptySlot()] = new Item(id, 64);
-          }
-          inventory[getEmptySlot()] = new Item(id, item.getQuantity() % 64);
+        int toAdd = Math.min(quantity, spaceLeft);
+        inventoryItem.setQuantity(stackQuantity + toAdd);
+        quantity -= toAdd;
+      }
 
-        } else {
-          inventoryItem.setQuantity(stackQuantity + quantity);
+      while (quantity >= 64) {
+        int slot = getEmptySlot();
+        if (slot == -1) {
+          canvas.dropItem(new Item(id, quantity), quantity);
+          return;
         }
-        return;
+        inventory[slot] = new Item(id, 64);
+        quantity -= 64;
+      }
+
+      if (quantity > 0) {
+        int slot = getEmptySlot();
+        if (slot == -1) {
+          canvas.dropItem(new Item(id, quantity), quantity);
+        } else {
+          inventory[slot] = new Item(id, quantity);
+        }
+      }
+
+    } else {
+      for (int i = 0; i < quantity; i++) {
+        int slot = getEmptySlot();
+        if (slot == -1) {
+          canvas.dropItem(new Item(id, 1), 1);
+        } else {
+          inventory[slot] = new Item(id, 1);
+        }
       }
     }
-
-    inventory[getEmptySlot()] = item;
-
   }
 
   public void setItem(int slot, Item item) {
