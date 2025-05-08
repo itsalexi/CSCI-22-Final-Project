@@ -5,15 +5,16 @@ public class SkillTreeSystem {
 
     private Skill rootSkill;
     private ArrayList<Skill> skills;
-    private Set<Skill> unlocked;
     private EconomySystem economySystem;
 
     public SkillTreeSystem(ArrayList<Skill> s, EconomySystem ec) {
        skills = s;
        rootSkill = s.get(0);
-       unlocked = new HashSet<>();
-       unlocked.add(rootSkill);
        economySystem = ec;
+    }
+
+    public ArrayList<Skill> getSkills() {
+        return skills;
     }
 
     public ArrayList<Skill> getSkillsAtLevel(int level) {
@@ -33,12 +34,8 @@ public class SkillTreeSystem {
         return output;
     }
 
-    public int getTreeHeight() {
-        return (int) (Math.log(skills.size() + 1) / Math.log(2)) - 1;
-    }
-
     public void unlockSkill(Skill s) {
-        if (unlocked.contains(s)) {
+        if (s.isUnlocked()) {
             return;
         }
 
@@ -46,11 +43,15 @@ public class SkillTreeSystem {
             return;
         }
 
-        for (Skill currSkill : unlocked) {
+        for (Skill currSkill : skills) {
+            if (!currSkill.isUnlocked()) {
+                continue;
+            }
             System.out.println("a");
             for (Skill unlockable : currSkill.getNextSkills()) {
                 if (s.equals(unlockable)) {
-                    unlocked.add(s);
+                    s.unlock();
+                    economySystem.setSkillPoints(economySystem.getSkillPoints() - s.getUnlockCost());
                     return;
                 }
             }
@@ -58,12 +59,9 @@ public class SkillTreeSystem {
     }
 
     public void upgradeSkill(Skill s) {
-        
-    
-
-        if (unlocked.contains(s)) {
-
+        if (s.isUnlocked() && s.getUpgradeCost() <= economySystem.getBalance() && !s.isMaxLevel()) {
+            economySystem.setBalance(economySystem.getBalance() - s.getUpgradeCost());
+            s.upgrade();
         }
-    }
-    
+    }    
 }

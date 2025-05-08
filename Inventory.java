@@ -212,7 +212,7 @@ public class Inventory {
     int tileY = (int) (localY / tileSize);
 
     if (tileX >= 0 && tileX < 11 && tileY >= 0 && tileY < 8) {
-      return new int[] { tileX, tileY, 0 };
+      return new int[] { tileX, tileY };
     }
 
     if (isOpen) {
@@ -221,7 +221,7 @@ public class Inventory {
       tileY = (int) (localY / tileSize);
 
       if (tileX >= 0 && tileX < 11 && tileY >= 0 && tileY < 8) {
-        return new int[] { tileX, tileY, 1 };
+        return new int[] { tileX, tileY };
       }
     }
 

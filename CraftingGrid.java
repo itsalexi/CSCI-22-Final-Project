@@ -162,7 +162,7 @@ public class CraftingGrid {
     int tileX = (int) (localX / tileSize);
     int tileY = (int) (localY / tileSize);
 
-    return new int[] { tileX, tileY, 0 };
+    return new int[] { tileX, tileY };
   }
 
   public void forwardPage() {

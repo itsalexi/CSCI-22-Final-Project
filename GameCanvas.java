@@ -33,6 +33,7 @@ public class GameCanvas extends JComponent {
   private int[] lastClickedInventoryTile;
   private int[] lastClickedCraftingTile;
   private int[] lastClickedShopTile;
+  private int[] lastClickedSkillTreeTile;
 
   private boolean isMapLoaded;
   private double anchorX, anchorY;
