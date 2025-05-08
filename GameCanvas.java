@@ -962,9 +962,7 @@ public class GameCanvas extends JComponent {
         }
 
         ArrayList<double[]> newPath = new ArrayList<>();
-        for (double[] pos : currPath) {
-          newPath.add(pos);
-        }
+        newPath.addAll(currPath);
         newPath.add(nextPosition);
         output.add(newPath);
 
@@ -994,6 +992,8 @@ public class GameCanvas extends JComponent {
     double halfViewHeight = (getHeight() / 2.0) / zoom;
 
     if (isMapLoaded) {
+
+      System.out.println(economySystem.getSkillPoints());
 
       if (!test) {
         findPathAsync(player.getSpriteDimensions(), new double[] { 0, 0 },

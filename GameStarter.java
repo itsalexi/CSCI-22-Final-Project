@@ -84,7 +84,9 @@ public class GameStarter {
                     x = Double.parseDouble(parts[2]);
                     y = Double.parseDouble(parts[3]);
                     int balance = Integer.parseInt(parts[4]);
+                    int skillPoints = Integer.parseInt(parts[5]);
                     canvas.getEconomySystem().setBalance(balance);
+                    canvas.getEconomySystem().setSkillPoints(skillPoints);
                     canvas.getPlayer().setPosition(x, y);
                     break;
 

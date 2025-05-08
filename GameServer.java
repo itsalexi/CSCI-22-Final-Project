@@ -19,7 +19,7 @@ public class GameServer {
   private static class PlayerState {
     double x, y;
     String direction, state, username;
-    int skin, balance;
+    int skin, balance, skillPoints;
   }
 
   private static class AnimalState {
@@ -250,7 +250,8 @@ public class GameServer {
             ps.y = coords[1] * 32;
             ps.direction = "DOWN";
             ps.state = "idle";
-            ps.balance = 200;
+            ps.balance = 200; // TODO: change to 0
+            ps.skillPoints = 20;
           }
 
           ps.username = username;
@@ -258,7 +259,7 @@ public class GameServer {
 
           playerStates.put(playerId, ps);
 
-          send("JOIN_SUCCESS " + playerId + " " + ps.x + " " + ps.y + " " + ps.balance);
+          send("JOIN_SUCCESS " + playerId + " " + ps.x + " " + ps.y + " " + ps.balance + " " + ps.skillPoints);
 
           if (animalControllerId == null) {
             animalControllerId = playerId;
