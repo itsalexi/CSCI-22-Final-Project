@@ -3,21 +3,33 @@ import java.util.ArrayList;
 public class Skill {
    
     private ArrayList<Skill> nextSkills;
+    private Skill prevSkill;
     private String name;
     private int unlockCost;
     private int initialUpgradeCost;
     private double scalingFactor;
     private int level;
     private int maxLevel;
+    private int skillIcon;
 
-    public Skill(String n, ArrayList<Skill> ns, int unlock, int upgrade, double scaling, int max) {
+    public Skill(String n, Skill prev, int unlock, int upgrade, double scaling, int max, int icon) {
         name = n;
-        nextSkills = ns;
+        prevSkill = prev;
         unlockCost = unlock;
         initialUpgradeCost = upgrade;
         scalingFactor = scaling;
         level = 0;
         maxLevel = max;
+        skillIcon = icon;
+        nextSkills = new ArrayList<>();
+    }
+
+    public Skill getPrevSkill() {
+        return prevSkill;
+    }
+
+    public int getIcon() {
+        return skillIcon;
     }
 
     public ArrayList<Skill> getNextSkills() {

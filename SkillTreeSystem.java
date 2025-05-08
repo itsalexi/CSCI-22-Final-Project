@@ -1,6 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 public class SkillTreeSystem {
 
     private Skill rootSkill;
@@ -9,8 +7,26 @@ public class SkillTreeSystem {
 
     public SkillTreeSystem(ArrayList<Skill> s, EconomySystem ec) {
        skills = s;
-       rootSkill = s.get(0);
+       rootSkill = getRootSkill(skills);
+       populateNextSkills(skills);
        economySystem = ec;
+    }
+
+    private void populateNextSkills(ArrayList<Skill> s) {
+        for (Skill skill : s) {
+            if (skill != rootSkill){
+                skill.getPrevSkill().addNextSkill(skill);
+            }
+        }
+    }
+
+    private Skill getRootSkill(ArrayList<Skill> s) {
+        for (Skill skill : s) {
+            if (skill.getPrevSkill() == null) {
+                return skill;
+            }
+        }
+        return null;
     }
 
     public ArrayList<Skill> getSkills() {

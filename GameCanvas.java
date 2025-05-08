@@ -50,10 +50,12 @@ public class GameCanvas extends JComponent {
 
   private CraftingGrid craftingGrid;
   private CraftingGrid shopGrid;
+  private SkillTreeGrid skillTree;
 
   private CraftingSystem craftingSystem;
   private EconomySystem economySystem;
   private ShopSystem shopSystem;
+  private SkillTreeSystem skillTreeSystem;
 
   private ArrayList<Recipe> recipes;
   private ArrayList<Recipe> trades;
@@ -91,6 +93,30 @@ public class GameCanvas extends JComponent {
     trades.add(new Recipe(new Item(14, 400), new Item(11, 1)));
     trades.add(new Recipe(new Item(14, 800), new Item(13, 1)));
     economySystem = new EconomySystem(this);
+
+    ArrayList<Skill> skills = new ArrayList<>(); // NOTE: add skills bottom-up
+
+    Skill one = new Skill("one", null, 1, 1, 1, 1, 0);
+    one.unlock();
+    one.upgrade();
+    Skill two = new Skill("two", one, 1, 1, 1, 1, 1);
+    two.unlock();
+    Skill three = new Skill("three", one, 1, 1, 1, 1, 2);
+    Skill four = new Skill("four", two, 1, 1, 1, 1, 3);
+    Skill five = new Skill("five", two, 1, 1, 1, 1, 4);
+    Skill six = new Skill("six", three, 1, 1, 1, 1, 5);
+    Skill seven = new Skill("seven", three, 1, 1, 1, 1, 6);
+
+    skills.add(one);
+    skills.add(two);
+    skills.add(three);
+    skills.add(four);
+    skills.add(five);
+    skills.add(six);
+    skills.add(seven);
+
+    skillTreeSystem = new SkillTreeSystem(skills, economySystem); // TODO: make skills
+    skillTree = new SkillTreeGrid(skillTreeSystem, this);
 
     craftingGrid = new CraftingGrid(recipes, this, false);
     shopGrid = new CraftingGrid(trades, this, true);
@@ -390,6 +416,15 @@ public class GameCanvas extends JComponent {
             }
             inventory.setOpen(!inventory.isOpen());
             break;
+          case KeyEvent.VK_C:
+            if (inventory.isOpen() && previousItemSlot != -1) {
+              if (hoveredItem != null) {
+                dropItem(hoveredItem, hoveredItem.getQuantity());
+                hoveredItem = null;
+                previousItemSlot = -1;
+              }
+            }
+            skillTree.setOpen(!skillTree.isOpen());
           case KeyEvent.VK_CONTROL:
             isCtrlPressed = true;
             break;
@@ -994,7 +1029,7 @@ public class GameCanvas extends JComponent {
 
     if (isMapLoaded) {
 
-      System.out.println(economySystem.getSkillPoints());
+      System.out.println(skillTree.isOpen());
 
       if (!test) {
         findPathAsync(player.getSpriteDimensions(), new double[] { 0, 0 },
@@ -1074,6 +1109,7 @@ public class GameCanvas extends JComponent {
       craftingGrid.draw(g2d);
       shopGrid.draw(g2d);
       goldCounter.draw(g2d);
+      skillTree.draw(g2d);
       // draw inventory highlight
       if (inventory.isOpen()) {
         drawInventoryHighlight(g2d);

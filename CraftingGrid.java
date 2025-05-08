@@ -102,7 +102,7 @@ public class CraftingGrid {
 
   }
 
-  public void drawCraftingQuantities(Graphics2D g2d) {
+  private void drawCraftingQuantities(Graphics2D g2d) {
     double tileSize = craftingItemsGrid.getTileSize();
 
     int start = currentPage * 4;
