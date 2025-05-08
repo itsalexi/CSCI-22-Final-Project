@@ -276,13 +276,13 @@ public class GameServer {
 
           Item[] inv = new Item[36];
           inv[0] = new Item(1, 1);
-          // inv[1] = new Item(0, 1);
-          // inv[2] = new Item(3, 32);
-          // inv[3] = new Item(5, 1);
-          // inv[4] = new Item(7, 1);
-          // inv[5] = new Item(9, 1);
-          // inv[6] = new Item(11, 1);
-          // inv[7] = new Item(13, 1);
+          inv[1] = new Item(0, 1);
+          inv[2] = new Item(3, 1);
+          inv[3] = new Item(5, 1);
+          inv[4] = new Item(7, 1);
+          inv[5] = new Item(9, 1);
+          inv[6] = new Item(11, 1);
+          inv[7] = new Item(13, 1);
 
           if (savedInventories.containsKey(playerId)) {
             System.out.println("test");

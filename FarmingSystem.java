@@ -7,6 +7,7 @@ public class FarmingSystem {
   private Map<String, Integer> plants;
   private Map<String, Long> lastGrowthTimestamps;
   private Map<String, Integer> drops;
+  private Map<String, Long> plantGrowthTimes;
 
   public FarmingSystem(int size) {
     farmMap = new int[size][size];
@@ -18,6 +19,7 @@ public class FarmingSystem {
     lastGrowthTimestamps = new HashMap<>();
     plants = new HashMap<>();
     drops = new HashMap<>();
+    plantGrowthTimes = new HashMap<>();
 
     plants.put("blueberry", 0);
     plants.put("carrot", 6);
@@ -32,6 +34,12 @@ public class FarmingSystem {
     drops.put("potato", 4);
     drops.put("strawberry", 10);
     drops.put("wheat", 2);
+    plantGrowthTimes.put("wheat", 10000L);
+    plantGrowthTimes.put("potato", 15000L);
+    plantGrowthTimes.put("carrot", 15000L);
+    plantGrowthTimes.put("onion", 20000L);
+    plantGrowthTimes.put("strawberry", 20000L);
+    plantGrowthTimes.put("blueberry", 30000L);
   }
 
   public int getPlantFromIndex(int val) {
@@ -42,6 +50,16 @@ public class FarmingSystem {
       return -1;
 
     return drops.get(plantNames[index]);
+  }
+
+  public String getPlantNameFromIndex(int val) {
+    String[] plantNames = { "blueberry", "carrot", "onion", "potato", "strawberry", "wheat" };
+
+    int index = (int) Math.floor(val / 6);
+    if (index >= plantNames.length)
+      return null;
+
+    return plantNames[index];
   }
 
   public String plant(int x, int y, String plant) {
@@ -58,14 +76,16 @@ public class FarmingSystem {
     if (val < 6 && val == 5 || val >= 6 && val % 6 == 5) {
       return "";
     }
-    long now = System.currentTimeMillis();
     long last = lastGrowthTimestamps.getOrDefault(x + "," + y, 0L);
+    long current = System.currentTimeMillis();
+    long growthTime = plantGrowthTimes.get(getPlantNameFromIndex(val));
 
-    if (now - last < 10)
+    if (current - last < growthTime)
       return "";
 
     farmMap[y][x] += 1;
-    lastGrowthTimestamps.put(x + "," + y, now);
+    lastGrowthTimestamps.put(x + "," + y, current);
+
     return String.format("UPDATE farm %d %d %d", val + 1, x, y);
   }
 
