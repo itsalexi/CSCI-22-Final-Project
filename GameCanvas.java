@@ -45,6 +45,7 @@ public class GameCanvas extends JComponent {
   private Boolean test;
   private boolean isCtrlPressed;
   private ArrayList<Rectangle2D> currentPath;
+  private int mouseX, mouseY;
 
   private GoldCounter goldCounter;
 
@@ -694,6 +695,9 @@ public class GameCanvas extends JComponent {
     this.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseMoved(MouseEvent e) {
+        mouseX = e.getX();
+        mouseY = e.getY();
+
         double x = (e.getX() - (getWidth() / 2)) / zoom + anchorX;
         double y = (e.getY() - (getHeight() / 2)) / zoom + anchorY;
 
@@ -918,6 +922,16 @@ public class GameCanvas extends JComponent {
     g2d.translate(xOffset, yOffset);
     invHighlight.setPosition(tileX * tileSize, tileY * tileSize);
     invHighlight.draw(g2d);
+    Item hoveringItem = inventory.getItem(inventory.getSlotFromGrid(tileX, tileY));
+    if (hoveringItem != null) {
+      ArrayList<TextLine> lines = new ArrayList<>();
+      lines.add(new TextLine(hoveringItem.getName(), Color.WHITE, Color.BLACK));
+      HoverInfo hoveredInfo = new HoverInfo(lines);
+      g2d.translate(mouseX - xOffset, (mouseY - yOffset - 32));
+      hoveredInfo.draw(g2d);
+      g2d.translate(-(mouseX - xOffset), -(mouseY - yOffset - 32));
+    }
+
     g2d.translate(-xOffset, -yOffset);
   }
 

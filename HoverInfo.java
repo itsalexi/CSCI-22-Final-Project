@@ -1,0 +1,87 @@
+
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+
+public class HoverInfo {
+  private TileGrid hoverInfoGrid;
+  private int[][] hoverInfoMap;
+  private ArrayList<TextLine> lines;
+  private boolean mapInitialized;
+
+  public HoverInfo(ArrayList<TextLine> l) {
+    lines = l;
+  }
+
+  private void initializeGrid(Graphics2D g2d) {
+    int max = -1;
+    Font font = new Font("Arial", Font.PLAIN, 24);
+
+    for (TextLine line : lines) {
+      FontMetrics metrics = g2d.getFontMetrics(font);
+      int width = metrics.stringWidth(line.getText());
+      if (width > max) {
+        max = width;
+      }
+    }
+
+    SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap/inventory");
+    Sprite sprite = new Sprite(tileMapFiles.getFiles(), 32);
+
+    int height = 2 + lines.size();
+    int width = 3 + max / (int) sprite.getSize();
+
+    hoverInfoMap = new int[height][width];
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        if (y == 0 && x == 0) {
+          // top left
+          hoverInfoMap[y][x] = 2;
+        } else if (y == 0 && x == width - 1) {
+          // top right
+          hoverInfoMap[y][x] = 6;
+        } else if (y == height - 1 && x == 0) {
+          // bottom left
+          hoverInfoMap[y][x] = 4;
+        } else if (y == height - 1 && x == width - 1) {
+          // bottom right
+          hoverInfoMap[y][x] = 8;
+        } else if (y == 0) {
+          // top
+          hoverInfoMap[y][x] = 5;
+        } else if (y == height - 1) {
+          // bottom
+          hoverInfoMap[y][x] = 9;
+        } else if (x == 0) {
+          // left
+          hoverInfoMap[y][x] = 3;
+        } else if (x == width - 1) {
+          // right
+          hoverInfoMap[y][x] = 7;
+        } else {
+          // center
+          hoverInfoMap[y][x] = 10;
+        }
+      }
+    }
+
+    hoverInfoGrid = new TileGrid(sprite, hoverInfoMap);
+    mapInitialized = true;
+  }
+
+  public void draw(Graphics2D g2d) {
+    if (!mapInitialized) {
+      initializeGrid(g2d);
+    }
+    hoverInfoGrid.draw(g2d);
+
+    for (int i = 0; i < lines.size(); i++) {
+      TextLine line = lines.get(i);
+      Font font = new Font("Arial", Font.PLAIN, 24);
+      g2d.setFont(font);
+      g2d.drawString(line.getText(), 32, +((i + 2) * 32) - 8);
+    }
+  }
+
+}
