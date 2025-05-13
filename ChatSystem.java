@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Timer;
@@ -46,9 +48,26 @@ public class ChatSystem {
     this.currentInput = input;
   }
 
+  private ArrayList<String> wrapText(String message) {
+    ArrayList<String> output = new ArrayList<>();
+    String curr = "";
+    AffineTransform transform = new AffineTransform();
+    FontRenderContext frc = new FontRenderContext(transform, true, true);
+    Font font = new Font("SansSerif", Font.PLAIN, 14);
+    for (int i = 0; i < message.length(); i++) {
+      if (font.getStringBounds(curr, frc).getWidth() > 380) {
+        output.add(curr);
+        curr = "";
+      }
+      curr += message.charAt(i);
+    }
+    output.add(curr);
+    return output;
+  }
+
   public void addMessage(String message) {
-    messages.add(message);
-    if (messages.size() > 5) {
+    messages.addAll(wrapText(message));
+    while (messages.size() > 5) {
       messages.remove(0);
     }
   }

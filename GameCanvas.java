@@ -538,7 +538,7 @@ public class GameCanvas extends JComponent {
             chatSystem.setChatOpen(!chatSystem.isChatOpen());
 
             // control message limit
-          } else if (!Character.isISOControl(c) && chatSystem.getMessageContent().length() <= 80) {
+          } else if (!Character.isISOControl(c) && chatSystem.getMessageContent().length() <= 400) {
             inputText += c;
             chatSystem.setCurrentInput(inputText);
           }
