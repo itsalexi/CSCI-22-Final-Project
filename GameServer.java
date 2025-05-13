@@ -237,6 +237,7 @@ public class GameServer {
             return;
           }
 
+          players.remove(playerId);
           playerId = username;
           players.put(playerId, this);
 
@@ -516,6 +517,7 @@ public class GameServer {
 
             }
           }
+          break;
         }
 
         case "PLAY_SOUND": {
@@ -544,6 +546,9 @@ public class GameServer {
     for (PlayerConnection pc : players.values()) {
       if (!pc.playerId.equals(senderId)) {
         pc.send(msg);
+      }
+      if (msg.contains("CHAT")) {
+        System.out.println(pc.playerId);
       }
     }
   }
