@@ -282,7 +282,10 @@ public class GameStarter {
                     break;
                 case "PLAY_SOUND":
                     String soundCode = parts[1];
-                    canvas.playSound(soundCode);
+                    x = Double.parseDouble(parts[2]);
+                    y = Double.parseDouble(parts[3]);
+
+                    canvas.playSound(soundCode, x, y);
             }
 
         }

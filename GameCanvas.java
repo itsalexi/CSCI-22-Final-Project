@@ -1163,7 +1163,10 @@ public class GameCanvas extends JComponent {
     }
   }
 
-  public void playSound(String soundCode) {
+  public void playSound(String soundCode, double x, double y) {
+    // TODO: adjust volume based on the position of the player and the position of
+    // the sound
+
     System.out.println("playing sound: " + soundCode);
     // String filename;
     // switch (soundCode) {
@@ -1187,8 +1190,12 @@ public class GameCanvas extends JComponent {
   }
 
   public void playGlobalSound(String soundCode) {
-    playSound(soundCode);
-    writer.send("PLAY_SOUND " + soundCode);
+    playLocalSound(soundCode);
+    writer.send("PLAY_SOUND " + soundCode + " " + player.getX() + " " + player.getY());
+  }
+
+  public void playLocalSound(String soundCode) {
+    playSound(soundCode, player.getX(), player.getY());
   }
 
   public class WriteToServer implements Runnable {
