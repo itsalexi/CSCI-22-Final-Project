@@ -15,6 +15,11 @@ public class GameStarter {
     private DataOutputStream out;
 
     public void start() {
+        SetupFrame sf = new SetupFrame(this);
+        sf.setUpGUI();
+    }
+
+    public void startGame() {
 
         try {
             socket = new Socket("localhost", 25565);
@@ -275,6 +280,9 @@ public class GameStarter {
                         canvas.getDroppedItems().remove(droppedItemId);
                     }
                     break;
+                case "PLAY_SOUND":
+                    String soundCode = parts[1];
+                    canvas.playSound(soundCode);
             }
 
         }

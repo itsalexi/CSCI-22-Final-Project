@@ -3,6 +3,7 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -12,6 +13,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 public class GameCanvas extends JComponent {
@@ -570,6 +575,7 @@ public class GameCanvas extends JComponent {
       player.setAnimationState(walkState);
 
       player.setPosition(newX, newY);
+      playGlobalSound("WALK_NORMAL");
     }
 
   }
@@ -682,7 +688,6 @@ public class GameCanvas extends JComponent {
         double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
         int tileY = (int) Math.floor(y / tileSize);
-        System.out.printf("%d\n", tileGrids.get("edge").getTileAt(tileY, tileX));
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
 
@@ -705,8 +710,10 @@ public class GameCanvas extends JComponent {
         int tileX = (int) Math.floor(x / tileSize);
         int tileY = (int) Math.floor(y / tileSize);
 
-        lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
-        lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
+        if (isMapLoaded) {
+          lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
+          lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
+        }
       }
     });
 
@@ -1043,8 +1050,6 @@ public class GameCanvas extends JComponent {
 
     if (isMapLoaded) {
 
-      System.out.println(skillTree.isOpen());
-
       if (!test) {
         findPathAsync(player.getSpriteDimensions(), new double[] { 0, 0 },
             player.getSpeed(), path -> {
@@ -1156,6 +1161,34 @@ public class GameCanvas extends JComponent {
       // dialogue.draw(g2d);
 
     }
+  }
+
+  public void playSound(String soundCode) {
+    System.out.println("playing sound: " + soundCode);
+    // String filename;
+    // switch (soundCode) {
+    // case "WATER_WALK" -> filename = "assets/sfx/water_walk.wav";
+    // case "FOLIAGE_BREAK" -> filename = "assets/sfx/foliage_break.wav";
+    // case "INVENTORY_OPEN" -> filename = "assets/sfx/inventory_open.wav";
+    // case "WALK_NORMAL" -> filename = "assets/sfx/walk_normal.wav";
+    // default -> filename = "sfx/water_walk.wav";
+    // }
+
+    // try {
+    // Clip clip = AudioSystem.getClip();
+    // AudioInputStream inputStream = AudioSystem.getAudioInputStream(new
+    // File(filename).getAbsoluteFile());
+    // clip.open(inputStream);
+    // clip.start();
+    // } catch (Exception e) {
+    // System.out.println(e.getMessage());
+    // // System.out.printf("Error playing sound %s", soundCode);
+    // }
+  }
+
+  public void playGlobalSound(String soundCode) {
+    playSound(soundCode);
+    writer.send("PLAY_SOUND " + soundCode);
   }
 
   public class WriteToServer implements Runnable {

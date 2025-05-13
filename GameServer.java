@@ -517,6 +517,10 @@ public class GameServer {
             }
           }
         }
+
+        case "PLAY_SOUND": {
+          broadcast(msg, playerId);
+        }
       }
     }
 

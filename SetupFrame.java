@@ -1,18 +1,18 @@
 import java.awt.Dimension;
 import javax.swing.*;
 
-public class GameFrame {
+public class SetupFrame {
 
     private JFrame f;
-    private GameCanvas gc;
+    private MainMenu mm;
 
-    public GameFrame() {
+    public SetupFrame(GameStarter s) {
         f = new JFrame();
-        gc = new GameCanvas();
+        mm = new MainMenu(s, this);
     }
 
     public void setUpGUI() {
-        f.add(gc);
+        f.add(mm);
         f.setPreferredSize(new Dimension(1024, 768));
         f.setTitle("Garden of Eden");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -21,7 +21,8 @@ public class GameFrame {
         f.setVisible(true);
     }
 
-    public GameCanvas getCanvas() {
-        return gc;
+    public JFrame getSetupFrame() {
+        return f;
     }
+
 }
