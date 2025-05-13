@@ -286,9 +286,19 @@ public class GameStarter {
                     y = Double.parseDouble(parts[3]);
 
                     canvas.playSound(soundCode, x, y);
-            }
+                    break;
+                case "CHAT":
+                    String content = "";
+                    int start = msg.indexOf('(');
+                    int end = msg.lastIndexOf(')');
+                    if (start != -1 && end != -1 && end > start) {
+                        content = msg.substring(start + 1, end).trim();
+                    }
 
+                    canvas.getChatSystem().addMessage(content);
+            }
         }
+
     }
 
     public String getPlayerID() {

@@ -520,6 +520,11 @@ public class GameServer {
 
         case "PLAY_SOUND": {
           broadcast(msg, playerId);
+          break;
+        }
+        case "CHAT": {
+          broadcast(msg, playerId);
+          break;
         }
       }
     }

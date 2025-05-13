@@ -3,7 +3,6 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -13,10 +12,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 public class GameCanvas extends JComponent {
@@ -62,6 +57,8 @@ public class GameCanvas extends JComponent {
   private EconomySystem economySystem;
   private ShopSystem shopSystem;
   private SkillTreeSystem skillTreeSystem;
+  private ChatSystem chatSystem;
+  private String inputText = "";
 
   private ArrayList<Recipe> recipes;
   private ArrayList<Recipe> trades;
@@ -73,8 +70,8 @@ public class GameCanvas extends JComponent {
     animals = new HashMap<>();
     droppedItems = new HashMap<>();
     inventory = new Inventory(this);
-
     collidableGrids = new ArrayList<>();
+    chatSystem = new ChatSystem();
 
     recipes = new ArrayList<>();
     trades = new ArrayList<>();
@@ -201,6 +198,7 @@ public class GameCanvas extends JComponent {
   }
 
   public void initializeWorld() {
+    chatSystem.setUsername(client.getPlayerID());
     collidableGrids.add(tileGrids.get("tree"));
     setMapLoaded(true);
 
@@ -413,6 +411,9 @@ public class GameCanvas extends JComponent {
             direction = "RIGHT";
             break;
           case KeyEvent.VK_E:
+            if (chatSystem.isChatOpen())
+              return;
+
             if (inventory.isOpen() && previousItemSlot != -1) {
               if (hoveredItem != null) {
                 dropItem(hoveredItem, hoveredItem.getQuantity());
@@ -433,6 +434,18 @@ public class GameCanvas extends JComponent {
             skillTree.setOpen(!skillTree.isOpen());
           case KeyEvent.VK_CONTROL:
             isCtrlPressed = true;
+            break;
+          case KeyEvent.VK_T:
+            if (!chatSystem.isChatOpen()) {
+              chatSystem.setChatOpen(!chatSystem.isChatOpen());
+              chatSystem.setCurrentInput("");
+            }
+            break;
+          case KeyEvent.VK_ESCAPE:
+            if (chatSystem.isChatOpen()) {
+              chatSystem.setChatOpen(false);
+              chatSystem.setCurrentInput("");
+            }
             break;
           case KeyEvent.VK_Q:
             if (!inventory.isOpen()) {
@@ -458,7 +471,7 @@ public class GameCanvas extends JComponent {
 
         }
 
-        if (direction != null) {
+        if (direction != null && !chatSystem.isChatOpen()) {
           player.setDirectionStatus(direction, true);
         }
       }
@@ -505,6 +518,43 @@ public class GameCanvas extends JComponent {
       }
 
     });
+    this.addKeyListener(new KeyAdapter() {
+
+      @Override
+      public void keyTyped(KeyEvent e) {
+
+        if (chatSystem.isChatOpen()) {
+
+          char c = e.getKeyChar();
+
+          if (c == '\n') {
+            if (!inputText.isBlank()) {
+              writer.send(String.format("CHAT (%s)", chatSystem.getMessageContent()));
+
+              chatSystem.addMessage(chatSystem.getMessageContent());
+              inputText = "";
+              chatSystem.setCurrentInput("");
+            }
+            chatSystem.setChatOpen(!chatSystem.isChatOpen());
+
+            // control message limit
+          } else if (!Character.isISOControl(c) && chatSystem.getMessageContent().length() <= 80) {
+            inputText += c;
+            chatSystem.setCurrentInput(inputText);
+          }
+        }
+      }
+
+      @Override
+      public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && inputText.length() > 0) {
+          inputText = inputText.substring(0, inputText.length() - 1);
+          chatSystem.setCurrentInput(inputText);
+          repaint();
+        }
+      }
+    });
+
   }
 
   private double[] addVector(double x1, double y1, double x2, double y2) {
@@ -515,8 +565,12 @@ public class GameCanvas extends JComponent {
     return result;
   }
 
+  public ChatSystem getChatSystem() {
+    return chatSystem;
+  }
+
   public void movePlayer() {
-    if (player.isDoingAction())
+    if (player.isDoingAction() || chatSystem.isChatOpen())
       return;
     boolean isInWater = isPlayerInWater();
 
@@ -1129,6 +1183,7 @@ public class GameCanvas extends JComponent {
       shopGrid.draw(g2d);
       goldCounter.draw(g2d);
       skillTree.draw(g2d);
+      chatSystem.draw(g2d);
       // draw inventory highlight
       if (inventory.isOpen()) {
         drawInventoryHighlight(g2d);
