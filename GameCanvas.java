@@ -1222,7 +1222,6 @@ public class GameCanvas extends JComponent {
     // TODO: adjust volume based on the position of the player and the position of
     // the sound
 
-    System.out.println("playing sound: " + soundCode);
     // String filename;
     // switch (soundCode) {
     // case "WATER_WALK" -> filename = "assets/sfx/water_walk.wav";
