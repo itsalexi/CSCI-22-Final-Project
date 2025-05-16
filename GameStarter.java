@@ -296,6 +296,17 @@ public class GameStarter {
                     }
 
                     canvas.getChatSystem().addMessage(content);
+                    break;
+                case "ECONOMY":
+                    action = parts[1];
+                    int amount = Integer.parseInt(parts[3]);
+
+                    if (action.equals("ADD")) {
+                        EconomySystem es = canvas.getEconomySystem();
+                        es.setBalance(es.getBalance() + amount);
+                        ChatSystem cs = canvas.getChatSystem();
+                        cs.addMessage("You have received " + amount + " coins!");
+                    }
             }
         }
 

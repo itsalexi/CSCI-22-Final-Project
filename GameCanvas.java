@@ -529,13 +529,46 @@ public class GameCanvas extends JComponent {
 
           if (c == '\n') {
             if (!inputText.isBlank()) {
-              writer.send(String.format("CHAT (%s)", chatSystem.getMessageContent()));
+              if (inputText.startsWith("/")) {
+                String command = inputText.substring(1);
+                String[] parts = command.split(" ");
+                String action = parts[0].toUpperCase();
+                switch (action) {
+                  case "SEND":
+                    if (parts.length == 3) {
+                      String playerId = parts[1];
+                      int amount = Integer.parseInt(parts[2]);
+                      if (playerExists(playerId) || playerId.equals(client.getPlayerID())) {
+                        if (economySystem.getBalance() - amount >= 0) {
+                          writer.send(String.format("ECONOMY ADD %s %d", playerId, amount));
+                          economySystem.setBalance(economySystem.getBalance() - amount);
+                          chatSystem.addMessage(String.format("[GAME] Sent %d coins to %s", amount, playerId));
+                        } else {
+                          chatSystem.addMessage("You do not have the coins to do that.");
+                        }
+                      } else {
+                        chatSystem.addMessage(String
+                            .format("[GAME] Player %s does not exist, or you are sending to yourself.", playerId));
+                      }
 
-              chatSystem.addMessage(chatSystem.getMessageContent());
-              inputText = "";
-              chatSystem.setCurrentInput("");
+                    } else {
+                      chatSystem.addMessage("[GAME] Missing arguments.");
+                    }
+                    break;
+                  default:
+                    chatSystem.addMessage("[GAME] Invalid Command.");
+                }
+                System.out.println(action);
+              } else {
+                writer.send(String.format("CHAT (%s)", chatSystem.getMessageContent()));
+
+                chatSystem.addMessage(chatSystem.getMessageContent());
+
+              }
             }
             chatSystem.setChatOpen(!chatSystem.isChatOpen());
+            inputText = "";
+            chatSystem.setCurrentInput("");
 
             // control message limit
           } else if (!Character.isISOControl(c) && chatSystem.getMessageContent().length() <= 400) {
@@ -555,6 +588,15 @@ public class GameCanvas extends JComponent {
       }
     });
 
+  }
+
+  private boolean playerExists(String playerId) {
+    for (Player player : otherPlayers.values()) {
+      if (player.getId().equals(playerId)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private double[] addVector(double x1, double y1, double x2, double y2) {
@@ -685,7 +727,7 @@ public class GameCanvas extends JComponent {
   }
 
   public void addPlayer(String id, String username, int skin, double x, double y, String dir, String state) {
-    Player newPlayer = new Player(username, skin);
+    Player newPlayer = new Player(id, skin);
     newPlayer.setPosition(x, y);
     newPlayer.setDirection(dir);
     newPlayer.setAnimationState(state);

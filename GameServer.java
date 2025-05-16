@@ -378,6 +378,11 @@ public class GameServer {
           if (action.equals("SET")) {
             PlayerState player = playerStates.get(id);
             player.balance = newBalance;
+          } else if (action.equals("ADD")) {
+            PlayerState player = playerStates.get(id);
+            PlayerConnection ps = players.get(id);
+            player.balance = player.balance + newBalance;
+            ps.send(msg);
           }
           break;
         }

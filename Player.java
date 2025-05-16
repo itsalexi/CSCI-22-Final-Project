@@ -11,7 +11,7 @@ public class Player {
     private long animStartTime;
 
     private int type;
-    private String username;
+    private String id;
 
     private Map<String, PlayerAction> playerActions;
     private String activeTool;
@@ -22,7 +22,7 @@ public class Player {
         y = 0;
         speed = 2.0;
         type = t;
-        username = u;
+        id = u;
         activeTool = "hoe";
         String pathName = String.format("assets/characters/%d/", type);
 
@@ -127,6 +127,10 @@ public class Player {
 
     public double getX() {
         return x;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public Rectangle2D getHitboxAt(double newX, double newY) {
