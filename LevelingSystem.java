@@ -3,17 +3,27 @@ public class LevelingSystem {
   private int level;
   private EconomySystem skillPoints;
 
+  private static final double BASE_XP = 100;
+  private static final double GROWTH_RATE = 1.2;
+
   public LevelingSystem() {
     xp = 0;
     level = 0;
   }
 
-  // public double xpToNextLevel() {
-  // }
+  public double xpToNextLevel() {
+    return BASE_XP * Math.pow(GROWTH_RATE, level);
+  }
 
-  public void addXP(double xp) {
-    // add xp, if level increased, increase the level, and add a skill point
-
+  public void addXP(double amount) {
+    xp += amount;
+    while (xp >= xpToNextLevel()) {
+      xp -= xpToNextLevel();
+      level++;
+      if (skillPoints != null) {
+        skillPoints.setSkillPoints(skillPoints.getSkillPoints() + 1);
+      }
+    }
   }
 
   public void setLevel(int l) {

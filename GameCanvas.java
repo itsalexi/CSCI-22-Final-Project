@@ -1226,6 +1226,7 @@ public class GameCanvas extends JComponent {
       goldCounter.draw(g2d);
       skillTree.draw(g2d);
       chatSystem.draw(g2d);
+      
       // draw inventory highlight
       if (inventory.isOpen()) {
         drawInventoryHighlight(g2d);

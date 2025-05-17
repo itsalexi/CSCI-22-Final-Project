@@ -7,6 +7,8 @@ public class FarmingSystem {
   private Map<String, Integer> plants;
   private Map<String, Long> lastGrowthTimestamps;
   private Map<String, Integer> drops;
+  private Map<String, Integer[]> dropQuantities;
+
   private Map<String, Long> plantGrowthTimes;
 
   public FarmingSystem(int size) {
@@ -40,6 +42,13 @@ public class FarmingSystem {
     plantGrowthTimes.put("onion", 20000L);
     plantGrowthTimes.put("strawberry", 20000L);
     plantGrowthTimes.put("blueberry", 30000L);
+
+    dropQuantities.put("wheat", new Integer[] { 1, 2 });
+    dropQuantities.put("potato", new Integer[] { 1, 2 });
+    dropQuantities.put("carrot", new Integer[] { 1, 2 });
+    dropQuantities.put("onion", new Integer[] { 1, 2 });
+    dropQuantities.put("strawberry", new Integer[] { 2, 3 });
+    dropQuantities.put("blueberry", new Integer[] { 3, 4 });
   }
 
   public int getPlantFromIndex(int val) {
@@ -69,6 +78,12 @@ public class FarmingSystem {
     lastGrowthTimestamps.put(x + "," + y, System.currentTimeMillis());
     farmMap[y][x] = plants.get(plant);
     return String.format("UPDATE farm %d %d %d", plants.get(plant), x, y);
+  }
+
+  public int getRandomQuantity(String plantString) {
+    Integer[] range = dropQuantities.get(plantString);
+
+    return range[0] + (int) (Math.random() * (range[1] - range[0]));
   }
 
   public String grow(int x, int y) {
