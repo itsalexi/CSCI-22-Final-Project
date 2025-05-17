@@ -1,4 +1,7 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
 public class Inventory {
   private TileGrid inventoryGrid;
@@ -9,6 +12,11 @@ public class Inventory {
   private boolean isOpen;
   private int activeHotbarSlot;
   private GameCanvas canvas;
+
+  private Timer itemSwitchTimer;
+
+  private long lastSwitchedItem;
+  private float activeItemTextAlpha;
 
   private int[][] inventoryMap = {
       { 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6 },
@@ -37,6 +45,7 @@ public class Inventory {
     items = new Sprite(itemFiles.getFiles(), 32);
     canvas = c;
     activeHotbarSlot = 0;
+    activeItemTextAlpha = 0f;
 
     inventory = new Item[36];
 
@@ -60,7 +69,21 @@ public class Inventory {
     isOpen = false;
     inventoryGrid = new TileGrid(tiles, inventoryMap);
     itemsGrid = new TileGrid(items, itemsMap);
+    lastSwitchedItem = System.currentTimeMillis();
 
+    itemSwitchTimer = new Timer(1000 / 60, new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        Long delta = System.currentTimeMillis() - lastSwitchedItem;
+        activeItemTextAlpha = (float) clamp(0, 1, (double) -delta / 500 + 4);
+      }
+    });
+    itemSwitchTimer.start();
+
+  }
+
+  private double clamp(double left, double right, double value) {
+    return Math.max(left, Math.min(right, value));
   }
 
   public Item[] getInventory() {
@@ -187,6 +210,7 @@ public class Inventory {
   }
 
   public void setActiveHotbarSlot(int slot) {
+    lastSwitchedItem = System.currentTimeMillis();
     activeHotbarSlot = slot;
   }
 
@@ -300,6 +324,7 @@ public class Inventory {
     double y = canvas.getHeight() - gridHeight;
 
     if (getActiveItem() != null) {
+      g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, activeItemTextAlpha));
 
       g2d.setColor(Color.WHITE);
       g2d.setFont(new Font("Arial", 1, (int) (20 * tileSize / 32)));
@@ -317,6 +342,7 @@ public class Inventory {
       g2d.setColor(Color.WHITE);
 
       g2d.drawString(text, itemTextX, itemTextY);
+      g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
     }
 
     for (int i = 0; i < inventory.length; i++) {

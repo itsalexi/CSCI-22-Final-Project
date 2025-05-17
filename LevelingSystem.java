@@ -1,3 +1,7 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
+
 public class LevelingSystem {
   private double xp;
   private int level;
@@ -6,9 +10,30 @@ public class LevelingSystem {
   private static final double BASE_XP = 100;
   private static final double GROWTH_RATE = 1.2;
 
-  public LevelingSystem() {
+  private long lastXPGain;
+
+  private Timer xpTextTimer;
+  private float xpTextAlpha;
+
+  public LevelingSystem(EconomySystem sp) {
     xp = 0;
     level = 0;
+    skillPoints = sp;
+    lastXPGain = System.currentTimeMillis();
+    xpTextAlpha = 0;
+
+    xpTextTimer = new Timer(1000 / 60, new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        Long delta = System.currentTimeMillis() - lastXPGain;
+        xpTextAlpha = (float) clamp(0, 1, (double) -delta / 500 + 4);
+      }
+    });
+    xpTextTimer.start();
+  }
+
+  private double clamp(double left, double right, double value) {
+    return Math.max(left, Math.min(right, value));
   }
 
   public double xpToNextLevel() {
@@ -36,6 +61,10 @@ public class LevelingSystem {
 
   public int getLevel() {
     return level;
+  }
+
+  public void draw() {
+
   }
 
 }

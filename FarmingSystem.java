@@ -8,7 +8,7 @@ public class FarmingSystem {
   private Map<String, Long> lastGrowthTimestamps;
   private Map<String, Integer> drops;
   private Map<String, Integer[]> dropQuantities;
-
+  private Map<String, Integer> xpDrops;
   private Map<String, Long> plantGrowthTimes;
 
   public FarmingSystem(int size) {
@@ -22,6 +22,8 @@ public class FarmingSystem {
     plants = new HashMap<>();
     drops = new HashMap<>();
     plantGrowthTimes = new HashMap<>();
+    xpDrops = new HashMap<>();
+    dropQuantities = new HashMap<>();
 
     plants.put("blueberry", 0);
     plants.put("carrot", 6);
@@ -36,6 +38,14 @@ public class FarmingSystem {
     drops.put("potato", 4);
     drops.put("strawberry", 10);
     drops.put("wheat", 2);
+
+    xpDrops.put("blueberry", 75);
+    xpDrops.put("carrot", 25);
+    xpDrops.put("onion", 40);
+    xpDrops.put("potato", 15);
+    xpDrops.put("strawberry", 60);
+    xpDrops.put("wheat", 10);
+
     plantGrowthTimes.put("wheat", 10000L);
     plantGrowthTimes.put("potato", 15000L);
     plantGrowthTimes.put("carrot", 15000L);
@@ -84,6 +94,11 @@ public class FarmingSystem {
     Integer[] range = dropQuantities.get(plantString);
 
     return range[0] + (int) (Math.random() * (range[1] - range[0]));
+  }
+
+  public int getXPFromPlant(String plantString) {
+    int xp = xpDrops.get(plantString);
+    return xp;
   }
 
   public String grow(int x, int y) {

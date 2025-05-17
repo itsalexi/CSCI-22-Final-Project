@@ -58,6 +58,9 @@ public class GameCanvas extends JComponent {
   private ShopSystem shopSystem;
   private SkillTreeSystem skillTreeSystem;
   private ChatSystem chatSystem;
+  private FarmingSystem farmSystem;
+  private LevelingSystem levelingSystem;
+
   private String inputText = "";
 
   private ArrayList<Recipe> recipes;
@@ -72,6 +75,7 @@ public class GameCanvas extends JComponent {
     inventory = new Inventory(this);
     collidableGrids = new ArrayList<>();
     chatSystem = new ChatSystem();
+    farmSystem = new FarmingSystem(0);
 
     recipes = new ArrayList<>();
     trades = new ArrayList<>();
@@ -125,6 +129,7 @@ public class GameCanvas extends JComponent {
     shopGrid = new CraftingGrid(trades, this, true);
     craftingSystem = new CraftingSystem(recipes, inventory);
     shopSystem = new ShopSystem(trades, inventory, economySystem);
+    levelingSystem = new LevelingSystem(economySystem);
 
     goldCounter = new GoldCounter(this);
 
@@ -350,8 +355,15 @@ public class GameCanvas extends JComponent {
                 + actionString[0].toUpperCase() + " " + x
                 + " " + y + " "
                 + player.getDirection());
+            if (tileGrids.get("foliage").getTileAt(y, x) != -1) {
+              levelingSystem.addXP(3);
+            }
             if (actionString[0].equals("hoe")) {
-              if (tileGrids.get("farm").getTileAt(y, x) != -1) {
+              int tile = tileGrids.get("farm").getTileAt(y, x);
+              if (tile != -1) {
+                if (tile % 6 == 5) {
+                  levelingSystem.addXP(farmSystem.getXPFromPlant(farmSystem.getPlantNameFromIndex(tile)));
+                }
                 writer.send("FARM HARVEST " + x + " " + y + " " + client.getPlayerID());
               }
             }
@@ -1226,7 +1238,7 @@ public class GameCanvas extends JComponent {
       goldCounter.draw(g2d);
       skillTree.draw(g2d);
       chatSystem.draw(g2d);
-      
+
       // draw inventory highlight
       if (inventory.isOpen()) {
         drawInventoryHighlight(g2d);
