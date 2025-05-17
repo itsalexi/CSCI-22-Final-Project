@@ -130,7 +130,7 @@ public class GameCanvas extends JComponent {
     shopGrid = new CraftingGrid(trades, this, true);
     craftingSystem = new CraftingSystem(recipes, inventory);
     shopSystem = new ShopSystem(trades, inventory, economySystem);
-    levelingSystem = new LevelingSystem(economySystem);
+    levelingSystem = new LevelingSystem(economySystem, this);
 
     goldCounter = new GoldCounter(this);
 
@@ -1000,7 +1000,6 @@ public class GameCanvas extends JComponent {
           int recipeIndex = grid.getCurrentPage() * 4 + recipeRow;
           if (recipeIndex >= 0 && recipeIndex < infos.size()) {
             Recipe hoveredRecipe = infos.get(recipeIndex);
-            System.out.println(recipeIndex);
             if (hoveredRecipe != null) {
               ArrayList<TextLine> lines = new ArrayList<>();
               lines.add(
@@ -1314,6 +1313,7 @@ public class GameCanvas extends JComponent {
       if (hoverInfo != null) {
         hoverInfo.draw(g2d);
       }
+      levelingSystem.draw(g2d);
       // dialogue.draw(g2d);
 
     }
