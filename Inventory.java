@@ -289,7 +289,7 @@ public class Inventory {
         String quantityString = Integer.toString(inventory[i].getQuantity());
 
         g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("Arial", 1, (int) (25 * tileSize / 32)));
+        g2d.setFont(new Font("Minecraft", 1, (int) (25 * tileSize / 32)));
 
         FontMetrics fm = g2d.getFontMetrics();
 
@@ -327,7 +327,7 @@ public class Inventory {
       g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, activeItemTextAlpha));
 
       g2d.setColor(Color.WHITE);
-      g2d.setFont(new Font("Arial", 1, (int) (20 * tileSize / 32)));
+      g2d.setFont(new Font("Minecraft", 1, (int) (20 * tileSize / 32)));
       String text = getActiveItem().getName();
       int textWidth = g2d.getFontMetrics().stringWidth(text);
 

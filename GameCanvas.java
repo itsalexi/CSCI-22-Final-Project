@@ -65,6 +65,7 @@ public class GameCanvas extends JComponent {
 
   private ArrayList<Recipe> recipes;
   private ArrayList<Recipe> trades;
+  private HoverInfo hoverInfo;
 
   public GameCanvas() {
     isMapLoaded = false;
@@ -833,6 +834,8 @@ public class GameCanvas extends JComponent {
         int[] craftingTile = craftingGrid.getTileAtMouse(x, y);
         int[] shopTile = shopGrid.getTileAtMouse(x, y);
 
+        drawGridInfo(mouseX, mouseY);
+
         lastClickedCraftingTile[0] = craftingTile[0];
         lastClickedCraftingTile[1] = craftingTile[1];
 
@@ -884,6 +887,8 @@ public class GameCanvas extends JComponent {
 
           handleCraftingGrid(lastClickedCraftingTile[0], lastClickedCraftingTile[1]);
           handleShopGrid(lastClickedShopTile[0], lastClickedShopTile[1]);
+          System.out.println(lastClickedCraftingTile[0] + " " + lastClickedCraftingTile[1]);
+          System.out.println(lastClickedShopTile[0] + " " + lastClickedShopTile[1]);
 
           int tileX = lastClickedInventoryTile[0];
           int tileY = lastClickedInventoryTile[1];
@@ -972,6 +977,47 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  private void drawGridInfo(int mouseX, int mouseY) {
+    int tileX, tileY;
+    CraftingGrid grid;
+    ArrayList<Recipe> infos;
+
+    for (int i = 0; i < 2; i++) {
+      if (i == 0) {
+        tileX = lastClickedCraftingTile[0];
+        tileY = lastClickedCraftingTile[1];
+        grid = craftingGrid;
+        infos = recipes;
+      } else {
+        tileX = lastClickedShopTile[0];
+        tileY = lastClickedShopTile[1];
+        grid = shopGrid;
+        infos = trades;
+      }
+      if (tileY >= 2 && tileY <= 5) {
+        if (tileX == 3) {
+          int recipeRow = tileY - 2;
+          int recipeIndex = grid.getCurrentPage() * 4 + recipeRow;
+          if (recipeIndex >= 0 && recipeIndex < infos.size()) {
+            Recipe hoveredRecipe = infos.get(recipeIndex);
+            System.out.println(recipeIndex);
+            if (hoveredRecipe != null) {
+              ArrayList<TextLine> lines = new ArrayList<>();
+              lines.add(
+                  new TextLine(String.format("%s -> %s", hoveredRecipe.getItemIn().getName(),
+                      hoveredRecipe.getItemOut().getName()), Color.WHITE, Color.BLACK));
+              hoverInfo = new HoverInfo(lines, mouseX, mouseY);
+              System.out.println(String.format("%s -> %s", hoveredRecipe.getItemIn().getName(),
+                  hoveredRecipe.getItemOut().getName()));
+              return;
+            }
+          }
+        }
+      }
+    }
+    hoverInfo = null;
+  }
+
   public WriteToServer getWriter() {
     return writer;
   }
@@ -1041,10 +1087,8 @@ public class GameCanvas extends JComponent {
     if (hoveringItem != null) {
       ArrayList<TextLine> lines = new ArrayList<>();
       lines.add(new TextLine(hoveringItem.getName(), Color.WHITE, Color.BLACK));
-      HoverInfo hoveredInfo = new HoverInfo(lines);
-      g2d.translate(mouseX - xOffset, (mouseY - yOffset - 32));
+      HoverInfo hoveredInfo = new HoverInfo(lines, mouseX - xOffset, mouseY - yOffset - 32);
       hoveredInfo.draw(g2d);
-      g2d.translate(-(mouseX - xOffset), -(mouseY - yOffset - 32));
     }
 
     g2d.translate(-xOffset, -yOffset);
@@ -1247,7 +1291,7 @@ public class GameCanvas extends JComponent {
           String quantityString = Integer.toString(hoveredItem.getQuantity());
 
           g2d.setColor(Color.BLACK);
-          g2d.setFont(new Font("Arial", 1, (int) (25 * getWidth() / 800)));
+          g2d.setFont(new Font("Minecraft", 1, (int) (25 * getWidth() / 800)));
           FontMetrics fm = g2d.getFontMetrics();
           int stringWidth = fm.stringWidth(quantityString);
 
@@ -1267,7 +1311,9 @@ public class GameCanvas extends JComponent {
           g2d.drawString(quantityString, quantityLabelX, quantityLabelY);
         }
       }
-
+      if (hoverInfo != null) {
+        hoverInfo.draw(g2d);
+      }
       // dialogue.draw(g2d);
 
     }

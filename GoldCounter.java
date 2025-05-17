@@ -21,7 +21,7 @@ public class GoldCounter {
     String goldString = Integer.toString(canvas.getEconomySystem().getBalance());
 
     g2d.setColor(Color.BLACK);
-    g2d.setFont(new Font("Arial", 1, 25));
+    g2d.setFont(new Font("Minecraft", 1, 25));
 
     float goldLabelX = 50;
     float goldLabelY = 30;

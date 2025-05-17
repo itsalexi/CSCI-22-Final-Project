@@ -9,14 +9,17 @@ public class HoverInfo {
   private int[][] hoverInfoMap;
   private ArrayList<TextLine> lines;
   private boolean mapInitialized;
+  private double posX, posY;
 
-  public HoverInfo(ArrayList<TextLine> l) {
+  public HoverInfo(ArrayList<TextLine> l, double x, double y) {
     lines = l;
+    posX = x;
+    posY = y;
   }
 
   private void initializeGrid(Graphics2D g2d) {
     int max = -1;
-    Font font = new Font("Arial", Font.PLAIN, 24);
+    Font font = new Font("Minecraft", Font.PLAIN, 24);
 
     for (TextLine line : lines) {
       FontMetrics metrics = g2d.getFontMetrics(font);
@@ -74,14 +77,23 @@ public class HoverInfo {
     if (!mapInitialized) {
       initializeGrid(g2d);
     }
+
+    if (posX + hoverInfoMap[0].length * 32 > 1024) {
+      posX -= hoverInfoMap[0].length * 32;
+    }
+
+    g2d.translate(posX, posY);
     hoverInfoGrid.draw(g2d);
 
     for (int i = 0; i < lines.size(); i++) {
       TextLine line = lines.get(i);
-      Font font = new Font("Arial", Font.PLAIN, 24);
+      Font font = new Font("Minecraft", Font.PLAIN, 24);
       g2d.setFont(font);
+      g2d.setColor(line.getColor());
       g2d.drawString(line.getText(), 32, +((i + 2) * 32) - 8);
     }
+    g2d.translate(-posX, -posY);
+
   }
 
 }

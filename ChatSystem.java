@@ -53,7 +53,7 @@ public class ChatSystem {
     String curr = "";
     AffineTransform transform = new AffineTransform();
     FontRenderContext frc = new FontRenderContext(transform, true, true);
-    Font font = new Font("SansSerif", Font.PLAIN, 14);
+    Font font = new Font("Minecraft", Font.PLAIN, 14);
     for (int i = 0; i < message.length(); i++) {
       if (font.getStringBounds(curr, frc).getWidth() > 380) {
         output.add(curr);
@@ -90,12 +90,12 @@ public class ChatSystem {
       g2d.drawRect(x, y, width, historyHeight);
       g2d.setColor(chatOpen ? Color.GREEN.darker() : Color.GRAY);
       g2d.drawRect(x, y + historyHeight + 10, width, inputHeight);
-      g2d.setFont(new Font("SansSerif", Font.PLAIN, 14));
+      g2d.setFont(new Font("Minecraft", Font.PLAIN, 14));
       g2d.setColor(Color.BLACK);
       g2d.drawString(currentInput, x + 10, y + historyHeight + 30);
 
     }
-    g2d.setFont(new Font("SansSerif", Font.PLAIN, 14));
+    g2d.setFont(new Font("Minecraft", Font.PLAIN, 14));
     g2d.setColor(Color.BLACK);
     int lineY = y + 20;
     for (String msg : messages) {

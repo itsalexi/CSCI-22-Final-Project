@@ -34,9 +34,9 @@ public class Dialogue {
     dialogueBox = new Sprite(dialogueBoxFiles, true);
     dialogueBox.setPosition(x, y);
 
-    nameFont = new Font("Arial", Font.BOLD, 16);
-    
-    messageFont = new Font("Arial", Font.PLAIN, 14);
+    nameFont = new Font("Minecraft", Font.PLAIN, 16);
+
+    messageFont = new Font("Minecraft", Font.PLAIN, 14);
     nameColor = Color.WHITE;
     messageColor = Color.BLACK;
 

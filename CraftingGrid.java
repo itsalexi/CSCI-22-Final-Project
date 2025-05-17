@@ -133,7 +133,7 @@ public class CraftingGrid {
   private void drawQuantityString(Graphics2D g2d, int quantity, int col, int row, double tileSize) {
     String quantityString = Integer.toString(quantity);
 
-    g2d.setFont(new Font("Arial", Font.BOLD, (int) (25 * tileSize / 32)));
+    g2d.setFont(new Font("Minecraft", Font.PLAIN, (int) (25 * tileSize / 32)));
     FontMetrics fm = g2d.getFontMetrics();
 
     int stringWidth = fm.stringWidth(quantityString);

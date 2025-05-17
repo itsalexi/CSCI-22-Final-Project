@@ -1,7 +1,13 @@
 
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
+import java.util.List;
+import javax.swing.JOptionPane;
 
 public class GameStarter {
 
@@ -325,6 +331,24 @@ public class GameStarter {
     }
 
     public static void main(String[] args) {
+
+        final GraphicsEnvironment GE = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        final List<String> AVAILABLE_FONT_FAMILY_NAMES = Arrays.asList(GE.getAvailableFontFamilyNames());
+        try {
+            final List<File> LIST = Arrays.asList(
+                    new File("assets/fonts/Minecraft.ttf"));
+            for (File LIST_ITEM : LIST) {
+                if (LIST_ITEM.exists()) {
+                    Font FONT = Font.createFont(Font.TRUETYPE_FONT, LIST_ITEM);
+                    if (!AVAILABLE_FONT_FAMILY_NAMES.contains(FONT.getFontName())) {
+                        GE.registerFont(FONT);
+                    }
+                }
+            }
+        } catch (FontFormatException | IOException exception) {
+            JOptionPane.showMessageDialog(null, exception.getMessage());
+        }
+
         System.setProperty("sun.java2d.uiScale", "1.0");
         if (args.length == 2) {
             username = args[0];

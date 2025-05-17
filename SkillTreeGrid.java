@@ -2,7 +2,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class SkillTreeGrid {
-    
+
     private SkillTreeSystem skillTree;
     private TileGrid skillTreeGrid;
     private TileGrid skillIconsGrid;
@@ -14,41 +14,41 @@ public class SkillTreeGrid {
     private boolean isOpen;
 
     private int[][] skillPositions = {
-        {2, 5},
-        {5, 3},
-        {5, 7},
-        {8, 2},
-        {8, 4},
-        {8, 6},
-        {8, 8}
+            { 2, 5 },
+            { 5, 3 },
+            { 5, 7 },
+            { 8, 2 },
+            { 8, 4 },
+            { 8, 6 },
+            { 8, 8 }
     };
 
     private int[][] skillTreeGridMap = {
-        {2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6},
-        {3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7},
-        {3, 10, 10, 10, 10, 0, 10, 10, 10, 10, 7},
-        {3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7},
-        {3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7},
-        {3, 10, 10, 0, 10, 10, 10, 0, 10, 10, 7},
-        {3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7},
-        {3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7},
-        {3, 10, 0, 10, 0, 10, 0, 10, 0, 10, 7},
-        {3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7},
-        {4, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8}
+            { 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6 },
+            { 3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7 },
+            { 3, 10, 10, 10, 10, 0, 10, 10, 10, 10, 7 },
+            { 3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7 },
+            { 3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7 },
+            { 3, 10, 10, 0, 10, 10, 10, 0, 10, 10, 7 },
+            { 3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7 },
+            { 3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7 },
+            { 3, 10, 0, 10, 0, 10, 0, 10, 0, 10, 7 },
+            { 3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7 },
+            { 4, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8 }
     };
 
     private int[][] skillIconsGridMap = {
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }
     };
 
     public SkillTreeGrid(SkillTreeSystem sys, GameCanvas c) {
@@ -84,7 +84,7 @@ public class SkillTreeGrid {
         return skillPositions;
     }
 
-    public boolean isOpen(){
+    public boolean isOpen() {
         return isOpen;
     }
 
@@ -121,22 +121,22 @@ public class SkillTreeGrid {
     }
 
     private void drawLabel(Graphics2D g2d, String label, int col, int row, double tileSize) {
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (25 * tileSize / 32)));
+        g2d.setFont(new Font("Minecraft", Font.PLAIN, (int) (25 * tileSize / 32)));
         FontMetrics fm = g2d.getFontMetrics();
-    
+
         int stringWidth = fm.stringWidth(label);
         float quantityLabelX = (float) ((col + 1) * tileSize) - stringWidth;
         float quantityLabelY = (float) ((row + 1) * tileSize);
-    
+
         g2d.setColor(Color.BLACK);
         g2d.drawString(label, quantityLabelX + 1, quantityLabelY - 1);
         g2d.drawString(label, quantityLabelX + 1, quantityLabelY + 1);
         g2d.drawString(label, quantityLabelX - 1, quantityLabelY - 1);
         g2d.drawString(label, quantityLabelX - 1, quantityLabelY + 1);
-    
+
         g2d.setColor(Color.WHITE);
         g2d.drawString(label, quantityLabelX, quantityLabelY);
-      }
+    }
 
     public void draw(Graphics2D g2d) {
         updateSkillTree();
