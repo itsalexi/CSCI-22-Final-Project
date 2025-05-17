@@ -50,7 +50,7 @@ public class Inventory {
     inventory = new Item[36];
 
     Item.registerItem(0, new ItemDetails("Watering Can", false, "water"));
-    Item.registerItem(1, new ItemDetails("Hoe", false, "hoe"));
+    Item.registerItem(1, new ItemDetails("Iron Hoe", false, "hoe"));
     Item.registerItem(2, new ItemDetails("Wheat", true, null));
     Item.registerItem(3, new ItemDetails("Wheat Seeds", true, "plant wheat"));
     Item.registerItem(4, new ItemDetails("Potato", true, null));

@@ -427,6 +427,10 @@ public class GameCanvas extends JComponent {
             if (chatSystem.isChatOpen())
               return;
 
+            if (skillTree.isOpen()) {
+              skillTree.setOpen(false);
+            }
+
             if (inventory.isOpen() && previousItemSlot != -1) {
               if (hoveredItem != null) {
                 dropItem(hoveredItem, hoveredItem.getQuantity());
@@ -437,6 +441,9 @@ public class GameCanvas extends JComponent {
             inventory.setOpen(!inventory.isOpen());
             break;
           case KeyEvent.VK_C:
+            if (chatSystem.isChatOpen())
+              return;
+
             if (inventory.isOpen() && previousItemSlot != -1) {
               if (hoveredItem != null) {
                 dropItem(hoveredItem, hoveredItem.getQuantity());
@@ -444,6 +451,10 @@ public class GameCanvas extends JComponent {
                 previousItemSlot = -1;
               }
             }
+            if (inventory.isOpen()) {
+              inventory.setOpen(false);
+            }
+
             skillTree.setOpen(!skillTree.isOpen());
           case KeyEvent.VK_CONTROL:
             isCtrlPressed = true;
@@ -1004,7 +1015,7 @@ public class GameCanvas extends JComponent {
               ArrayList<TextLine> lines = new ArrayList<>();
               lines.add(
                   new TextLine(String.format("%s -> %s", hoveredRecipe.getItemIn().getName(),
-                      hoveredRecipe.getItemOut().getName()), Color.WHITE, Color.BLACK));
+                      hoveredRecipe.getItemOut().getName()), Color.WHITE));
               hoverInfo = new HoverInfo(lines, mouseX, mouseY);
               System.out.println(String.format("%s -> %s", hoveredRecipe.getItemIn().getName(),
                   hoveredRecipe.getItemOut().getName()));
@@ -1085,7 +1096,7 @@ public class GameCanvas extends JComponent {
     Item hoveringItem = inventory.getItem(inventory.getSlotFromGrid(tileX, tileY));
     if (hoveringItem != null) {
       ArrayList<TextLine> lines = new ArrayList<>();
-      lines.add(new TextLine(hoveringItem.getName(), Color.WHITE, Color.BLACK));
+      lines.add(new TextLine(hoveringItem.getName(), Color.WHITE));
       HoverInfo hoveredInfo = new HoverInfo(lines, mouseX - xOffset, mouseY - yOffset - 32);
       hoveredInfo.draw(g2d);
     }

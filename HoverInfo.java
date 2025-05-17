@@ -2,6 +2,8 @@
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 public class HoverInfo {
@@ -17,17 +19,53 @@ public class HoverInfo {
     posY = y;
   }
 
+  private ArrayList<String> wrapText(String message) {
+    ArrayList<String> output = new ArrayList<>();
+    String curr = "";
+    AffineTransform transform = new AffineTransform();
+    FontRenderContext frc = new FontRenderContext(transform, true, true);
+    Font font = new Font("Minecraft", Font.PLAIN, 24);
+    for (int i = 0; i < message.length(); i++) {
+      if (font.getStringBounds(curr, frc).getWidth() > 320) {
+        output.add(curr);
+        curr = "";
+      }
+      curr += message.charAt(i);
+    }
+    output.add(curr);
+    return output;
+  }
+
   private void initializeGrid(Graphics2D g2d) {
     int max = -1;
     Font font = new Font("Minecraft", Font.PLAIN, 24);
 
+    ArrayList<TextLine> finalLines = new ArrayList<>();
     for (TextLine line : lines) {
       FontMetrics metrics = g2d.getFontMetrics(font);
       int width = metrics.stringWidth(line.getText());
       if (width > max) {
         max = width;
+
+        if (max > 320) {
+          ArrayList<String> tempLines = wrapText(line.getText());
+          ArrayList<TextLine> tempTextLines = new ArrayList<>();
+          for (String l : tempLines) {
+            tempTextLines.add(new TextLine(l, line.getColor()));
+            System.out.println(l);
+          }
+          finalLines.addAll(tempTextLines);
+          max = 320;
+        } else {
+          finalLines.add(line);
+        }
+        continue;
       }
+      finalLines.add(line);
     }
+
+    lines = new ArrayList<>();
+    lines.addAll(finalLines);
 
     SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap/inventory");
     Sprite sprite = new Sprite(tileMapFiles.getFiles(), 32);
