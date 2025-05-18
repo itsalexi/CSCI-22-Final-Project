@@ -33,7 +33,10 @@ public class HoverInfo {
         output.add(curr);
         curr = words[i];
       } else {
-        curr += " " + words[i];
+        if (!curr.equals("")) {
+          curr += " ";
+        }
+        curr += words[i];
       }
     }
     output.add(curr);
