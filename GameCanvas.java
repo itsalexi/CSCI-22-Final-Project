@@ -122,13 +122,20 @@ public class GameCanvas extends JComponent {
 
     skills = new ArrayList<>(); // NOTE: add skills level-order
 
-    Skill one = new Skill("Fruit of Knowledge", 1, 1, 1, 10, 0, "test");
-    Skill two = new Skill("Lightfooted", 1, 1, 1, 10, 1, "test");
-    Skill three = new Skill("Merchant's Rizz", 1, 1, 1, 10, 2, "test");
-    Skill four = new Skill("Cheap Tricks", 1, 1, 1, 10, 3, "test");
-    Skill five = new Skill("Nature's Grasp", 1, 1, 1, 10, 4, "test");
-    Skill six = new Skill("Green Thumb", 1, 1, 1, 5, 5, "test");
-    Skill seven = new Skill("Seal of the Serpent", 1, 1, 1, 5, 6, "test");
+    Skill one = new Skill("Fruit of Knowledge", 1, 1, 1, 10, 0,
+        "\"Getting smarter one harvest at a time.\"\nYou're so smart you probably have no friends!");
+    Skill two = new Skill("Lightfooted", 1, 1, 1, 10, 1,
+        "\"I swear my feet aren’t touching the ground.\"\n No one's gonna catch you slipping");
+    Skill three = new Skill("Merchant's Rizz", 1, 1, 1, 10, 2,
+        "\"Unspoken rizz or an HR complaint?\"\nAre they paying more to buy or just to make you shut up. Either way, you win ");
+    Skill four = new Skill("Cheap Tricks", 1, 1, 1, 10, 3,
+        "\"Why pay full price when you can just gas light the skill tree?\"\n Too broke to upgrade huh?");
+    Skill five = new Skill("Nature's Grasp", 1, 1, 1, 10, 4,
+        "\"Why are my fingers so long??\"\nInteract with things from faraway. Kinda weird though.");
+    Skill six = new Skill("Green Thumb", 1, 1, 1, 5, 5,
+        "\"Plants just can’t get enough of you.\"\nEither way, you’re their favorite weirdo.");
+    Skill seven = new Skill("Seal of the Serpent", 1, 1, 1, 5, 6,
+        "\"One bite never hurt anyone...\"\nEverything's cheaper, and it only took a bite. What could go wrong?");
 
     skills.add(one);
     skills.add(two);
@@ -859,7 +866,6 @@ public class GameCanvas extends JComponent {
         int tileY = (int) Math.floor(y / tileSize);
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
-
 
         int playerTileX = (int) Math.floor((player.getX() + player.getWidth() / 2) / tileSize);
         int playerTileY = (int) Math.floor((player.getY() + player.getHeight() / 2) / tileSize);
