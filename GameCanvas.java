@@ -70,7 +70,7 @@ public class GameCanvas extends JComponent {
   private ArrayList<Recipe> recipes;
   private ArrayList<Recipe> trades;
   private ArrayList<Recipe> baseTrades;
-
+  private ArrayList<Skill> skills;
   private ArrayList<Sound> bgm;
 
   private HoverInfo hoverInfo;
@@ -118,7 +118,7 @@ public class GameCanvas extends JComponent {
     baseTrades = new ArrayList<>(trades);
     economySystem = new EconomySystem(this);
 
-    ArrayList<Skill> skills = new ArrayList<>(); // NOTE: add skills level-order
+    skills = new ArrayList<>(); // NOTE: add skills level-order
 
     Skill one = new Skill("Fruit of Knowledge", 1, 1, 1, 10, 0, "test");
     Skill two = new Skill("Lightfooted", 1, 1, 1, 10, 1, "test");
@@ -1155,6 +1155,12 @@ public class GameCanvas extends JComponent {
     System.out.println("level " + skillTreeSystem.findSkill("Seal of the Serpent").getLevel());
 
     // Cheap Tricks
+    for (int i = 0; i < skills.size(); i++) {
+      Skill s = skills.get(i);
+
+      s.setScaling(s.getScalingFactor() * (1 - .02 * skillTreeSystem.findSkill("Cheap Tricks").getLevel()));
+      skills.set(i, s);
+    }
 
     // Nature's Grasp
 

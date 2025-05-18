@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class Skill {
-   
+
     private ArrayList<Skill> nextSkills;
     private String name;
     private int unlockCost;
@@ -70,6 +70,14 @@ public class Skill {
 
     public boolean isMaxLevel() {
         return level == maxLevel;
+    }
+
+    public void setScaling(double sf) {
+        scalingFactor = sf;
+    }
+
+    public double getScalingFactor() {
+        return scalingFactor;
     }
 
     @Override
