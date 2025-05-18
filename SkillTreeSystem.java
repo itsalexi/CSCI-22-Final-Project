@@ -80,4 +80,14 @@ public class SkillTreeSystem {
             s.upgrade();
         }
     }
+
+    public Skill findSkill(String name) {
+        name = name.toLowerCase();
+        for (Skill s : skills) {
+            if (name.equals(s.getName().toLowerCase())) {
+                return s;
+            }
+        }
+        return null;
+    }
 }

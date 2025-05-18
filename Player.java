@@ -6,6 +6,7 @@ import java.util.Map;
 public class Player {
 
     private double x, y;
+    private double baseSpeed;
     private double speed;
     private PlayerSprite sprite;
     private long animStartTime;
@@ -20,7 +21,8 @@ public class Player {
     public Player(String u, int t) {
         x = 0;
         y = 0;
-        speed = 2.0;
+        baseSpeed = 2;
+        speed = 2;
         type = t;
         id = u;
         activeTool = "hoe";
@@ -51,6 +53,14 @@ public class Player {
         playerActions.put("water", new PlayerAction("watering", 750));
         playerActions.put("plant", new PlayerAction("plant", 750));
 
+    }
+
+    public double getBaseSpeed() {
+        return baseSpeed;
+    }
+
+    public void setBaseSpeed(double s) {
+        baseSpeed = s;
     }
 
     public void tick() {

@@ -114,13 +114,13 @@ public class GameCanvas extends JComponent {
 
     ArrayList<Skill> skills = new ArrayList<>(); // NOTE: add skills level-order
 
-    Skill one = new Skill("one", 1, 1, 1, 10, 0);
-    Skill two = new Skill("two", 1, 1, 1, 10, 1);
-    Skill three = new Skill("three", 1, 1, 1, 10, 2);
-    Skill four = new Skill("four", 1, 1, 1, 10, 3);
-    Skill five = new Skill("five", 1, 1, 1, 10, 4);
-    Skill six = new Skill("six", 1, 1, 1, 5, 5);
-    Skill seven = new Skill("seven", 1, 1, 1, 5, 6);
+    Skill one = new Skill("Fruit of Knowledge", 1, 1, 1, 10, 0, "test");
+    Skill two = new Skill("Lightfooted", 1, 1, 1, 10, 1, "test");
+    Skill three = new Skill("Merchant's Rizz", 1, 1, 1, 10, 2, "test");
+    Skill four = new Skill("Cheap Tricks", 1, 1, 1, 10, 3, "test");
+    Skill five = new Skill("Nature's Grasp", 1, 1, 1, 10, 4, "test");
+    Skill six = new Skill("Green Thumb", 1, 1, 1, 5, 5, "test");
+    Skill seven = new Skill("Seal of the Serpent", 1, 1, 1, 5, 6, "test");
 
     skills.add(one);
     skills.add(two);
@@ -674,11 +674,11 @@ public class GameCanvas extends JComponent {
       return;
     boolean isInWater = isPlayerInWater();
 
-    double speed = player.getSpeed();
+    double speed = player.getBaseSpeed();
     if (isInWater) {
-      player.setSpeed(2);
+      player.setSpeed(player.getBaseSpeed());
     } else {
-      player.setSpeed(3);
+      player.setSpeed(player.getBaseSpeed() * 1.5);
     }
 
     Map<String, Boolean> activeDirections = player.getActiveDirections();
@@ -1113,6 +1113,11 @@ public class GameCanvas extends JComponent {
       System.out.println(skill.getUnlockCost());
       System.out.println(economySystem.getSkillPoints());
     }
+    updateSkills();
+  }
+
+  public void updateSkills() {
+    player.setBaseSpeed(2 * (1 + 0.1 * skillTreeSystem.findSkill("Lightfooted").getLevel()));
   }
 
   public Inventory getInventory() {

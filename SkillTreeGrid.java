@@ -54,7 +54,7 @@ public class SkillTreeGrid {
 
     public SkillTreeGrid(SkillTreeSystem sys, GameCanvas c) {
         SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap/inventory");
-        SpriteFiles itemFiles = new SpriteFiles("assets/items");
+        SpriteFiles itemFiles = new SpriteFiles("assets/skill_icons");
         tilesSprites = new Sprite(tileMapFiles.getFiles(), 32);
         itemsSprites = new Sprite(itemFiles.getFiles(), 32);
 
@@ -204,7 +204,8 @@ public class SkillTreeGrid {
             drawArrows(g2d);
             skillIconsGrid.draw(g2d);
             drawSkillLevels(g2d);
-            g2d.drawString("Skill Tree", (int) (gridWidth - g2d.getFontMetrics().stringWidth("Skill Tree")) / 2, (int) (tileSize * 1.5));
+            g2d.setFont(new Font("Minecraft", Font.PLAIN, (int) 20));
+            g2d.drawString("Garden of Eden", (int) (gridWidth - g2d.getFontMetrics().stringWidth("Garden of Eden")) / 2, (int) (tileSize * 1.5));
             g2d.setFont(new Font("Minecraft", Font.PLAIN, (int) 16));
             g2d.drawString(String.format("Remaining Skill Points: %d", canvas.getEconomySystem().getSkillPoints()), (int) (tileSize), (int) (gridHeight - tileSize * 1.25));
             g2d.translate(-x, -y);

@@ -27,7 +27,6 @@ public class HoverInfo {
     FontRenderContext frc = new FontRenderContext(transform, true, true);
     Font font = new Font("Minecraft", Font.PLAIN, 16);
     for (int i = 0; i < words.length; i++) {
-      System.out.println(words[i]);
       String temp = curr + " " + words[i];
       if (font.getStringBounds(temp, frc).getWidth() > 320) {
         output.add(curr);

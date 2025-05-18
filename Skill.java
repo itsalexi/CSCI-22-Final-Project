@@ -10,8 +10,9 @@ public class Skill {
     private int level;
     private int maxLevel;
     private int skillIcon;
+    private String description;
 
-    public Skill(String n, int unlock, int upgrade, double scaling, int max, int icon) {
+    public Skill(String n, int unlock, int upgrade, double scaling, int max, int icon, String d) {
         name = n;
         unlockCost = unlock;
         initialUpgradeCost = upgrade;
@@ -20,6 +21,11 @@ public class Skill {
         maxLevel = max;
         skillIcon = icon;
         nextSkills = new ArrayList<>();
+        description = d;
+    }
+
+    public String getDescrption() {
+        return description;
     }
 
     public int getIcon() {
