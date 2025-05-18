@@ -21,6 +21,8 @@ public class LevelingSystem {
   private float xpTextAlpha;
   private String status;
 
+  private double xpBoost;
+
   public LevelingSystem(EconomySystem sp, GameCanvas c) {
     xp = 90;
     level = 0;
@@ -29,6 +31,7 @@ public class LevelingSystem {
     xpTextAlpha = 0;
     canvas = c;
     status = "";
+    xpBoost = 0;
 
     xpTextTimer = new Timer(1000 / 60, new ActionListener() {
       @Override
@@ -48,7 +51,12 @@ public class LevelingSystem {
     return BASE_XP * Math.pow(GROWTH_RATE, level);
   }
 
+  public void setXPBoost(double boost) {
+    xpBoost = boost;
+  }
+
   public void addXP(double amount) {
+    amount = amount * xpBoost;
     lastXPGain = System.currentTimeMillis();
     xp += amount;
     status = String.format("+%.1f (%.1f/%.1f)", amount, xp, xpToNextLevel());

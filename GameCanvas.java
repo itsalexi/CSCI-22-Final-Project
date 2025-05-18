@@ -69,11 +69,15 @@ public class GameCanvas extends JComponent {
 
   private ArrayList<Recipe> recipes;
   private ArrayList<Recipe> trades;
+  private ArrayList<Recipe> baseTrades;
+
   private ArrayList<Sound> bgm;
 
   private HoverInfo hoverInfo;
 
   private GameAudio gameAudio;
+
+  private double greenThumbChance;
 
   public GameCanvas() {
     isMapLoaded = false;
@@ -110,6 +114,8 @@ public class GameCanvas extends JComponent {
     trades.add(new Recipe(new Item(14, 200), new Item(9, 1)));
     trades.add(new Recipe(new Item(14, 400), new Item(11, 1)));
     trades.add(new Recipe(new Item(14, 800), new Item(13, 1)));
+
+    baseTrades = new ArrayList<>(trades);
     economySystem = new EconomySystem(this);
 
     ArrayList<Skill> skills = new ArrayList<>(); // NOTE: add skills level-order
@@ -387,6 +393,7 @@ public class GameCanvas extends JComponent {
               playLocalSound("water_can");
             }
 
+            boolean planted = false;
             if (actionString[0].equals("plant")) {
               if (tileGrids.get("ground").getTileAt(y, x) == 354) {
                 if (tileGrids.get("farm").getTileAt(y, x) == -1) {
@@ -396,11 +403,18 @@ public class GameCanvas extends JComponent {
                   writer.send("FARM PLANT " + actionString[1]
                       + " " + x + " " + y);
                   itemUsed = true;
+                  planted = true;
                   playLocalSound("plant");
                 }
               }
             }
             if (itemUsed) {
+              if (planted) {
+                int random = (int) (Math.random() * 100);
+                if (random > 100 - greenThumbChance) {
+                  return;
+                }
+              }
               activeItem.consume();
             }
             return;
@@ -1117,7 +1131,39 @@ public class GameCanvas extends JComponent {
   }
 
   public void updateSkills() {
+    // Lightfooted
     player.setBaseSpeed(2 * (1 + 0.1 * skillTreeSystem.findSkill("Lightfooted").getLevel()));
+
+    // Merchant's Rizz & Seal of the Serpent
+    for (int i = 0; i < trades.size(); i++) {
+      Recipe trade = trades.get(i);
+      Recipe base = baseTrades.get(i);
+
+      if (trade.getItemIn().getId() != 14) {
+        trade.setItemOut(
+            new Item(14,
+                (int) Math.floor((base.getItemOut().getQuantity()
+                    * (1 + .02 * skillTreeSystem.findSkill("Merchant's Rizz").getLevel())))));
+      } else {
+        trade.setItemIn(
+            new Item(14,
+                (int) Math.floor((base.getItemIn().getQuantity()
+                    * (1 - .02 * skillTreeSystem.findSkill("Seal of the Serpent").getLevel())))));
+      }
+      trades.set(i, trade);
+    }
+    System.out.println("level " + skillTreeSystem.findSkill("Seal of the Serpent").getLevel());
+
+    // Cheap Tricks
+
+    // Nature's Grasp
+
+    // Green Thumb
+    greenThumbChance = 2 * skillTreeSystem.findSkill("Green Thumb").getLevel();
+
+    // Fruit of Knowledge
+    levelingSystem.setXPBoost(1 + 0.02 * skillTreeSystem.findSkill("Fruit of Knowledge").getLevel());
+
   }
 
   public Inventory getInventory() {

@@ -14,4 +14,12 @@ public class Recipe {
   public Item getItemOut() {
     return itemOut;
   }
+
+  public void setItemOut(Item out) {
+    itemOut = out;
+  }
+
+  public void setItemIn(Item in) {
+    itemIn = in;
+  }
 }
