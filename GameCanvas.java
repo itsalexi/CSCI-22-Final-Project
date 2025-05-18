@@ -1188,6 +1188,7 @@ public class GameCanvas extends JComponent {
     }
 
     // Nature's Grasp
+    player.setReach(2 + skillTreeSystem.findSkill("Nature's Grasp").getLevel());
 
     // Green Thumb
     greenThumbChance = 2 * skillTreeSystem.findSkill("Green Thumb").getLevel();
