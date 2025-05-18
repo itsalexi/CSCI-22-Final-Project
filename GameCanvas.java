@@ -3,9 +3,11 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +28,7 @@ public class GameCanvas extends JComponent {
   private Map<String, Animal> animals;
   private Map<String, TileGrid> tileGrids;
   private Map<Integer, DroppedItem> droppedItems;
+  private Map<String, Sound> sounds;
 
   private GameStarter client;
   private WriteToServer writer;
@@ -77,10 +80,11 @@ public class GameCanvas extends JComponent {
     collidableGrids = new ArrayList<>();
     chatSystem = new ChatSystem();
     farmSystem = new FarmingSystem(0);
-
     recipes = new ArrayList<>();
     trades = new ArrayList<>();
+    sounds = new HashMap<>();
 
+    setupSounds();
     recipes.add(new Recipe(new Item(2, 1), new Item(3, 2)));
     recipes.add(new Recipe(new Item(4, 1), new Item(5, 2)));
     recipes.add(new Recipe(new Item(6, 1), new Item(7, 2)));
@@ -261,6 +265,7 @@ public class GameCanvas extends JComponent {
           item.getSpriteSize());
       if (playerHitbox.intersects(itemHitbox)) {
         itemsToPickup.add(item.getDroppedItemId());
+        playLocalSound("item_pickup");
       }
     }
 
@@ -290,6 +295,7 @@ public class GameCanvas extends JComponent {
     String playerDirection = player.getDirection();
     double droppedItemX = player.getX() + (player.getWidth() / 2);
     double droppedItemY = player.getY() + (player.getHeight() / 2);
+    playLocalSound("item_drop");
 
     switch (playerDirection) {
       case "UP":
@@ -356,17 +362,25 @@ public class GameCanvas extends JComponent {
                 + actionString[0].toUpperCase() + " " + x
                 + " " + y + " "
                 + player.getDirection());
-            if (tileGrids.get("foliage").getTileAt(y, x) != -1) {
-              levelingSystem.addXP(3);
-            }
+
             if (actionString[0].equals("hoe")) {
               int tile = tileGrids.get("farm").getTileAt(y, x);
               if (tile != -1) {
                 if (tile % 6 == 5) {
                   levelingSystem.addXP(farmSystem.getXPFromPlant(farmSystem.getPlantNameFromIndex(tile)));
+                  playLocalSound("foliage_break");
                 }
                 writer.send("FARM HARVEST " + x + " " + y + " " + client.getPlayerID());
               }
+
+              if (tileGrids.get("foliage").getTileAt(y, x) != -1) {
+                levelingSystem.addXP(3);
+                playLocalSound("foliage_break");
+              } else {
+                playLocalSound("hoe_till");
+              }
+            } else if (actionString[0].equals("water")) {
+              playLocalSound("water_can");
             }
 
             if (actionString[0].equals("plant")) {
@@ -378,6 +392,7 @@ public class GameCanvas extends JComponent {
                   writer.send("FARM PLANT " + actionString[1]
                       + " " + x + " " + y);
                   itemUsed = true;
+                  playLocalSound("plant");
                 }
               }
             }
@@ -437,6 +452,9 @@ public class GameCanvas extends JComponent {
                 hoveredItem = null;
                 previousItemSlot = -1;
               }
+            }
+            if (!inventory.isOpen()) {
+              playLocalSound("inventory_open");
             }
             inventory.setOpen(!inventory.isOpen());
             break;
@@ -695,7 +713,6 @@ public class GameCanvas extends JComponent {
       player.setAnimationState(walkState);
 
       player.setPosition(newX, newY);
-      playGlobalSound("WALK_NORMAL");
     }
 
   }
@@ -982,13 +999,17 @@ public class GameCanvas extends JComponent {
         int recipeRow = tileY - 2;
         int recipeIndex = craftingGrid.getCurrentPage() * 4 + recipeRow;
         if (recipeIndex >= 0 && recipeIndex < recipes.size()) {
-          craftingSystem.craft(recipeIndex);
+          if (craftingSystem.craft(recipeIndex)) {
+            playLocalSound("item_pickup");
+          }
         }
       }
     }
   }
 
   private void drawGridInfo(int mouseX, int mouseY) {
+    if (!inventory.isOpen())
+      return;
     int tileX, tileY;
     CraftingGrid grid;
     ArrayList<Recipe> infos;
@@ -1048,7 +1069,9 @@ public class GameCanvas extends JComponent {
         int tradeRow = tileY - 2;
         int tradeIndex = shopGrid.getCurrentPage() * 4 + tradeRow;
         if (tradeIndex >= 0 && tradeIndex < trades.size()) {
-          shopSystem.trade(tradeIndex);
+          if (shopSystem.trade(tradeIndex)) {
+            playLocalSound("purchase");
+          }
         }
       }
     }
@@ -1330,29 +1353,17 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  private void setupSounds() {
+    ArrayList<File> fileList = new ArrayList<>();
+    fileList.addAll(Arrays.asList(new File("assets/sfx/").listFiles()));
+    for (File f : fileList) {
+      sounds.put(f.getName().substring(0, f.getName().lastIndexOf(".")), new Sound(f));
+    }
+  }
+
   public void playSound(String soundCode, double x, double y) {
-    // TODO: adjust volume based on the position of the player and the position of
-    // the sound
-
-    // String filename;
-    // switch (soundCode) {
-    // case "WATER_WALK" -> filename = "assets/sfx/water_walk.wav";
-    // case "FOLIAGE_BREAK" -> filename = "assets/sfx/foliage_break.wav";
-    // case "INVENTORY_OPEN" -> filename = "assets/sfx/inventory_open.wav";
-    // case "WALK_NORMAL" -> filename = "assets/sfx/walk_normal.wav";
-    // default -> filename = "sfx/water_walk.wav";
-    // }
-
-    // try {
-    // Clip clip = AudioSystem.getClip();
-    // AudioInputStream inputStream = AudioSystem.getAudioInputStream(new
-    // File(filename).getAbsoluteFile());
-    // clip.open(inputStream);
-    // clip.start();
-    // } catch (Exception e) {
-    // System.out.println(e.getMessage());
-    // // System.out.printf("Error playing sound %s", soundCode);
-    // }
+    Sound sound = sounds.get(soundCode);
+    sound.play();
   }
 
   public void playGlobalSound(String soundCode) {

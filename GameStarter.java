@@ -13,8 +13,8 @@ public class GameStarter {
 
     private static String playerId;
     private static GameCanvas canvas;
-    private static String username;
-    private static int skin;
+    private String username, ip, port;
+    private int skin;
 
     private Socket socket;
     private DataInputStream in;
@@ -28,7 +28,7 @@ public class GameStarter {
     public void startGame() {
 
         try {
-            socket = new Socket("localhost", 25565);
+            socket = new Socket(ip, Integer.parseInt(port));
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
@@ -330,6 +330,13 @@ public class GameStarter {
         return skin;
     }
 
+    public void setConnectionInfo(String addr, String p, String u, int s) {
+        ip = addr;
+        port = p;
+        username = u;
+        skin = s;
+    }
+
     public static void main(String[] args) {
 
         final GraphicsEnvironment GE = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -350,10 +357,6 @@ public class GameStarter {
         }
 
         System.setProperty("sun.java2d.uiScale", "1.0");
-        if (args.length == 2) {
-            username = args[0];
-            skin = Integer.parseInt(args[1]);
-        }
 
         new GameStarter().start();
     }

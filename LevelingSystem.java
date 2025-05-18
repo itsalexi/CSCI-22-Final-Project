@@ -55,6 +55,7 @@ public class LevelingSystem {
     while (xp >= xpToNextLevel()) {
       xp -= xpToNextLevel();
       level++;
+      canvas.playLocalSound("level_up");
       if (skillPoints != null) {
         skillPoints.setSkillPoints(skillPoints.getSkillPoints() + 1);
       }
@@ -75,7 +76,6 @@ public class LevelingSystem {
   }
 
   public void draw(Graphics2D g2d) {
-    System.out.println(xpTextAlpha);
 
     g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, xpTextAlpha));
 

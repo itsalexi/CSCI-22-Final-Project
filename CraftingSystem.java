@@ -11,7 +11,7 @@ public class CraftingSystem {
     inventory = i;
   }
 
-  public void craft(int recipeID) {
+  public boolean craft(int recipeID) {
     Recipe recipe = recipes.get(recipeID);
     Item itemIn = recipe.getItemIn();
     Item itemOut = recipe.getItemOut();
@@ -21,7 +21,9 @@ public class CraftingSystem {
 
       inventory.addItem(itemOut.getId(), itemOut.getQuantity());
       inventory.removeItem(itemIn.getId(), itemIn.getQuantity());
+      return true;
     }
+    return false;
   }
 
   public boolean isCraftable(int recipeID) {

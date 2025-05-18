@@ -31,6 +31,7 @@ public class MainMenu extends JComponent {
     playButton = new Sprite(buttonFiles.getFiles(), true);
     gameLogo = new Sprite(logoFiles.getFiles(), 300);
 
+    background.setSprite((int) (Math.random() * bgFiles.getFiles().size()));
     logoX = 512 - (int) (gameLogo.getWidth() * gameLogo.getHScale() / 2);
     centerX = 512 - (int) (gameLogo.getWidth() * gameLogo.getHScale() / 2);
     logoY = 100;
@@ -66,8 +67,7 @@ public class MainMenu extends JComponent {
   }
 
   private void handlePlayButtonClick() {
-    starter.startGame();
-    frame.getSetupFrame().setVisible(false);
+    frame.showConnectionScreen();
   }
 
   @Override

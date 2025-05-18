@@ -19,6 +19,7 @@ public class GameFrame {
         f.setResizable(false);
         f.pack();
         f.setVisible(true);
+
     }
 
     public GameCanvas getCanvas() {

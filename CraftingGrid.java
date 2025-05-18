@@ -170,12 +170,15 @@ public class CraftingGrid {
     if (currentPage + 1 >= totalPages)
       return;
     currentPage++;
+    canvas.playLocalSound("ui_click");
   }
 
   public void backwardPage() {
     if (currentPage <= 0)
       return;
     currentPage--;
+    canvas.playLocalSound("ui_click");
+
   }
 
   public void draw(Graphics2D g2d) {

@@ -13,7 +13,7 @@ public class ShopSystem {
     balance = eS;
   }
 
-  public void trade(int tradeID) {
+  public boolean trade(int tradeID) {
     Recipe trade = trades.get(tradeID);
     Item itemIn = trade.getItemIn();
     Item itemOut = trade.getItemOut();
@@ -30,8 +30,10 @@ public class ShopSystem {
         balance.setBalance(balance.getBalance() + itemOut.getQuantity());
         inventory.removeItem(itemIn.getId(), itemIn.getQuantity());
       }
+      return true;
 
     }
+    return false;
   }
 
   public boolean isTradeable(int tradeID) {
