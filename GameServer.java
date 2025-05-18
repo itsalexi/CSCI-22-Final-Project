@@ -354,6 +354,29 @@ public class GameServer {
                 if (foliageMap[y][x] != -1) {
                   foliageMap[y][x] = -1;
                   broadcastAll("UPDATE foliage -1 " + x + " " + y);
+                  int rand = (int) (Math.random() * 100);
+
+                  if (rand > 80) {
+                    int itemId = 3;
+                    int quantity = 1;
+                    int droppedItemId = numItemsDropped++;
+
+                    double dropX = (x * 32) + 8;
+                    double dropY = (y * 32) + 8;
+
+                    DroppedItemState dis = new DroppedItemState();
+                    dis.x = dropX;
+                    dis.y = dropY;
+                    dis.itemId = itemId;
+                    dis.quantity = quantity;
+                    dis.id = droppedItemId;
+
+                    droppedItemStates.put(droppedItemId, dis);
+                    broadcastAll(
+                        String.format("ITEMDROP CREATE %f %f %d %d %d", dropX, dropY, itemId, quantity,
+                            droppedItemId));
+                  }
+
                 } else if (groundMap[y][x] == 36) {
                   groundMap[y][x] = 353;
                   broadcastAll("UPDATE ground 353 " + x + " " + y);
@@ -454,7 +477,7 @@ public class GameServer {
             if ((val < 6 && val == 5) || (val >= 6 && val % 6 == 5)) {
 
               int itemId = farmSystem.getPlantFromIndex(val);
-              int quantity = 2;
+              int quantity = farmSystem.getRandomQuantity(farmSystem.getPlantNameFromIndex(val));
               int droppedItemId = numItemsDropped++;
 
               double dropX = (x * 32) + 8;
@@ -545,6 +568,7 @@ public class GameServer {
         }
       }
     }
+
   }
 
   private void broadcast(String msg, String senderId) {
