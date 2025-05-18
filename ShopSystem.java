@@ -19,7 +19,6 @@ public class ShopSystem {
     Item itemOut = trade.getItemOut();
 
     boolean tradeable = isTradeable(tradeID);
-    System.out.println(tradeable);
     if (tradeable) {
       // coin -> item
       if (itemIn.getId() == 14) {

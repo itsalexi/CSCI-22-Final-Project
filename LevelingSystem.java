@@ -51,7 +51,7 @@ public class LevelingSystem {
   public void addXP(double amount) {
     lastXPGain = System.currentTimeMillis();
     xp += amount;
-    status = String.format("+%s (%s/%s)", amount, xp, xpToNextLevel());
+    status = String.format("+%.1f (%.1f/%.1f)", amount, xp, xpToNextLevel());
     while (xp >= xpToNextLevel()) {
       xp -= xpToNextLevel();
       level++;
