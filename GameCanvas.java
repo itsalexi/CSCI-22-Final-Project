@@ -844,7 +844,7 @@ public class GameCanvas extends JComponent {
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
 
-        if (!inventory.isOpen()) {
+        if (!inventory.isOpen() && !skillTree.isOpen()) {
           doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
         }
       }

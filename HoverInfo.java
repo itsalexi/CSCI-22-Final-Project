@@ -21,16 +21,20 @@ public class HoverInfo {
 
   private ArrayList<String> wrapText(String message) {
     ArrayList<String> output = new ArrayList<>();
+    String[] words = message.split("\s");
     String curr = "";
     AffineTransform transform = new AffineTransform();
     FontRenderContext frc = new FontRenderContext(transform, true, true);
     Font font = new Font("Minecraft", Font.PLAIN, 16);
-    for (int i = 0; i < message.length(); i++) {
-      if (font.getStringBounds(curr, frc).getWidth() > 320) {
+    for (int i = 0; i < words.length; i++) {
+      System.out.println(words[i]);
+      String temp = curr + " " + words[i];
+      if (font.getStringBounds(temp, frc).getWidth() > 320) {
         output.add(curr);
-        curr = "";
+        curr = words[i];
+      } else {
+        curr += " " + words[i];
       }
-      curr += message.charAt(i);
     }
     output.add(curr);
     return output;
