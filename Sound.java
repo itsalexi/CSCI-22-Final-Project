@@ -21,6 +21,7 @@ public class Sound {
   }
 
   public void play() {
+    clip.stop();
     clip.setFramePosition(0);
     clip.start();
   }

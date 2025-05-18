@@ -1127,6 +1127,21 @@ public class GameCanvas extends JComponent {
     g2d.translate(-xOffset, -yOffset);
   }
 
+  private void drawUsername(Graphics2D g2d, Player player) {
+    g2d.setFont(new Font("Minecraft", 1, 10));
+    g2d.setColor(Color.WHITE);
+
+    FontMetrics metrics = g2d.getFontMetrics();
+    int usernameX = (int) (player.getX() + (player.getWidth() / 2) - metrics.stringWidth(player.getId()) / 2);
+    int usernameY = (int) player.getY() + 5;
+    g2d.setColor(new Color(0, 0, 0, 50));
+
+    g2d.fillRect(usernameX - 3, usernameY - 10, metrics.stringWidth(player.getId()) + 3, metrics.getHeight());
+    g2d.setColor(Color.WHITE);
+
+    g2d.drawString(player.getId(), usernameX, usernameY);
+  }
+
   private ArrayList<double[]> findPath(Rectangle2D obj, double[] target, double speed) {
 
     double tileSize = tileGrids.get("ground").getTileSize();
@@ -1277,9 +1292,11 @@ public class GameCanvas extends JComponent {
 
       for (Player other : otherPlayers.values()) {
         other.draw(g2d);
+        drawUsername(g2d, other);
       }
 
       player.draw(g2d);
+      drawUsername(g2d, player);
 
       if (!inventory.isOpen()) {
         highlight.setPosition(lastClickedTile[0] * 32, lastClickedTile[1] * 32);
@@ -1343,10 +1360,11 @@ public class GameCanvas extends JComponent {
 
           g2d.drawString(quantityString, quantityLabelX, quantityLabelY);
         }
+        if (hoverInfo != null) {
+          hoverInfo.draw(g2d);
+        }
       }
-      if (hoverInfo != null) {
-        hoverInfo.draw(g2d);
-      }
+
       levelingSystem.draw(g2d);
       // dialogue.draw(g2d);
 

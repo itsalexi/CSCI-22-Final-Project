@@ -107,6 +107,7 @@ public class ConnectionScreen extends JPanel {
 
       starter.setConnectionInfo(ip, port, username, skin);
       starter.startGame();
+      f.setVisible(false);
     });
   }
 
