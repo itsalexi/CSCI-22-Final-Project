@@ -24,6 +24,10 @@ public class Skill {
         description = d;
     }
 
+    public int getMaxLevel() {
+        return maxLevel;
+    }
+
     public String getDescrption() {
         return description;
     }

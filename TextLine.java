@@ -17,4 +17,8 @@ public class TextLine {
   public Color getColor() {
     return color;
   }
+
+  public void setColor(Color c) {
+    color = c;
+  }
 }

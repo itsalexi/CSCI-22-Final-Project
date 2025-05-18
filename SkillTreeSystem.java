@@ -28,6 +28,10 @@ public class SkillTreeSystem {
         return skills;
     }
 
+    public Skill getRootSkill() {
+        return rootSkill;
+    }
+
     public ArrayList<Skill> getSkillsAtLevel(int level) {
         ArrayList<Skill> output = new ArrayList<>();
         output.add(rootSkill);
@@ -43,6 +47,39 @@ public class SkillTreeSystem {
         }
 
         return output;
+    }
+
+    public boolean isUnlockable(Skill s) {
+        if (s.isUnlocked()) {
+            System.out.println("unlocked");
+            return false;
+        }
+
+        if (economySystem.getSkillPoints() < s.getUnlockCost()) {
+            System.out.println("not enough");
+            return false;
+        }
+
+        if (s.equals(rootSkill)) {
+            return true;
+        }
+
+        for (Skill currSkill : skills) {
+            if (!currSkill.isUnlocked()) {
+                continue;
+            }
+            for (Skill unlockable : currSkill.getNextSkills()) {
+                if (s.equals(unlockable)) {
+                    return true;
+                }
+            }
+        }
+        System.out.println("not found");
+        return false;
+    }
+
+    public boolean isUpgradeable(Skill s) {
+        return s.isUnlocked() && s.getUpgradeCost() <= economySystem.getBalance() && !s.isMaxLevel();
     }
 
     public void unlockSkill(Skill s) {

@@ -158,7 +158,7 @@ public class GameCanvas extends JComponent {
 
     zoom = 2;
     previousItemSlot = -1;
-    test = false;
+    test = false; //TODO: remove this
     currentPath = new ArrayList<>();
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
@@ -971,6 +971,8 @@ public class GameCanvas extends JComponent {
           handleSkillTreeGrid(lastClickedSkillTreeTile[0], lastClickedSkillTreeTile[1]);
         }
 
+        drawGridInfo((int) x, (int) y);
+
         if (inventory.isOpen()) {
 
           handleCraftingGrid(lastClickedCraftingTile[0], lastClickedCraftingTile[1]);
@@ -1066,7 +1068,7 @@ public class GameCanvas extends JComponent {
   }
 
   private void drawGridInfo(int mouseX, int mouseY) {
-    if (!inventory.isOpen())
+    if (!inventory.isOpen() && !skillTree.isOpen())
       return;
     int tileX, tileY;
 
@@ -1076,7 +1078,19 @@ public class GameCanvas extends JComponent {
       Skill skill = skillTree.getSkillAtTile(tileX, tileY);
       if (skill != null) {
         ArrayList<TextLine> lines = new ArrayList<>();
+        lines.add(new TextLine(String.format("%s (Level %d / %d)\n", skill.getName(), skill.getLevel(), skill.getMaxLevel()), Color.WHITE));
+        lines.add(new TextLine(skill.getDescrption() + "\n", Color.LIGHT_GRAY));
+        if (!skill.isMaxLevel()) {
+          if (skill.isUnlocked()) {
+            lines.add(new TextLine(String.format("Upgrade for %d gold", skill.getUpgradeCost()), skillTreeSystem.isUpgradeable(skill) ? Color.YELLOW : Color.PINK));
+          } else {
+            lines.add(new TextLine(String.format("Unlock for %d SP", skill.getUnlockCost()), skillTreeSystem.isUnlockable(skill) ? Color.YELLOW : Color.PINK));
+          }
+        }
+        hoverInfo = new HoverInfo(lines, mouseX, mouseY);
+        return;
       }
+      hoverInfo = null;
     }
 
     if (inventory.isOpen()) {
@@ -1495,6 +1509,9 @@ public class GameCanvas extends JComponent {
 
           g2d.drawString(quantityString, quantityLabelX, quantityLabelY);
         }
+      }
+
+      if (inventory.isOpen() || skillTree.isOpen()) {
         if (hoverInfo != null) {
           hoverInfo.draw(g2d);
         }
