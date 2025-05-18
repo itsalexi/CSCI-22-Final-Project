@@ -71,6 +71,8 @@ public class GameCanvas extends JComponent {
   private ArrayList<Recipe> trades;
   private ArrayList<Recipe> baseTrades;
   private ArrayList<Skill> skills;
+  private ArrayList<Skill> baseSkills;
+
   private ArrayList<Sound> bgm;
 
   private HoverInfo hoverInfo;
@@ -135,7 +137,7 @@ public class GameCanvas extends JComponent {
     skills.add(five);
     skills.add(six);
     skills.add(seven);
-
+    baseSkills = new ArrayList<>(skills);
     skillTreeSystem = new SkillTreeSystem(skills, economySystem); // TODO: make skills
     skillTree = new SkillTreeGrid(skillTreeSystem, this);
 
@@ -1157,8 +1159,8 @@ public class GameCanvas extends JComponent {
     // Cheap Tricks
     for (int i = 0; i < skills.size(); i++) {
       Skill s = skills.get(i);
-
-      s.setScaling(s.getScalingFactor() * (1 - .02 * skillTreeSystem.findSkill("Cheap Tricks").getLevel()));
+      Skill base = baseSkills.get(i);
+      s.setScaling(base.getScalingFactor() * (1 - .02 * skillTreeSystem.findSkill("Cheap Tricks").getLevel()));
       skills.set(i, s);
     }
 
