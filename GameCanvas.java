@@ -860,7 +860,19 @@ public class GameCanvas extends JComponent {
         lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);
         lastClickedTile[1] = (int) clamp(0, tileGrids.get("ground").getHeight() - 1, tileY);
 
-        if (!inventory.isOpen() && !skillTree.isOpen()) {
+
+        int playerTileX = (int) Math.floor((player.getX() + player.getWidth() / 2) / tileSize);
+        int playerTileY = (int) Math.floor((player.getY() + player.getHeight() / 2) / tileSize);
+
+        int distance = (int) Math.sqrt(Math.pow(playerTileX - tileX, 2) + Math.pow(playerTileY - tileY, 2));
+
+        if (distance < player.getReach()) {
+          highlight.setSprite(0);
+        } else {
+          highlight.setSprite(2);
+        }
+
+        if (!inventory.isOpen() && !skillTree.isOpen() && distance < player.getReach()) {
           doPlayerAction(lastClickedTile[0], lastClickedTile[1]);
         }
       }
@@ -878,6 +890,17 @@ public class GameCanvas extends JComponent {
         double tileSize = 32;
         int tileX = (int) Math.floor(x / tileSize);
         int tileY = (int) Math.floor(y / tileSize);
+
+        int playerTileX = (int) Math.floor((player.getX() + player.getWidth() / 2) / tileSize);
+        int playerTileY = (int) Math.floor((player.getY() + player.getHeight() / 2) / tileSize);
+
+        int distance = (int) Math.sqrt(Math.pow(playerTileX - tileX, 2) + Math.pow(playerTileY - tileY, 2));
+
+        if (distance < player.getReach()) {
+          highlight.setSprite(0);
+        } else {
+          highlight.setSprite(2);
+        }
 
         if (isMapLoaded) {
           lastClickedTile[0] = (int) clamp(0, tileGrids.get("ground").getWidth() - 1, tileX);

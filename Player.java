@@ -13,6 +13,8 @@ public class Player {
 
     private int type;
     private String id;
+    private int baseReach;
+    private int reach;
 
     private Map<String, PlayerAction> playerActions;
     private String activeTool;
@@ -23,6 +25,8 @@ public class Player {
         y = 0;
         baseSpeed = 2;
         speed = 2;
+        baseReach = 2;
+        reach = 2;
         type = t;
         id = u;
         activeTool = "hoe";
@@ -61,6 +65,22 @@ public class Player {
 
     public void setBaseSpeed(double s) {
         baseSpeed = s;
+    }
+
+    public int getBaseReach() {
+        return baseReach;
+    }
+
+    public void setBaseReach(int r) {
+        baseReach = r;
+    }
+
+    public int getReach() {
+        return reach;
+    }
+
+    public void setReach(int r) {
+        reach = r;
     }
 
     public void tick() {
