@@ -91,6 +91,7 @@ public class ConnectionScreen extends JPanel {
         skin--;
       loadAvatar();
       repaint();
+      frame.playSound("ui_click");
     });
 
     rightButton.addActionListener(e -> {
@@ -98,6 +99,8 @@ public class ConnectionScreen extends JPanel {
         skin++;
       loadAvatar();
       repaint();
+      frame.playSound("ui_click");
+
     });
 
     connectButton.addActionListener(e -> {
@@ -108,6 +111,9 @@ public class ConnectionScreen extends JPanel {
       starter.setConnectionInfo(ip, port, username, skin);
       starter.startGame();
       f.setVisible(false);
+      frame.playSound("ui_click");
+      frame.getGameAudio().stop();
+
     });
   }
 

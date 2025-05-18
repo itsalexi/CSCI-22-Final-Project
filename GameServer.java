@@ -214,6 +214,8 @@ public class GameServer {
             }
 
             broadcast("LEAVE " + playerId, playerId);
+            broadcastAll("CHAT (" + playerId + " has left the game!)");
+
           }
 
           socket.close();
@@ -317,7 +319,7 @@ public class GameServer {
 
           broadcast("JOIN_ANNOUNCE " + playerId + " " + username + " " + skin + " "
               + ps.x + " " + ps.y + " " + ps.direction + " " + ps.state, playerId);
-
+          broadcastAll("CHAT (" + playerId + " has joined the game!)");
           break;
         }
 

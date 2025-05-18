@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,7 +69,11 @@ public class GameCanvas extends JComponent {
 
   private ArrayList<Recipe> recipes;
   private ArrayList<Recipe> trades;
+  private ArrayList<Sound> bgm;
+
   private HoverInfo hoverInfo;
+
+  private GameAudio gameAudio;
 
   public GameCanvas() {
     isMapLoaded = false;
@@ -83,6 +88,7 @@ public class GameCanvas extends JComponent {
     recipes = new ArrayList<>();
     trades = new ArrayList<>();
     sounds = new HashMap<>();
+    bgm = new ArrayList<>();
 
     setupSounds();
     recipes.add(new Recipe(new Item(2, 1), new Item(3, 2)));
@@ -1372,11 +1378,26 @@ public class GameCanvas extends JComponent {
   }
 
   private void setupSounds() {
-    ArrayList<File> fileList = new ArrayList<>();
-    fileList.addAll(Arrays.asList(new File("assets/sfx/").listFiles()));
-    for (File f : fileList) {
+    ArrayList<File> sfxList = new ArrayList<>();
+    sfxList.addAll(Arrays.asList(new File("assets/sfx/").listFiles()));
+    for (File f : sfxList) {
       sounds.put(f.getName().substring(0, f.getName().lastIndexOf(".")), new Sound(f));
     }
+
+    ArrayList<File> bgmList = new ArrayList<>();
+    bgmList.addAll(Arrays.asList(new File("assets/bgm/").listFiles()));
+    for (File f : bgmList) {
+      bgm.add(new Sound(f));
+    }
+    Collections.shuffle(bgm);
+    gameAudio = new GameAudio(bgm);
+    gameAudio.start();
+  }
+
+  public void playMusic(String soundCode) {
+    Sound sound = sounds.get(soundCode);
+    sound.play();
+    sound.loop();
   }
 
   public void playSound(String soundCode, double x, double y) {

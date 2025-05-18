@@ -38,7 +38,6 @@ public class MainMenu extends JComponent {
     centerY = 100;
     buttonWidth = (int) playButton.getWidth();
     buttonHeight = (int) playButton.getHeight();
-
     addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -68,6 +67,7 @@ public class MainMenu extends JComponent {
 
   private void handlePlayButtonClick() {
     frame.showConnectionScreen();
+    frame.playSound("ui_click");
   }
 
   @Override
