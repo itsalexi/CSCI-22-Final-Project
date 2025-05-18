@@ -49,21 +49,35 @@ public class Inventory {
 
     inventory = new Item[36];
 
-    Item.registerItem(0, new ItemDetails("Watering Can", false, "water"));
-    Item.registerItem(1, new ItemDetails("Iron Hoe", false, "hoe"));
-    Item.registerItem(2, new ItemDetails("Wheat", true, null));
-    Item.registerItem(3, new ItemDetails("Wheat Seeds", true, "plant wheat"));
-    Item.registerItem(4, new ItemDetails("Potato", true, null));
-    Item.registerItem(5, new ItemDetails("Potato Seeds", true, "plant potato"));
-    Item.registerItem(6, new ItemDetails("Carrot", true, null));
-    Item.registerItem(7, new ItemDetails("Carrot Seeds", true, "plant carrot"));
-    Item.registerItem(8, new ItemDetails("Onion", true, null));
-    Item.registerItem(9, new ItemDetails("Onion Seeds", true, "plant onion"));
-    Item.registerItem(10, new ItemDetails("Strawberry", true, null));
-    Item.registerItem(11, new ItemDetails("Strawberry Seeds", true, "plant strawberry"));
-    Item.registerItem(12, new ItemDetails("Blueberry", true, null));
-    Item.registerItem(13, new ItemDetails("Blueberry Seeds", true, "plant blueberry"));
-    Item.registerItem(14, new ItemDetails("Coins", true, ""));
+    Item.registerItem(0,
+        new ItemDetails("Watering Can", false, "water", "Use this to water your plants and help them grow."));
+    Item.registerItem(1,
+        new ItemDetails("Iron Hoe", false, "hoe", "Great for breaking up dirt and getting your garden ready."));
+    Item.registerItem(2,
+        new ItemDetails("Wheat", true, null, "The first crop you’ll grow. It’s simple but gets things started."));
+    Item.registerItem(3, new ItemDetails("Wheat Seeds", true, "plant wheat",
+        "Plant these to get your wheat growing and your farm going."));
+    Item.registerItem(4,
+        new ItemDetails("Potato", true, null, "A root that grows underground. Nothing fancy but reliable."));
+    Item.registerItem(5, new ItemDetails("Potato Seeds", true, "plant potato",
+        "Throw these in the dirt and wait for potatoes to pop up."));
+    Item.registerItem(6,
+        new ItemDetails("Carrot", true, null, "Crunchy and bright, carrots bring some color to your farm."));
+    Item.registerItem(7, new ItemDetails("Carrot Seeds", true, "plant carrot",
+        "Plant these seeds and watch your farm get a little more lively."));
+    Item.registerItem(8, new ItemDetails("Onion", true, null, "Adds a bit of flavor to your farm with its layers."));
+    Item.registerItem(9,
+        new ItemDetails("Onion Seeds", true, "plant onion", "Plant these and keep your farm growing strong."));
+    Item.registerItem(10,
+        new ItemDetails("Strawberry", true, null, "Sweet berries that show your farm’s getting better."));
+    Item.registerItem(11, new ItemDetails("Strawberry Seeds", true, "plant strawberry",
+        "Plant these seeds and get ready for some sweet snacks."));
+    Item.registerItem(12,
+        new ItemDetails("Blueberry", true, null, "The best fruit you’ve grown so far, small but tasty."));
+    Item.registerItem(13, new ItemDetails("Blueberry Seeds", true, "plant blueberry",
+        "Plant these and wait for the sweetest berries on your farm."));
+    Item.registerItem(14,
+        new ItemDetails("Coins", true, "", "Earned from all your hard work. Use them to keep growing."));
 
     tiles = new Sprite(tileMapFiles.getFiles(), 32);
     isOpen = false;

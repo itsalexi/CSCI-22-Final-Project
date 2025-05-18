@@ -23,6 +23,11 @@ public class Item {
     return details != null ? details.getName() : "Unknown";
   }
 
+  public String getLore() {
+    ItemDetails details = items.get(id);
+    return details != null ? details.getLore() : "Unknown";
+  }
+
   public String getActionName() {
     ItemDetails details = items.get(id);
     return details != null ? details.getActionName() : "";

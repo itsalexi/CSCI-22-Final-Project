@@ -1143,7 +1143,8 @@ public class GameCanvas extends JComponent {
     if (skillTree.isOpen()) {
       int x = lastClickedSkillTreeTile[0];
       int y = lastClickedSkillTreeTile[1];
-      invHighlight.setPosition(x * invHighlight.getSize() + skillTree.getX(), y * invHighlight.getSize() + skillTree.getY());
+      invHighlight.setPosition(x * invHighlight.getSize() + skillTree.getX(),
+          y * invHighlight.getSize() + skillTree.getY());
       invHighlight.draw(g2d);
     }
 
@@ -1159,18 +1160,17 @@ public class GameCanvas extends JComponent {
     int xOffset = (getWidth() - gridWidth) / 2;
     int yOffset = getHeight() - (8 * tileSize);
 
-    g2d.translate(xOffset, yOffset);
-    invHighlight.setPosition(tileX * tileSize, tileY * tileSize);
+    invHighlight.setPosition(tileX * tileSize + xOffset, tileY * tileSize + yOffset);
     invHighlight.draw(g2d);
     Item hoveringItem = inventory.getItem(inventory.getSlotFromGrid(tileX, tileY));
     if (hoveringItem != null) {
       ArrayList<TextLine> lines = new ArrayList<>();
       lines.add(new TextLine(hoveringItem.getName(), Color.WHITE));
-      HoverInfo hoveredInfo = new HoverInfo(lines, mouseX - xOffset, mouseY - yOffset - 32);
+      lines.add(new TextLine(hoveringItem.getLore(), Color.LIGHT_GRAY));
+      HoverInfo hoveredInfo = new HoverInfo(lines, mouseX, mouseY - 32);
       hoveredInfo.draw(g2d);
     }
 
-    g2d.translate(-xOffset, -yOffset);
   }
 
   private void drawUsername(Graphics2D g2d, Player player) {

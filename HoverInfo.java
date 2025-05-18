@@ -24,7 +24,7 @@ public class HoverInfo {
     String curr = "";
     AffineTransform transform = new AffineTransform();
     FontRenderContext frc = new FontRenderContext(transform, true, true);
-    Font font = new Font("Minecraft", Font.PLAIN, 24);
+    Font font = new Font("Minecraft", Font.PLAIN, 16);
     for (int i = 0; i < message.length(); i++) {
       if (font.getStringBounds(curr, frc).getWidth() > 320) {
         output.add(curr);
@@ -38,7 +38,7 @@ public class HoverInfo {
 
   private void initializeGrid(Graphics2D g2d) {
     int max = -1;
-    Font font = new Font("Minecraft", Font.PLAIN, 24);
+    Font font = new Font("Minecraft", Font.PLAIN, 16);
 
     ArrayList<TextLine> finalLines = new ArrayList<>();
     for (TextLine line : lines) {
@@ -115,8 +115,12 @@ public class HoverInfo {
       initializeGrid(g2d);
     }
 
-    if (posX + hoverInfoMap[0].length * 32 > 1024) {
-      posX -= hoverInfoMap[0].length * 32;
+    if (posX + hoverInfoMap[0].length * hoverInfoGrid.getTileSize() > 1024) {
+      posX -= hoverInfoMap[0].length * hoverInfoGrid.getTileSize();
+    }
+
+    if (posY + hoverInfoMap.length * hoverInfoGrid.getTileSize() > 768) {
+      posY -= (posY + hoverInfoMap.length * hoverInfoGrid.getTileSize()) - 768 + 30;
     }
 
     g2d.translate(posX, posY);
@@ -124,7 +128,7 @@ public class HoverInfo {
 
     for (int i = 0; i < lines.size(); i++) {
       TextLine line = lines.get(i);
-      Font font = new Font("Minecraft", Font.PLAIN, 24);
+      Font font = new Font("Minecraft", Font.PLAIN, 16);
       g2d.setFont(font);
       g2d.setColor(line.getColor());
       g2d.drawString(line.getText(), 32, +((i + 2) * 32) - 8);
