@@ -24,7 +24,7 @@ public class LevelingSystem {
   private double xpBoost;
 
   public LevelingSystem(EconomySystem sp, GameCanvas c) {
-    xp = 90;
+    xp = 0;
     level = 0;
     skillPoints = sp;
     lastXPGain = System.currentTimeMillis();
@@ -55,6 +55,10 @@ public class LevelingSystem {
     xpBoost = boost;
   }
 
+  public void setXP(double amount) {
+    xp = amount;
+  }
+
   public void addXP(double amount) {
     amount = amount * xpBoost;
     lastXPGain = System.currentTimeMillis();
@@ -69,6 +73,8 @@ public class LevelingSystem {
       }
       status = String.format("Level %s -> [%s]", level - 1, level);
     }
+    canvas.getWriter().send("LEVELS SET XP " + canvas.getPlayer().getId() + " " + xp);
+    canvas.getWriter().send("LEVELS SET LVL " + canvas.getPlayer().getId() + " " + level);
   }
 
   public void setLevel(int l) {

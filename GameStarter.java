@@ -96,8 +96,13 @@ public class GameStarter {
                     y = Double.parseDouble(parts[3]);
                     int balance = Integer.parseInt(parts[4]);
                     int skillPoints = Integer.parseInt(parts[5]);
+                    int level = Integer.parseInt(parts[6]);
+                    double xp = Double.parseDouble(parts[7]);
+
                     canvas.getEconomySystem().setBalance(balance);
                     canvas.getEconomySystem().setSkillPoints(skillPoints);
+                    canvas.getLevelingSystem().setLevel(level);
+                    canvas.getLevelingSystem().setXP(xp);
                     canvas.getPlayer().setPosition(x, y);
                     break;
 
@@ -312,6 +317,17 @@ public class GameStarter {
                         es.setBalance(es.getBalance() + amount);
                         ChatSystem cs = canvas.getChatSystem();
                         cs.addMessage("You have received " + amount + " coins!");
+                    }
+                    break;
+                case "SKILLTREE":
+                    action = parts[1];
+                    if (action.equals("LOAD")) {
+                        String[] data = parts[2].split(",");
+                        int[] levels = new int[7];
+                        for (int i = 0; i < 7; i++) {
+                            levels[i] = Integer.parseInt(data[i]);
+                        }
+                        canvas.setLevels(levels);
                     }
             }
         }

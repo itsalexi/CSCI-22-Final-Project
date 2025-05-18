@@ -17,9 +17,9 @@ public class GameServer {
   private FarmingSystem farmSystem;
 
   private static class PlayerState {
-    double x, y;
+    double x, y, currXP;
     String direction, state, username;
-    int skin, balance, skillPoints;
+    int skin, balance, skillPoints, level;
   }
 
   private static class AnimalState {
@@ -36,8 +36,12 @@ public class GameServer {
   private static Map<String, PlayerState> playerStates;
   private static Map<String, AnimalState> animalStates;
   private static Map<Integer, DroppedItemState> droppedItemStates;
+
   private Map<String, PlayerState> savedPlayerStates = new HashMap<>();
   private Map<String, Item[]> savedInventories = new HashMap<>();
+  private Map<String, ArrayList<Skill>> savedSkillTrees = new HashMap<>();
+
+  private ArrayList<Skill> baseSkills;
 
   private String animalControllerId = null;
 
@@ -51,6 +55,7 @@ public class GameServer {
     playerStates = new HashMap<>();
     animalStates = new HashMap<>();
     droppedItemStates = new HashMap<>();
+    baseSkills = new ArrayList<>();
     Random rand = new Random();
 
     farmSystem = new FarmingSystem(100);
@@ -59,6 +64,29 @@ public class GameServer {
     edgeMap = worldGen.getEdgeMap();
     foliageMap = worldGen.getFoliageMap();
     treeMap = worldGen.getTreeMap();
+
+    Skill one = new Skill("Fruit of Knowledge", 1, 1, 1, 10, 0,
+        "\"Getting smarter one harvest at a time.\"\nYou're so smart you probably have no friends!");
+    Skill two = new Skill("Lightfooted", 1, 1, 1, 10, 1,
+        "\"I swear my feet aren’t touching the ground.\"\n No one's gonna catch you slipping");
+    Skill three = new Skill("Merchant's Rizz", 1, 1, 1, 10, 2,
+        "\"Unspoken rizz or an HR complaint?\"\nAre they paying more to buy or just to make you shut up. Either way, you win ");
+    Skill four = new Skill("Cheap Tricks", 1, 1, 1, 10, 3,
+        "\"Why pay full price when you can just gas light the skill tree?\"\n Too broke to upgrade huh?");
+    Skill five = new Skill("Nature's Grasp", 1, 1, 1, 10, 4,
+        "\"Why are my fingers so long??\"\nInteract with things from faraway. Kinda weird though.");
+    Skill six = new Skill("Green Thumb", 1, 1, 1, 5, 5,
+        "\"Plants just can’t get enough of you.\"\nEither way, you’re their favorite weirdo.");
+    Skill seven = new Skill("Seal of the Serpent", 1, 1, 1, 5, 6,
+        "\"One bite never hurt anyone...\"\nEverything's cheaper, and it only took a bite. What could go wrong?");
+
+    baseSkills.add(one);
+    baseSkills.add(two);
+    baseSkills.add(three);
+    baseSkills.add(four);
+    baseSkills.add(five);
+    baseSkills.add(six);
+    baseSkills.add(seven);
 
     new Thread(() -> {
       while (true) {
@@ -253,8 +281,10 @@ public class GameServer {
             ps.y = coords[1] * 32;
             ps.direction = "DOWN";
             ps.state = "idle";
-            ps.balance = 200; // TODO: change to 0
-            ps.skillPoints = 20;
+            ps.balance = 0; // TODO: change to 0
+            ps.skillPoints = 16;
+            ps.level = 5;
+            ps.currXP = 162;
           }
 
           ps.username = username;
@@ -262,7 +292,8 @@ public class GameServer {
 
           playerStates.put(playerId, ps);
 
-          send("JOIN_SUCCESS " + playerId + " " + ps.x + " " + ps.y + " " + ps.balance + " " + ps.skillPoints);
+          send("JOIN_SUCCESS " + playerId + " " + ps.x + " " + ps.y + " " + ps.balance + " " + ps.skillPoints + " "
+              + ps.level + " " + ps.currXP);
 
           if (animalControllerId == null) {
             animalControllerId = playerId;
@@ -289,10 +320,11 @@ public class GameServer {
           inv[7] = new Item(13, 1);
 
           if (savedInventories.containsKey(playerId)) {
-            System.out.println("test");
             inv = savedInventories.get(playerId);
           }
-          StringBuilder sb = new StringBuilder("INVENTORY LOAD " + playerId);
+
+          StringBuilder sb;
+          sb = new StringBuilder("INVENTORY LOAD " + playerId);
           for (int i = 0; i < inv.length; i++) {
             Item item = inv[i];
             int itemId = (item != null) ? item.getId() : -1;
@@ -301,6 +333,21 @@ public class GameServer {
           }
           send(sb.toString());
 
+          ArrayList<Skill> playersSkills = new ArrayList<>(baseSkills);
+
+          playersSkills.get(0).setLevel(10);
+
+          if (savedSkillTrees.containsKey(playerId)) {
+            playersSkills = savedSkillTrees.get(playerId);
+          } else {
+            savedSkillTrees.put(playerId, playersSkills);
+          }
+
+          sb = new StringBuilder("SKILLTREE LOAD ");
+          for (Skill s : playersSkills) {
+            sb.append(s.getLevel()).append(",");
+          }
+          send(sb.toString());
           send("TILEMAP DONE");
 
           for (Map.Entry<String, PlayerState> entry : playerStates.entrySet()) {
@@ -549,7 +596,33 @@ public class GameServer {
           }
           break;
         }
-
+        case "SKILLTREE":
+          String action = parts[1];
+          if (action.equals("SET")) {
+            ArrayList<Skill> currSkills = savedSkillTrees.get(parts[2]);
+            Skill modify = currSkills.get(Integer.parseInt(parts[3]));
+            modify.setLevel(Integer.parseInt(parts[4]));
+            savedSkillTrees.put(playerId, currSkills);
+          }
+          break;
+        case "LEVELS":
+          action = parts[1];
+          type = parts[2];
+          if (action.equals("SET")) {
+            PlayerState ps = savedPlayerStates.get(parts[3]);
+            if (ps != null) {
+              switch (type) {
+                case "XP":
+                  ps.currXP = Double.parseDouble(parts[4]);
+                  break;
+                case "LVL":
+                  ps.level = Integer.parseInt(parts[4]);
+                  break;
+              }
+              savedPlayerStates.put(playerId, ps);
+            }
+          }
+          break;
         case "PLAY_SOUND": {
           broadcast(msg, playerId);
           break;

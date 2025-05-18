@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+
 public class SkillTreeSystem {
 
     private Skill rootSkill;
@@ -6,10 +7,10 @@ public class SkillTreeSystem {
     private EconomySystem economySystem;
 
     public SkillTreeSystem(ArrayList<Skill> s, EconomySystem ec) {
-       skills = s;
-       rootSkill = s.get(0);
-       populateNextSkills(skills);
-       economySystem = ec;
+        skills = s;
+        rootSkill = s.get(0);
+        populateNextSkills(skills);
+        economySystem = ec;
     }
 
     private void populateNextSkills(ArrayList<Skill> s) {
@@ -37,7 +38,7 @@ public class SkillTreeSystem {
         output.add(rootSkill);
 
         ArrayList<Skill> nextLevel;
-        for(int i = 1; i < level; i++) {
+        for (int i = 1; i < level; i++) {
             nextLevel = new ArrayList<>();
             for (Skill s : output) {
                 nextLevel.addAll(s.getNextSkills());
@@ -82,19 +83,19 @@ public class SkillTreeSystem {
         return s.isUnlocked() && s.getUpgradeCost() <= economySystem.getBalance() && !s.isMaxLevel();
     }
 
-    public void unlockSkill(Skill s) {
+    public boolean unlockSkill(Skill s) {
         if (s.isUnlocked()) {
-            return;
+            return false;
         }
 
         if (economySystem.getSkillPoints() < s.getUnlockCost()) {
-            return;
+            return false;
         }
 
         if (s.equals(rootSkill)) {
             s.unlock();
             economySystem.setSkillPoints(economySystem.getSkillPoints() - s.getUnlockCost());
-            return;
+            return false;
         }
 
         for (Skill currSkill : skills) {
@@ -105,17 +106,20 @@ public class SkillTreeSystem {
                 if (s.equals(unlockable)) {
                     s.unlock();
                     economySystem.setSkillPoints(economySystem.getSkillPoints() - s.getUnlockCost());
-                    return;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
-    public void upgradeSkill(Skill s) {
+    public boolean upgradeSkill(Skill s) {
         if (s.isUnlocked() && s.getUpgradeCost() <= economySystem.getBalance() && !s.isMaxLevel()) {
             economySystem.setBalance(economySystem.getBalance() - s.getUpgradeCost());
             s.upgrade();
+            return true;
         }
+        return false;
     }
 
     public Skill findSkill(String name) {

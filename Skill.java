@@ -84,6 +84,9 @@ public class Skill {
         return scalingFactor;
     }
 
+    public void setLevel(int l) {
+        level = l;
+    }
     @Override
     public boolean equals(Object obj) {
         if (obj.getClass() != getClass()) {

@@ -120,7 +120,7 @@ public class GameCanvas extends JComponent {
     baseTrades = new ArrayList<>(trades);
     economySystem = new EconomySystem(this);
 
-    skills = new ArrayList<>(); // NOTE: add skills level-order
+    skills = new ArrayList<>();
 
     Skill one = new Skill("Fruit of Knowledge", 1, 1, 1, 10, 0,
         "\"Getting smarter one harvest at a time.\"\nYou're so smart you probably have no friends!");
@@ -158,7 +158,7 @@ public class GameCanvas extends JComponent {
 
     zoom = 2;
     previousItemSlot = -1;
-    test = false; //TODO: remove this
+    test = false; // TODO: remove this
     currentPath = new ArrayList<>();
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
@@ -216,6 +216,13 @@ public class GameCanvas extends JComponent {
 
   public GameStarter getClient() {
     return client;
+  }
+
+  public void setLevels(int[] levels) {
+    for (int i = 0; i < levels.length; i++) {
+      skills.get(i).setLevel(levels[i]);
+    }
+    updateSkills();
   }
 
   public void setServerOut(DataOutputStream out) {
@@ -1078,13 +1085,17 @@ public class GameCanvas extends JComponent {
       Skill skill = skillTree.getSkillAtTile(tileX, tileY);
       if (skill != null) {
         ArrayList<TextLine> lines = new ArrayList<>();
-        lines.add(new TextLine(String.format("%s (Level %d / %d)\n", skill.getName(), skill.getLevel(), skill.getMaxLevel()), Color.WHITE));
+        lines.add(
+            new TextLine(String.format("%s (Level %d / %d)\n", skill.getName(), skill.getLevel(), skill.getMaxLevel()),
+                Color.WHITE));
         lines.add(new TextLine(skill.getDescrption() + "\n", Color.LIGHT_GRAY));
         if (!skill.isMaxLevel()) {
           if (skill.isUnlocked()) {
-            lines.add(new TextLine(String.format("Upgrade for %d gold", skill.getUpgradeCost()), skillTreeSystem.isUpgradeable(skill) ? Color.YELLOW : Color.PINK));
+            lines.add(new TextLine(String.format("Upgrade for %d gold", skill.getUpgradeCost()),
+                skillTreeSystem.isUpgradeable(skill) ? Color.YELLOW : Color.PINK));
           } else {
-            lines.add(new TextLine(String.format("Unlock for %d SP", skill.getUnlockCost()), skillTreeSystem.isUnlockable(skill) ? Color.YELLOW : Color.PINK));
+            lines.add(new TextLine(String.format("Unlock for %d SP", skill.getUnlockCost()),
+                skillTreeSystem.isUnlockable(skill) ? Color.YELLOW : Color.PINK));
           }
         }
         hoverInfo = new HoverInfo(lines, mouseX, mouseY);
@@ -1137,6 +1148,10 @@ public class GameCanvas extends JComponent {
     return writer;
   }
 
+  public LevelingSystem getLevelingSystem() {
+    return levelingSystem;
+  }
+
   public void handleShopGrid(int tileX, int tileY) {
     if (tileY == 7) {
       if (tileX == 1) {
@@ -1163,15 +1178,20 @@ public class GameCanvas extends JComponent {
 
   public void handleSkillTreeGrid(int tileX, int tileY) {
     Skill skill = skillTree.getSkillAtTile(tileX, tileY);
+    boolean success;
     if (skill != null) {
       if (skill.isUnlocked()) {
-        skillTreeSystem.upgradeSkill(skill);
+        success = skillTreeSystem.upgradeSkill(skill);
       } else {
-        skillTreeSystem.unlockSkill(skill);
+        success = skillTreeSystem.unlockSkill(skill);
       }
-      System.out.println(skill.getUnlockCost());
-      System.out.println(economySystem.getSkillPoints());
+      if (success) {
+        System.out
+            .println("SKILLTREE SET " + client.getPlayerID() + " " + skills.indexOf(skill) + " " + skill.getLevel());
+        writer.send("SKILLTREE SET " + client.getPlayerID() + " " + skills.indexOf(skill) + " " + skill.getLevel());
+      }
     }
+
     updateSkills();
   }
 
