@@ -52,7 +52,6 @@ public class HoverInfo {
           ArrayList<TextLine> tempTextLines = new ArrayList<>();
           for (String l : tempLines) {
             tempTextLines.add(new TextLine(l, line.getColor()));
-            System.out.println(l);
           }
           finalLines.addAll(tempTextLines);
           max = 320;

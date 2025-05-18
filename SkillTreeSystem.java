@@ -7,26 +7,21 @@ public class SkillTreeSystem {
 
     public SkillTreeSystem(ArrayList<Skill> s, EconomySystem ec) {
        skills = s;
-       rootSkill = getRootSkill(skills);
+       rootSkill = s.get(0);
        populateNextSkills(skills);
        economySystem = ec;
     }
 
     private void populateNextSkills(ArrayList<Skill> s) {
-        for (Skill skill : s) {
-            if (skill != rootSkill){
-                skill.getPrevSkill().addNextSkill(skill);
+        for (int i = 0; i < s.size(); i++) {
+            Skill currSkill = s.get(i);
+            if (i * 2 + 1 < s.size()) {
+                currSkill.addNextSkill(s.get(i * 2 + 1));
+            }
+            if (i * 2 + 2 < s.size()) {
+                currSkill.addNextSkill(s.get(i * 2 + 2));
             }
         }
-    }
-
-    private Skill getRootSkill(ArrayList<Skill> s) {
-        for (Skill skill : s) {
-            if (skill.getPrevSkill() == null) {
-                return skill;
-            }
-        }
-        return null;
     }
 
     public ArrayList<Skill> getSkills() {
@@ -59,11 +54,16 @@ public class SkillTreeSystem {
             return;
         }
 
+        if (s.equals(rootSkill)) {
+            s.unlock();
+            economySystem.setSkillPoints(economySystem.getSkillPoints() - s.getUnlockCost());
+            return;
+        }
+
         for (Skill currSkill : skills) {
             if (!currSkill.isUnlocked()) {
                 continue;
             }
-            System.out.println("a");
             for (Skill unlockable : currSkill.getNextSkills()) {
                 if (s.equals(unlockable)) {
                     s.unlock();
@@ -79,5 +79,5 @@ public class SkillTreeSystem {
             economySystem.setBalance(economySystem.getBalance() - s.getUpgradeCost());
             s.upgrade();
         }
-    }    
+    }
 }

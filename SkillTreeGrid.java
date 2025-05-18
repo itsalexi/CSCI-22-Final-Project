@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 public class SkillTreeGrid {
@@ -63,6 +64,8 @@ public class SkillTreeGrid {
         skillTree = sys;
         canvas = c;
         isOpen = false;
+
+        getX();
     }
 
     public int[] getTileAtMouse(double mouseX, double mouseY) {
@@ -90,6 +93,16 @@ public class SkillTreeGrid {
 
     public void setOpen(boolean open) {
         isOpen = open;
+    }
+
+    public Skill getSkillAtTile(double tileX, double tileY) {
+        for (int i=0; i < skillPositions.length; i++) {
+            int[] skillPos = skillPositions[i];
+            if (tileY == skillPos[0] && tileX == skillPos[1]) {
+                return skillTree.getSkills().get(i);
+            }
+        }
+        return null;
     }
 
     public void updateSkillTree() {
@@ -138,6 +151,37 @@ public class SkillTreeGrid {
         g2d.drawString(label, quantityLabelX, quantityLabelY);
     }
 
+    public double getX() {
+        double tileSize = canvas.getWidth() * 32 / 800;
+        double gridWidth = skillTreeGridMap[0].length * tileSize;
+
+        return (canvas.getWidth() - gridWidth) / 2;
+    }
+
+    public double getY() {
+        double tileSize = canvas.getWidth() * 32 / 800;
+        double gridHeight = skillTreeGridMap.length * tileSize;
+        
+        return (canvas.getHeight() - gridHeight) / 2;
+    }
+
+    public void drawArrows(Graphics2D g2d) {
+        for (int i=0; i < skillPositions.length; i++) {
+            int[] currPosition = skillPositions[i];
+            double[] start = {(currPosition[1] + 0.5) * skillIconsGrid.getTileSize(), (currPosition[0] + 1) * skillIconsGrid.getTileSize()};
+            if (i * 2 + 1 < skillPositions.length) {
+                int[] endPosition = skillPositions[i * 2 + 1];
+                double[] end = {(endPosition[1] + 0.5) * skillIconsGrid.getTileSize(), endPosition[0] * skillIconsGrid.getTileSize()};
+                g2d.draw(new Line2D.Double(start[0], start[1], end[0], end[1]));
+            }
+            if (i * 2 + 2 < skillPositions.length) {
+                int[] endPosition = skillPositions[i * 2 + 2];
+                double[] end = {(endPosition[1] + 0.5) * skillIconsGrid.getTileSize(), endPosition[0] * skillIconsGrid.getTileSize()};
+                g2d.draw(new Line2D.Double(start[0], start[1], end[0], end[1]));
+            }
+        }
+    }
+
     public void draw(Graphics2D g2d) {
         updateSkillTree();
 
@@ -156,8 +200,13 @@ public class SkillTreeGrid {
         if (isOpen()) {
             g2d.translate(x, y);
             skillTreeGrid.draw(g2d);
+            g2d.setStroke(new BasicStroke(2));
+            drawArrows(g2d);
             skillIconsGrid.draw(g2d);
             drawSkillLevels(g2d);
+            g2d.drawString("Skill Tree", (int) (gridWidth - g2d.getFontMetrics().stringWidth("Skill Tree")) / 2, (int) (tileSize * 1.5));
+            g2d.setFont(new Font("Minecraft", Font.PLAIN, (int) 16));
+            g2d.drawString(String.format("Remaining Skill Points: %d", canvas.getEconomySystem().getSkillPoints()), (int) (tileSize), (int) (gridHeight - tileSize * 1.25));
             g2d.translate(-x, -y);
         }
     }

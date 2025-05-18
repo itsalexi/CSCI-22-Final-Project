@@ -106,18 +106,15 @@ public class GameCanvas extends JComponent {
     trades.add(new Recipe(new Item(14, 800), new Item(13, 1)));
     economySystem = new EconomySystem(this);
 
-    ArrayList<Skill> skills = new ArrayList<>(); // NOTE: add skills bottom-up
+    ArrayList<Skill> skills = new ArrayList<>(); // NOTE: add skills level-order
 
-    Skill one = new Skill("one", null, 1, 1, 1, 1, 0);
-    one.unlock();
-    one.upgrade();
-    Skill two = new Skill("two", one, 1, 1, 1, 1, 1);
-    two.unlock();
-    Skill three = new Skill("three", one, 1, 1, 1, 1, 2);
-    Skill four = new Skill("four", two, 1, 1, 1, 1, 3);
-    Skill five = new Skill("five", two, 1, 1, 1, 1, 4);
-    Skill six = new Skill("six", three, 1, 1, 1, 1, 5);
-    Skill seven = new Skill("seven", three, 1, 1, 1, 1, 6);
+    Skill one = new Skill("one", 1, 1, 1, 10, 0);
+    Skill two = new Skill("two", 1, 1, 1, 10, 1);
+    Skill three = new Skill("three", 1, 1, 1, 10, 2);
+    Skill four = new Skill("four", 1, 1, 1, 10, 3);
+    Skill five = new Skill("five", 1, 1, 1, 10, 4);
+    Skill six = new Skill("six", 1, 1, 1, 5, 5);
+    Skill seven = new Skill("seven", 1, 1, 1, 5, 6);
 
     skills.add(one);
     skills.add(two);
@@ -150,6 +147,7 @@ public class GameCanvas extends JComponent {
     lastClickedInventoryTile = new int[] { 6, 1 };
     lastClickedCraftingTile = new int[2];
     lastClickedShopTile = new int[2];
+    lastClickedSkillTreeTile = new int[2];
 
     highlight = new Sprite(selectorFiles.getFiles(), 32);
     invHighlight = new Sprite(selectorFiles.getFiles(), 32);
@@ -488,6 +486,19 @@ public class GameCanvas extends JComponent {
               chatSystem.setChatOpen(false);
               chatSystem.setCurrentInput("");
             }
+            if (inventory.isOpen() && previousItemSlot != -1) {
+              if (hoveredItem != null) {
+                dropItem(hoveredItem, hoveredItem.getQuantity());
+                hoveredItem = null;
+                previousItemSlot = -1;
+              }
+            }
+            if (inventory.isOpen()) {
+              inventory.setOpen(false);
+            }
+            if (skillTree.isOpen()) {
+              skillTree.setOpen(false);
+            }
             break;
           case KeyEvent.VK_Q:
             if (!inventory.isOpen()) {
@@ -510,7 +521,6 @@ public class GameCanvas extends JComponent {
             syncInventoryBulk();
 
             break;
-
         }
 
         if (direction != null && !chatSystem.isChatOpen()) {
@@ -859,16 +869,11 @@ public class GameCanvas extends JComponent {
       public void mouseMoved(MouseEvent e) {
         double x = e.getX();
         double y = e.getY();
-        int[] craftingTile = craftingGrid.getTileAtMouse(x, y);
-        int[] shopTile = shopGrid.getTileAtMouse(x, y);
+        lastClickedCraftingTile = craftingGrid.getTileAtMouse(x, y);
+        lastClickedShopTile = shopGrid.getTileAtMouse(x, y);
+        lastClickedSkillTreeTile = skillTree.getTileAtMouse(x, y);
 
         drawGridInfo(mouseX, mouseY);
-
-        lastClickedCraftingTile[0] = craftingTile[0];
-        lastClickedCraftingTile[1] = craftingTile[1];
-
-        lastClickedShopTile[0] = shopTile[0];
-        lastClickedShopTile[1] = shopTile[1];
 
         int[] coords = inventory.getTileAtMouse(x, y);
         if (coords != null) {
@@ -911,12 +916,14 @@ public class GameCanvas extends JComponent {
         double x = e.getX();
         double y = e.getY();
 
+        if (skillTree.isOpen()) {
+          handleSkillTreeGrid(lastClickedSkillTreeTile[0], lastClickedSkillTreeTile[1]);
+        }
+
         if (inventory.isOpen()) {
 
           handleCraftingGrid(lastClickedCraftingTile[0], lastClickedCraftingTile[1]);
           handleShopGrid(lastClickedShopTile[0], lastClickedShopTile[1]);
-          System.out.println(lastClickedCraftingTile[0] + " " + lastClickedCraftingTile[1]);
-          System.out.println(lastClickedShopTile[0] + " " + lastClickedShopTile[1]);
 
           int tileX = lastClickedInventoryTile[0];
           int tileY = lastClickedInventoryTile[1];
@@ -1011,42 +1018,54 @@ public class GameCanvas extends JComponent {
     if (!inventory.isOpen())
       return;
     int tileX, tileY;
-    CraftingGrid grid;
-    ArrayList<Recipe> infos;
 
-    for (int i = 0; i < 2; i++) {
-      if (i == 0) {
-        tileX = lastClickedCraftingTile[0];
-        tileY = lastClickedCraftingTile[1];
-        grid = craftingGrid;
-        infos = recipes;
-      } else {
-        tileX = lastClickedShopTile[0];
-        tileY = lastClickedShopTile[1];
-        grid = shopGrid;
-        infos = trades;
+    if (skillTree.isOpen()) {
+      tileX = lastClickedSkillTreeTile[0];
+      tileY = lastClickedSkillTreeTile[1];
+      Skill skill = skillTree.getSkillAtTile(tileX, tileY);
+      if (skill != null) {
+        ArrayList<TextLine> lines = new ArrayList<>();
       }
-      if (tileY >= 2 && tileY <= 5) {
-        if (tileX == 3) {
-          int recipeRow = tileY - 2;
-          int recipeIndex = grid.getCurrentPage() * 4 + recipeRow;
-          if (recipeIndex >= 0 && recipeIndex < infos.size()) {
-            Recipe hoveredRecipe = infos.get(recipeIndex);
-            if (hoveredRecipe != null) {
-              ArrayList<TextLine> lines = new ArrayList<>();
-              lines.add(
-                  new TextLine(String.format("%s -> %s", hoveredRecipe.getItemIn().getName(),
-                      hoveredRecipe.getItemOut().getName()), Color.WHITE));
-              hoverInfo = new HoverInfo(lines, mouseX, mouseY);
-              System.out.println(String.format("%s -> %s", hoveredRecipe.getItemIn().getName(),
-                  hoveredRecipe.getItemOut().getName()));
-              return;
+    }
+
+    if (inventory.isOpen()) {
+      CraftingGrid grid;
+      ArrayList<Recipe> infos;
+
+      for (int i = 0; i < 2; i++) {
+        if (i == 0) {
+          tileX = lastClickedCraftingTile[0];
+          tileY = lastClickedCraftingTile[1];
+          grid = craftingGrid;
+          infos = recipes;
+        } else {
+          tileX = lastClickedShopTile[0];
+          tileY = lastClickedShopTile[1];
+          grid = shopGrid;
+          infos = trades;
+        }
+        if (tileY >= 2 && tileY <= 5) {
+          if (tileX == 3) {
+            int recipeRow = tileY - 2;
+            int recipeIndex = grid.getCurrentPage() * 4 + recipeRow;
+            if (recipeIndex >= 0 && recipeIndex < infos.size()) {
+              Recipe hoveredRecipe = infos.get(recipeIndex);
+              if (hoveredRecipe != null) {
+                ArrayList<TextLine> lines = new ArrayList<>();
+                lines.add(
+                    new TextLine(String.format("%s -> %s", hoveredRecipe.getItemIn().getName(),
+                        hoveredRecipe.getItemOut().getName()), Color.WHITE));
+                hoverInfo = new HoverInfo(lines, mouseX, mouseY);
+                System.out.println(String.format("%s -> %s", hoveredRecipe.getItemIn().getName(),
+                    hoveredRecipe.getItemOut().getName()));
+                return;
+              }
             }
           }
         }
       }
+      hoverInfo = null;
     }
-    hoverInfo = null;
   }
 
   public WriteToServer getWriter() {
@@ -1077,6 +1096,19 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  public void handleSkillTreeGrid(int tileX, int tileY) {
+    Skill skill = skillTree.getSkillAtTile(tileX, tileY);
+    if (skill != null) {
+      if (skill.isUnlocked()) {
+        skillTreeSystem.upgradeSkill(skill);
+      } else {
+        skillTreeSystem.unlockSkill(skill);
+      }
+      System.out.println(skill.getUnlockCost());
+      System.out.println(economySystem.getSkillPoints());
+    }
+  }
+
   public Inventory getInventory() {
     return inventory;
   }
@@ -1101,6 +1133,14 @@ public class GameCanvas extends JComponent {
   }
 
   private void drawInventoryHighlight(Graphics2D g2d) {
+
+    if (skillTree.isOpen()) {
+      int x = lastClickedSkillTreeTile[0];
+      int y = lastClickedSkillTreeTile[1];
+      invHighlight.setPosition(x * invHighlight.getSize() + skillTree.getX(), y * invHighlight.getSize() + skillTree.getY());
+      invHighlight.draw(g2d);
+    }
+
     if (lastClickedInventoryTile[0] == -1 || lastClickedInventoryTile[1] == -1)
       return;
 
