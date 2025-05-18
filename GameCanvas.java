@@ -40,6 +40,7 @@ public class GameCanvas extends JComponent {
   private int[] lastClickedSkillTreeTile;
 
   private boolean isMapLoaded;
+  private boolean isFirstKey;
   private double anchorX, anchorY;
   private Inventory inventory;
   private double zoom;
@@ -373,7 +374,7 @@ public class GameCanvas extends JComponent {
   }
 
   private void doPlayerAction(int x, int y) {
-    if (!player.isDoingAction()) {
+    if (!player.isDoingAction() && !isPlayerInWater()) {
       if (inventory.getActiveItem() != null) {
         Item activeItem = inventory.getActiveItem();
         boolean itemUsed = false;
@@ -513,14 +514,24 @@ public class GameCanvas extends JComponent {
             break;
           case KeyEvent.VK_T:
             if (!chatSystem.isChatOpen()) {
-              chatSystem.setChatOpen(!chatSystem.isChatOpen());
+              chatSystem.setChatOpen(true);
               chatSystem.setCurrentInput("");
+              inputText = "";
+              isFirstKey = true;
+            }
+            break;
+          case KeyEvent.VK_SLASH:
+            if (!chatSystem.isChatOpen()) {
+              chatSystem.setChatOpen(true);
+              chatSystem.setCurrentInput("");
+              inputText = "";
             }
             break;
           case KeyEvent.VK_ESCAPE:
             if (chatSystem.isChatOpen()) {
               chatSystem.setChatOpen(false);
               chatSystem.setCurrentInput("");
+              inputText = "";
             }
             if (inventory.isOpen() && previousItemSlot != -1) {
               if (hoveredItem != null) {
@@ -615,6 +626,10 @@ public class GameCanvas extends JComponent {
 
           char c = e.getKeyChar();
 
+          if (isFirstKey) {
+            isFirstKey = false;
+            return;
+          }
           if (c == '\n') {
             if (!inputText.isBlank()) {
               if (inputText.startsWith("/")) {
@@ -640,7 +655,7 @@ public class GameCanvas extends JComponent {
                       }
 
                     } else {
-                      chatSystem.addMessage("[GAME] Missing arguments.");
+                      chatSystem.addMessage("[GAME] Missing arguments. /send <playerId> <amount>");
                     }
                     break;
                   default:
