@@ -19,39 +19,39 @@ public class WorldGenerator {
     private Boolean[][] waterPositions;
 
     public WaterEdgeMatrix(Boolean[][] wp) {
-        waterPositions = wp;
+      waterPositions = wp;
     }
 
     @Override
     public boolean equals(Object another) {
-        if (another == this) {
-            return true;
-        }
-
-        if (another == null) {
-            return false;
-        }
-
-        if (another.getClass() != this.getClass()) {
-            return false;
-        }
-
-        WaterEdgeMatrix other = (WaterEdgeMatrix) another;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (waterPositions[i][j] == null || other.getWaterPositions()[i][j] == null) {
-                    continue;
-                }
-                if (waterPositions[i][j] != other.getWaterPositions()[i][j]) {
-                    return false;
-                }
-            }
-        }
+      if (another == this) {
         return true;
+      }
+
+      if (another == null) {
+        return false;
+      }
+
+      if (another.getClass() != this.getClass()) {
+        return false;
+      }
+
+      WaterEdgeMatrix other = (WaterEdgeMatrix) another;
+      for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+          if (waterPositions[i][j] == null || other.getWaterPositions()[i][j] == null) {
+            continue;
+          }
+          if (waterPositions[i][j] != other.getWaterPositions()[i][j]) {
+            return false;
+          }
+        }
+      }
+      return true;
     }
 
     public Boolean[][] getWaterPositions() {
-        return waterPositions;
+      return waterPositions;
     }
   }
 
@@ -277,6 +277,18 @@ public class WorldGenerator {
 
     }
 
+  }
+
+  public ArrayList<int[]> getValidSpawns() {
+    ArrayList<int[]> valids = new ArrayList<>();
+    for (int i = 0; i < 100; i++) {
+      for (int j = 0; j < 100; j++) {
+        if (groundMap[i][j] == 36) {
+          valids.add(new int[] { i, j });
+        }
+      }
+    }
+    return valids;
   }
 
   private void generateWaterEdges() {

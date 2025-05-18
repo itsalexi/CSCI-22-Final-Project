@@ -42,6 +42,7 @@ public class GameServer {
   private Map<String, ArrayList<Skill>> savedSkillTrees = new HashMap<>();
 
   private ArrayList<Skill> baseSkills;
+  private ArrayList<int[]> validSpawns;
 
   private String animalControllerId = null;
 
@@ -64,6 +65,7 @@ public class GameServer {
     edgeMap = worldGen.getEdgeMap();
     foliageMap = worldGen.getFoliageMap();
     treeMap = worldGen.getTreeMap();
+    validSpawns = worldGen.getValidSpawns();
 
     Skill one = new Skill("Fruit of Knowledge", 1, 1, 1, 10, 0,
         "\"Getting smarter one harvest at a time.\"\nYou're so smart you probably have no friends!");
@@ -174,15 +176,20 @@ public class GameServer {
     }
   }
 
-  public void acceptConnections() {
-    spawnAnimal("animal1", "cow", 0, 250, 350, 64, "LEFT", "idle");
-    spawnAnimal("animal2", "chicken", 0, 150, 365, 32, "LEFT", "idle");
-    spawnAnimal("animal3", "sheep", 0, 300, 50, 64, "LEFT", "idle");
-    spawnAnimal("animal4", "pig", 0, 350, 100, 64, "LEFT", "idle");
-    spawnAnimal("animal5", "fox", 0, 130, 365, 64, "LEFT", "idle");
-    spawnAnimal("animal6", "cat", 0, 110, 340, 64, "LEFT", "idle");
-    spawnAnimal("animal7", "dog", 0, 100, 320, 64, "LEFT", "idle");
+  public void spawnRandomAnimal() {
+    String animalId = "animal" + animalStates.size() + 1;
+    String[] animalTypes = { "cow", "chicken", "sheep", "pig", "fox", "cat", "dog" };
+    String animalType = animalTypes[(int) (Math.random() * animalTypes.length)];
 
+    int[] pos = validSpawns.get((int) (Math.random() * validSpawns.size()));
+    spawnAnimal(animalId, animalType, 0, pos[1] * 32, pos[0] * 32, animalType.equals("chicken") ? 32 : 64, "LEFT",
+        "IDLE");
+  }
+
+  public void acceptConnections() {
+    for (int i = 0; i < 100; i++) {
+      spawnRandomAnimal();
+    }
     try {
       System.out.println("Waiting for connections.");
       while (numPlayers < maxPlayers) {

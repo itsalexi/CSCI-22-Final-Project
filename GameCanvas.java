@@ -1487,7 +1487,8 @@ public class GameCanvas extends JComponent {
         highlight.draw(g2d);
       }
 
-      for (Animal an : animals.values()) {
+      Map<String, Animal> copyAnimals = new HashMap<>(animals);
+      for (Animal an : copyAnimals.values()) {
         an.draw(g2d);
       }
 
