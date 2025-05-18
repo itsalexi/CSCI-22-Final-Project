@@ -54,7 +54,7 @@ public class Inventory {
     Item.registerItem(1,
         new ItemDetails("Iron Hoe", false, "hoe", "Great for breaking up dirt and getting your garden ready."));
     Item.registerItem(2,
-        new ItemDetails("Wheat", true, null, "The first crop you’ll grow. It’s simple but gets things started."));
+        new ItemDetails("Wheat", true, null, "The first crop you'll grow. It's simple but gets things started."));
     Item.registerItem(3, new ItemDetails("Wheat Seeds", true, "plant wheat",
         "Plant these to get your wheat growing and your farm going."));
     Item.registerItem(4,
@@ -69,11 +69,11 @@ public class Inventory {
     Item.registerItem(9,
         new ItemDetails("Onion Seeds", true, "plant onion", "Plant these and keep your farm growing strong."));
     Item.registerItem(10,
-        new ItemDetails("Strawberry", true, null, "Sweet berries that show your farm’s getting better."));
+        new ItemDetails("Strawberry", true, null, "Sweet berries that show your farm's getting better."));
     Item.registerItem(11, new ItemDetails("Strawberry Seeds", true, "plant strawberry",
         "Plant these seeds and get ready for some sweet snacks."));
     Item.registerItem(12,
-        new ItemDetails("Blueberry", true, null, "The best fruit you’ve grown so far, small but tasty."));
+        new ItemDetails("Blueberry", true, null, "The best fruit you've grown so far, small but tasty."));
     Item.registerItem(13, new ItemDetails("Blueberry Seeds", true, "plant blueberry",
         "Plant these and wait for the sweetest berries on your farm."));
     Item.registerItem(14,
