@@ -67,7 +67,7 @@ public class ChatSystem {
 
   public void addMessage(String message) {
     messages.addAll(wrapText(message));
-    while (messages.size() > 5) {
+    while (messages.size() > 9) {
       messages.remove(0);
     }
   }
