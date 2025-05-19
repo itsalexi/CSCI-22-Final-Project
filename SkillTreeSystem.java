@@ -52,12 +52,10 @@ public class SkillTreeSystem {
 
     public boolean isUnlockable(Skill s) {
         if (s.isUnlocked()) {
-            System.out.println("unlocked");
             return false;
         }
 
         if (economySystem.getSkillPoints() < s.getUnlockCost()) {
-            System.out.println("not enough");
             return false;
         }
 
@@ -75,7 +73,6 @@ public class SkillTreeSystem {
                 }
             }
         }
-        System.out.println("not found");
         return false;
     }
 

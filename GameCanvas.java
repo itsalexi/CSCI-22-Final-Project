@@ -196,19 +196,19 @@ public class GameCanvas extends JComponent {
           ghost.tick();
         }
 
-        for (Map.Entry<String, Animal> entry : new ArrayList<>(animals.entrySet())) {
-          String id = entry.getKey();
-          Animal animal = entry.getValue();
+        // for (Map.Entry<String, Animal> entry : new ArrayList<>(animals.entrySet())) {
+        //   String id = entry.getKey();
+        //   Animal animal = entry.getValue();
 
-          animal.tick();
+        //   animal.tick();
 
-          animal.randomAction(GameCanvas.this);
+        //   animal.randomAction(GameCanvas.this);
 
-          writer.send("ANIMAL MOVE " + id + " " + animal.getX() + " " + animal.getY()
-              + " " + animal.getDirection() + " "
-              + animal.getAnimationState());
+        //   writer.send("ANIMAL MOVE " + id + " " + animal.getX() + " " + animal.getY()
+        //       + " " + animal.getDirection() + " "
+        //       + animal.getAnimationState());
 
-        }
+        // }
         repaint();
       }
     });

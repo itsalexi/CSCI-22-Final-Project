@@ -1,6 +1,8 @@
+import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class GameServer {
 
@@ -35,6 +37,7 @@ public class GameServer {
 
   private static Map<String, PlayerState> playerStates;
   private static Map<String, AnimalState> animalStates;
+  private static Map<String, Deque<double[]>> animalPaths;
   private static Map<Integer, DroppedItemState> droppedItemStates;
 
   private Map<String, PlayerState> savedPlayerStates = new HashMap<>();
@@ -55,6 +58,7 @@ public class GameServer {
     players = new HashMap<>();
     playerStates = new HashMap<>();
     animalStates = new HashMap<>();
+    animalPaths = new HashMap<>();
     droppedItemStates = new HashMap<>();
     baseSkills = new ArrayList<>();
     Random rand = new Random();
@@ -111,6 +115,15 @@ public class GameServer {
       }
     }).start();
 
+    new Thread(() -> {
+      while (true) {
+        ArrayList<String> states = new ArrayList<>(animalStates.keySet());
+        for (String id : states) {
+          randomMoveAnimal(id);
+        }
+      }
+    }).start();
+
     try {
       ss = new ServerSocket(25565);
       System.out.println("===== GAME SERVER STARTED =====");
@@ -145,6 +158,177 @@ public class GameServer {
 
     return output;
   }
+  
+  private Deque<double[]> findPath(Rectangle2D obj, double[] target, double speed) {
+
+    double tileSize = 32;
+    Rectangle2D targetTile = new Rectangle2D.Double(
+        Math.floor(target[0] / tileSize) * tileSize,
+        Math.floor(target[1] / tileSize) * tileSize,
+        tileSize,
+        tileSize);
+
+    ArrayList<Rectangle2D> collidableObjects = new ArrayList<>();
+    ArrayList<int[][]> collidableMaps = new ArrayList<>();
+    collidableMaps.add(edgeMap);
+    collidableMaps.add(treeMap);
+    for (int[][] map : collidableMaps) {
+      for (int i=0; i < map.length; i++) {
+        for (int j=0; j < map[0].length; j++) {
+          if (map[i][j] != -1) {
+            collidableObjects.add(new Rectangle2D.Double(
+              j * tileSize,
+              i * tileSize,
+              tileSize,
+              tileSize
+            ));
+          }
+        }
+      }
+    }
+
+    Deque<Deque<double[]>> output = new ArrayDeque<>();
+    Set<Position> visited = new HashSet<>();
+    double[] currPosition = { obj.getCenterX(), obj.getCenterY() };
+    Deque<double[]> initialPath = new ArrayDeque<>();
+    initialPath.add(currPosition);
+    output.add(initialPath);
+
+    while (!output.isEmpty()) {
+      Deque<double[]> currPath = output.removeFirst();
+      double[] lastVisited = currPath.peekLast();
+
+      Position lastVisitedPosition = new Position(lastVisited);
+      if (visited.contains(lastVisitedPosition)) {
+        continue;
+      }
+
+      Rectangle2D currHitbox = new Rectangle2D.Double(
+          lastVisited[0] - obj.getWidth() / 2,
+          lastVisited[1] - obj.getHeight() / 2,
+          obj.getWidth(),
+          obj.getHeight());
+      if (currHitbox.intersects(targetTile)) {
+        return currPath;
+      }
+
+      visited.add(lastVisitedPosition);
+
+      double[] up = { speed, 0 };
+      double[] right = { 0, speed };
+      double[] down = { -speed, 0 };
+      double[] left = { 0, -speed };
+      double[][] directions = { up, right, left, down };
+
+      for (int i = 0; i < 4; i++) {
+        double[] nextPosition = new double[2];
+        nextPosition[0] = lastVisited[0] + directions[i][0];
+        nextPosition[1] = lastVisited[1] + directions[i][1];
+        Rectangle2D nextHitbox = new Rectangle2D.Double(
+            nextPosition[0] - obj.getWidth() / 2,
+            nextPosition[1] - obj.getHeight() / 2,
+            obj.getWidth(),
+            obj.getHeight());
+
+        Boolean collides = false;
+        for (Rectangle2D collidable : collidableObjects) {
+          if (collidable.intersects(nextHitbox)) {
+            collides = true;
+            break;
+          }
+        }
+
+        if (collides) {
+          continue;
+        }
+
+        Deque<double[]> newPath = new ArrayDeque<>();
+        newPath.addAll(currPath);
+        newPath.add(nextPosition);
+        output.add(newPath);
+
+      }
+    }
+
+    return null;
+  }
+
+  private void findPathAsync(Rectangle2D obj, double[] target, double speed,
+      Consumer<Deque<double[]>> onResult) {
+    new Thread(() -> {
+      Deque<double[]> path = findPath(obj, target, speed);
+      onResult.accept(path);
+    }).start();
+  }
+
+  private double clamp(double left, double right, double value) {
+    return Math.max(left, Math.min(right, value));
+  }
+
+  private double distance(double x1, double y1, double x2, double y2) {
+    return Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
+  }
+
+  private void tickAnimal(String id) {
+    AnimalState a = animalStates.get(id);
+    Deque<double[]> path = animalPaths.get(id);
+
+    if (path.size() != 0) {
+      double[] newPos = animalPaths.get(id).peekFirst();
+      String dir = a.direction;
+      String state = "WALK";
+      if (a.x < newPos[0]) {
+        dir = "RIGHT";
+      } else if (a.x > newPos[0]) {
+        dir = "LEFT";
+      } else if (a.y < newPos[1]) {
+        dir = "UP";
+      } else if (a.y > newPos[1]) {
+        dir = "DOWN";
+      } else {
+        state = "IDLE";
+      }
+
+      moveAnimal(id, newPos[0], newPos[1], dir, state);
+      path.removeFirst();
+    }
+  }
+
+  private void randomMoveAnimal(String id) {
+
+    if (animalPaths.get(id).size() != 0) {
+      tickAnimal(id);
+      return;
+    }
+
+    AnimalState a = animalStates.get(id);
+    boolean inRange = false;
+    double tileSize = 32;
+    double range = 10 * tileSize;
+    for (PlayerState ps : playerStates.values()) {
+      if (distance(a.x, a.y, ps.x, ps.y) < range) {
+        inRange = true;
+      }
+    }
+    if (!inRange) {
+      return;
+    }
+
+    double chanceToMove = 1 / 10;
+    if (Math.random() > chanceToMove) {
+      return;
+    }
+
+    double movementRange = 5 * tileSize;
+    double x = a.x + (2 * movementRange * Math.random()) - movementRange;
+    double y = a.y + (2 * movementRange * Math.random()) - movementRange;
+    double[] targetPos = {clamp(0, groundMap[0].length * tileSize - 1, x), clamp(0, groundMap.length * tileSize - 1, y)};
+    Rectangle2D hitbox = new Rectangle2D.Double(a.x, a.y, a.size, a.size);
+    findPathAsync(hitbox, targetPos,
+      1, newPath -> {
+        animalPaths.put(id, newPath);
+      });
+  }
 
   public void spawnAnimal(String animalId, String name, int type, double x, double y, int size, String dir,
       String state) {
@@ -159,6 +343,7 @@ public class GameServer {
     a.state = state;
 
     animalStates.put(animalId, a);
+    animalPaths.put(animalId, new ArrayDeque<>());
 
     broadcastAll("ANIMAL ADD " + animalId + " " + name + " " + type + " " +
         x + " " + y + " " + size + " " + dir + " " + state);
@@ -288,10 +473,10 @@ public class GameServer {
             ps.y = coords[1] * 32;
             ps.direction = "DOWN";
             ps.state = "idle";
-            ps.balance = 0; // TODO: change to 0
-            ps.skillPoints = 16;
-            ps.level = 5;
-            ps.currXP = 162;
+            ps.balance = 0;
+            ps.skillPoints = 0;
+            ps.level = 0;
+            ps.currXP = 0;
           }
 
           ps.username = username;
