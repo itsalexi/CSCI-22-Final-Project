@@ -3,15 +3,13 @@ import java.awt.geom.Rectangle2D;
 import java.util.Map;
 import java.util.Random;
 
-public class Animal {
+public class Animal extends Entity {
 
-  private double x, y;
   private double speed;
   private AnimalSprite sprite;
 
   public Animal(double posX, double posY, String t, int skin, int size) {
-    x = posX;
-    y = posY;
+    super(posX, posY);
     speed = 1.0;
     String pathName = String.format("assets/animals/%s/%d/", t, skin);
 
@@ -26,6 +24,7 @@ public class Animal {
     sprite = new AnimalSprite(animations, frames, size);
   }
 
+  @Override
   public void tick() {
     sprite.tick();
   }
@@ -70,26 +69,27 @@ public class Animal {
     }
   }
 
+  @Override
   public void draw(Graphics2D g2d) {
     sprite.draw(g2d, x, y);
   }
 
+  @Override
   public void setAnimationState(String state) {
+    super.setAnimationState(state);
     sprite.setAnimationState(state);
   }
 
-  public String getAnimationState() {
-    return sprite.getAnimationState();
+  public void setSpeed(double s) {
+    speed = s;
   }
 
-  public void setSpeed(double speed) {
-    this.speed = speed;
-  }
-
+  @Override
   public double getWidth() {
     return sprite.getWidth();
   }
 
+  @Override
   public double getHeight() {
     return sprite.getHeight();
   }

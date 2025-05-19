@@ -75,7 +75,7 @@ public class ChatSystem {
   public void draw(Graphics2D g2d) {
     int width = 400;
     int historyHeight = 200;
-    int inputHeight = 30;
+    int lineHeight = 20;
     int x = 10;
     int y = 10;
 
@@ -83,6 +83,9 @@ public class ChatSystem {
     g2d.fillRect(x, y, width, historyHeight);
 
     if (chatOpen) {
+      ArrayList<String> wrappedInput = wrapText(currentInput);
+      int inputHeight = Math.max(30, wrappedInput.size() * lineHeight + 10); 
+      
       g2d.setColor(new Color(200, 255, 200, 99));
       g2d.fillRect(x, y + historyHeight + 10, width, inputHeight);
 
@@ -92,8 +95,17 @@ public class ChatSystem {
       g2d.drawRect(x, y + historyHeight + 10, width, inputHeight);
       g2d.setFont(new Font("Minecraft", Font.PLAIN, 14));
       g2d.setColor(Color.BLACK);
-      g2d.drawString(currentInput, x + 10, y + historyHeight + 30);
+      
+      int inputY = y + historyHeight + 30;
+      for (String line : wrappedInput) {
+        g2d.drawString(line, x + 10, inputY);
+        inputY += lineHeight;
+      }
 
+      if (cursorVisible && chatOpen) {
+        String lastLine = wrappedInput.isEmpty() ? "" : wrappedInput.get(wrappedInput.size() - 1);
+        g2d.drawString("|", x + 10 + g2d.getFontMetrics().stringWidth(lastLine), inputY - lineHeight);
+      }
     }
     g2d.setFont(new Font("Minecraft", Font.PLAIN, 14));
     g2d.setColor(Color.BLACK);
@@ -101,10 +113,6 @@ public class ChatSystem {
     for (String msg : messages) {
       g2d.drawString(msg, x + 10, lineY);
       lineY += 20;
-    }
-
-    if (cursorVisible && chatOpen) {
-      g2d.drawString("|", x + 10 + g2d.getFontMetrics().stringWidth(currentInput), y + historyHeight + 30);
     }
   }
 }

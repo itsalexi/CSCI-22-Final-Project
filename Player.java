@@ -3,9 +3,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Player {
+public class Player extends Entity {
 
-    private double x, y;
     private double baseSpeed;
     private double speed;
     private PlayerSprite sprite;
@@ -20,8 +19,7 @@ public class Player {
     private Map<String, Boolean> activeDirections;
 
     public Player(String u, int t) {
-        x = 0;
-        y = 0;
+        super(0, 0);
         baseSpeed = 2;
         speed = 2;
         reach = 2;
@@ -54,7 +52,6 @@ public class Player {
         playerActions.put("hoe", new PlayerAction("hoe", 750));
         playerActions.put("water", new PlayerAction("watering", 750));
         playerActions.put("plant", new PlayerAction("plant", 750));
-
     }
 
     public double getBaseSpeed() {
@@ -73,6 +70,7 @@ public class Player {
         reach = r;
     }
 
+    @Override
     public void tick() {
         sprite.tick();
         for (PlayerAction action : playerActions.values()) {
@@ -84,7 +82,6 @@ public class Player {
                 }
             }
         }
-
     }
 
     public String getActiveTool() {
@@ -117,42 +114,24 @@ public class Player {
         sprite.setAnimationState(name);
     }
 
+    @Override
     public void draw(Graphics2D g2d) {
         sprite.draw(g2d, x, y);
     }
 
+    @Override
     public void setAnimationState(String state) {
+        super.setAnimationState(state);
         sprite.setAnimationState(state);
     }
 
-    public String getAnimationState() {
-        return sprite.getAnimationState();
+    @Override
+    public void setDirection(String direction) {
+        super.setDirection(direction);
+        sprite.setDirection(direction);
     }
 
-    public void setSpeed(double speed) {
-        this.speed = speed;
-    }
-
-    public double getWidth() {
-        return sprite.getWidth() * sprite.getHScale();
-    }
-
-    public double getHeight() {
-        return sprite.getHeight() * sprite.getVScale();
-    }
-
-    public double getSpeed() {
-        return speed;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public String getId() {
-        return id;
-    }
-
+    @Override
     public Rectangle2D getHitboxAt(double newX, double newY) {
         double offsetX = sprite.getWidth() * sprite.getHScale() * 12 / 32;
         double offsetY = sprite.getHeight() * sprite.getVScale() * 20 / 32;
@@ -172,6 +151,32 @@ public class Player {
                 getHeight() * 26 / 32);
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public Map<String, Boolean> getActiveDirections() {
+        return activeDirections;
+    }
+
+    @Override
+    public double getWidth() {
+        return sprite.getWidth() * sprite.getHScale();
+    }
+
+    @Override
+    public double getHeight() {
+        return sprite.getHeight() * sprite.getVScale();
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public double getX() {
+        return x;
+    }
+
     public double getY() {
         return y;
     }
@@ -180,21 +185,12 @@ public class Player {
         return sprite.getDirection();
     }
 
-    public Map<String, Boolean> getActiveDirections() {
-        return activeDirections;
-    }
-
-    public void setDirection(String direction) {
-        sprite.setDirection(direction);
+    public void setDirectionStatus(String direction, Boolean isMoving) {
+        activeDirections.replace(direction, isMoving);
     }
 
     public void setPosition(double newX, double newY) {
         x = newX;
         y = newY;
     }
-
-    public void setDirectionStatus(String direction, Boolean isMoving) {
-        activeDirections.replace(direction, isMoving);
-    }
-
 }
