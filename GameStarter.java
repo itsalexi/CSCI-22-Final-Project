@@ -354,6 +354,7 @@ public class GameStarter {
     }
 
     public static void main(String[] args) {
+        System.setProperty("sun.java2d.uiScale", "1.0");
 
         final GraphicsEnvironment GE = GraphicsEnvironment.getLocalGraphicsEnvironment();
         final List<String> AVAILABLE_FONT_FAMILY_NAMES = Arrays.asList(GE.getAvailableFontFamilyNames());
@@ -371,8 +372,6 @@ public class GameStarter {
         } catch (FontFormatException | IOException exception) {
             JOptionPane.showMessageDialog(null, exception.getMessage());
         }
-
-        System.setProperty("sun.java2d.uiScale", "1.0");
 
         new GameStarter().start();
     }
