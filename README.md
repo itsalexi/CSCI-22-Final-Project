@@ -1,16 +1,17 @@
 ![Webp net-resizeimage](https://github.com/user-attachments/assets/87ce31eb-976c-43e8-b1cf-ce9d26fde328)
 
-## Overview
+## **Overview**
 
-#### Welcome to the Garden of Eden\! This manual will guide you through all the game mechanics, controls, and systems to help you get started.  
-- Garden of Eden is a multiplayer open-ended farming sandbox game where you team up with friends to cultivate a shared world. Till the soil, plant diverse crops, and build your dream farm together, with endless opportunities for growth, trade and creation!
+Welcome to the Garden of Eden\! This manual will guide you through all the game mechanics, controls, and systems to help you get started.
+
+- Garden of Eden is a multiplayer open-ended farming sandbox game where you team up with friends to cultivate a shared world. Till the soil, plant diverse crops, and build your dream farm together, with endless opportunities for growth, trade and creation\!  
 ---
 
-## Controls
+## **Controls**
 
 ### Movement
 
-- **WASD**: Movement Keys
+- **WASD**: Movement Keys  
 - **Mouse Wheel**: Cycle through hotbar items
 
 ### Inventory & Crafting
@@ -27,16 +28,16 @@
 - **Right Click**: Interact with objects  
 - **Mouse Wheel**: Scroll through hotbar
 
-## Game Systems
+## **Game Systems**
 
-### Inventory System
+### **Inventory System**
 
 - Your inventory has **36 slots** (27 in main inventory \+ 9 hotbar slots).  
 - Hotbar slots can be accessed using number keys **1-9**.  
 - Items can be dragged and dropped between slots.  
 - Hold **CTRL** while dropping items to drop the entire stack.
 
-### Items and Tools
+### **Items and Tools**
 
 #### Basic Tools
 
@@ -60,7 +61,15 @@
   * Can be earned through selling items  
   * Can be transferred between players
 
-### Farming System
+### 
+
+### 
+
+### 
+
+### 
+
+### **Farming System**
 
 1. Use the **Hoe** tool to till soil.  
 2. Water the tilled soil using the **Watering Can**.  
@@ -68,7 +77,7 @@
 4. Wait for crops to grow.  
 5. Harvest fully grown crops.
 
-#### **Crop Progression System**
+#### Crop Progression System
 
 | Crop | Tier | Growth Time | Value | Sells For | XP per Harvest |
 | :---- | :---- | :---- | :---- | :---- | :---- |
@@ -79,7 +88,7 @@
 | Strawberries | 5 | Long | Very high | 25 coins | 60 XP |
 | Blueberries | 6 | Longest | Highest | 35 coins | 75 XP |
 
-#### **Crop Growth Stages**
+#### Crop Growth Stages
 
 - **Stage 1**: Planted seed  
 - **Stage 2-5**: Growing phases  
@@ -98,18 +107,27 @@
 * Wheat → **4 coins**  
 * Potatoes → **8 coins**  
 * Carrots → **10 coins**  
-* Tomatoes → **15 coins**  
+* Onions → **15 coins**  
 * Strawberries → **25 coins**  
 * Blueberries → **35 coins** 
 
 
 **2\. Purchasing Seeds**
 
-* 50 coins → **Carrot Seeds**  
-* 100 coins → **Potato Seeds**  
-* 200 coins → **Tomato Seeds**  
+* 50 coins → **Potato Seeds**  
+* 100 coins → **Carrot Seeds**  
+* 200 coins → **Onion Seeds**  
 * 400 coins → **Strawberry Seeds**  
 * 800 coins → **Blueberry Seeds**
+
+#### Crafting System
+
+* Wheat → (2x) **Wheat Seeds**  
+* Potatoes → (2x) **Potato Seeds**  
+* Carrots → (2x) **Carrot Seeds**
+* Onion → (2x) **Onion Seeds**  
+* Strawberry → (2x) **Strawberry Seeds**  
+* Blueberry → (2x) **Blueberry Seeds**
 
 ### **Skill Tree System**
 
@@ -170,7 +188,8 @@ The skill tree offers various upgrades that enhance your gameplay:
    * Chat system with command support  
    * Player name display above characters  
    * Real-time player movement and actions  
-   * Player join/leave notifications
+   * Player join/leave notifications  
+     
 
 ### **World Features**
 
@@ -190,7 +209,8 @@ The skill tree offers various upgrades that enhance your gameplay:
    * Multiplayer sound synchronization
 
 ---
-## Tips & Tricks
+
+## **Tips & Tricks**
 
 1. Always keep your tools in your hotbar for quick access.  
 2. Use the skill tree to specialize in your preferred playstyle.  
@@ -201,7 +221,7 @@ The skill tree offers various upgrades that enhance your gameplay:
 
 ---
 
-## Credits
+## **Credits**
 
 Game developed by:
 
