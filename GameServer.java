@@ -119,6 +119,7 @@ public class GameServer {
       while (true) {
         ArrayList<String> states = new ArrayList<>(animalStates.keySet());
         for (String id : states) {
+          System.out.println("what");
           randomMoveAnimal(id);
         }
       }
@@ -250,7 +251,7 @@ public class GameServer {
       }
     }
 
-    return null;
+    return new ArrayDeque<>();
   }
 
   private void findPathAsync(Rectangle2D obj, double[] target, double speed,
@@ -274,6 +275,7 @@ public class GameServer {
     Deque<double[]> path = animalPaths.get(id);
 
     if (path.size() != 0) {
+      System.out.println("?");
       double[] newPos = animalPaths.get(id).peekFirst();
       String dir = a.direction;
       String state = "WALK";
@@ -297,6 +299,7 @@ public class GameServer {
   private void randomMoveAnimal(String id) {
 
     if (animalPaths.get(id).size() != 0) {
+      System.out.println("moving " + id);
       tickAnimal(id);
       return;
     }
@@ -362,7 +365,7 @@ public class GameServer {
   }
 
   public void spawnRandomAnimal() {
-    String animalId = "animal" + animalStates.size() + 1;
+    String animalId = "animal" + animalStates.size();
     String[] animalTypes = { "cow", "chicken", "sheep", "pig", "fox", "cat", "dog" };
     String animalType = animalTypes[(int) (Math.random() * animalTypes.length)];
 

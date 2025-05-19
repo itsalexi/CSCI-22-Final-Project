@@ -47,9 +47,7 @@ public class GameCanvas extends JComponent {
   private Sprite hoveredItemSprite;
   private Item hoveredItem;
   private int previousItemSlot;
-  private Boolean test;
   private boolean isCtrlPressed;
-  private ArrayList<Rectangle2D> currentPath;
   private int mouseX, mouseY;
 
   private GoldCounter goldCounter;
@@ -146,7 +144,7 @@ public class GameCanvas extends JComponent {
     skills.add(six);
     skills.add(seven);
     baseSkills = new ArrayList<>(skills);
-    skillTreeSystem = new SkillTreeSystem(skills, economySystem); // TODO: make skills
+    skillTreeSystem = new SkillTreeSystem(skills, economySystem);
     skillTree = new SkillTreeGrid(skillTreeSystem, this);
 
     craftingGrid = new CraftingGrid(recipes, this, false);
@@ -159,8 +157,6 @@ public class GameCanvas extends JComponent {
 
     zoom = 2;
     previousItemSlot = -1;
-    test = false; // TODO: remove this
-    currentPath = new ArrayList<>();
     SpriteFiles selectorFiles = new SpriteFiles("assets/ui/selector");
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
     hoveredItemSprite = new Sprite(itemFiles.getFiles(), 32);
@@ -196,19 +192,6 @@ public class GameCanvas extends JComponent {
           ghost.tick();
         }
 
-        // for (Map.Entry<String, Animal> entry : new ArrayList<>(animals.entrySet())) {
-        //   String id = entry.getKey();
-        //   Animal animal = entry.getValue();
-
-        //   animal.tick();
-
-        //   animal.randomAction(GameCanvas.this);
-
-        //   writer.send("ANIMAL MOVE " + id + " " + animal.getX() + " " + animal.getY()
-        //       + " " + animal.getDirection() + " "
-        //       + animal.getAnimationState());
-
-        // }
         repaint();
       }
     });
@@ -1147,8 +1130,6 @@ public class GameCanvas extends JComponent {
                     new TextLine(String.format("%s -> %s", hoveredRecipe.getItemIn().getName(),
                         hoveredRecipe.getItemOut().getName()), Color.WHITE));
                 hoverInfo = new HoverInfo(lines, mouseX, mouseY);
-                System.out.println(String.format("%s -> %s", hoveredRecipe.getItemIn().getName(),
-                    hoveredRecipe.getItemOut().getName()));
                 return;
               }
             }
@@ -1326,101 +1307,6 @@ public class GameCanvas extends JComponent {
     g2d.drawString(player.getId(), usernameX, usernameY);
   }
 
-  private ArrayList<double[]> findPath(Rectangle2D obj, double[] target, double speed) {
-
-    double tileSize = tileGrids.get("ground").getTileSize();
-    Rectangle2D targetTile = new Rectangle2D.Double(
-        Math.floor(target[0] / tileSize) * tileSize,
-        Math.floor(target[1] / tileSize) * tileSize,
-        tileSize,
-        tileSize);
-
-    ArrayList<Rectangle2D> collidableObjects = new ArrayList<>();
-    for (TileGrid grid : collidableGrids) {
-      for (int i = 0; i < grid.getHeight(); i++) {
-        for (int j = 0; j < grid.getWidth(); j++) {
-          Rectangle2D hitbox = grid.getTileHitBoxAt(i, j);
-          if (hitbox != null) {
-            collidableObjects.add(hitbox);
-          }
-        }
-      }
-    }
-
-    Deque<ArrayList<double[]>> output = new ArrayDeque<>();
-    Set<Position> visited = new HashSet<>();
-    double[] currPosition = { obj.getCenterX(), obj.getCenterY() };
-    ArrayList<double[]> initialPath = new ArrayList<>();
-    initialPath.add(currPosition);
-    output.add(initialPath);
-
-    while (!output.isEmpty()) {
-      ArrayList<double[]> currPath = output.removeFirst();
-      double[] lastVisited = currPath.get(currPath.size() - 1);
-
-      Position lastVisitedPosition = new Position(lastVisited);
-      if (visited.contains(lastVisitedPosition)) {
-        continue;
-      }
-
-      Rectangle2D currHitbox = new Rectangle2D.Double(
-          lastVisited[0] - obj.getWidth() / 2,
-          lastVisited[1] - obj.getHeight() / 2,
-          obj.getWidth(),
-          obj.getHeight());
-      if (currHitbox.intersects(targetTile)) {
-        return currPath;
-      }
-
-      visited.add(lastVisitedPosition);
-
-      double[] up = { speed, 0 };
-      double[] right = { 0, speed };
-      double[] down = { -speed, 0 };
-      double[] left = { 0, -speed };
-      double[][] directions = { up, right, left, down };
-
-      for (int i = 0; i < 4; i++) {
-        double[] nextPosition = new double[2];
-        nextPosition[0] = lastVisited[0] + directions[i][0];
-        nextPosition[1] = lastVisited[1] + directions[i][1];
-        Rectangle2D nextHitbox = new Rectangle2D.Double(
-            nextPosition[0] - obj.getWidth() / 2,
-            nextPosition[1] - obj.getHeight() / 2,
-            obj.getWidth(),
-            obj.getHeight());
-
-        Boolean collides = false;
-        for (Rectangle2D collidable : collidableObjects) {
-          if (collidable.intersects(nextHitbox)) {
-            collides = true;
-            break;
-          }
-        }
-
-        if (collides) {
-          continue;
-        }
-
-        ArrayList<double[]> newPath = new ArrayList<>();
-        newPath.addAll(currPath);
-        newPath.add(nextPosition);
-        output.add(newPath);
-
-      }
-    }
-
-    return null;
-  }
-
-  public void findPathAsync(Rectangle2D obj, double[] target, double speed,
-      Consumer<ArrayList<double[]>> onResult) {
-    new Thread(() -> {
-      ArrayList<double[]> path = findPath(obj, target, speed);
-      onResult.accept(path);
-    }).start();
-  }
-
   public EconomySystem getEconomySystem() {
     return economySystem;
   }
@@ -1433,22 +1319,6 @@ public class GameCanvas extends JComponent {
     double halfViewHeight = (getHeight() / 2.0) / zoom;
 
     if (isMapLoaded) {
-
-      if (!test) {
-        findPathAsync(player.getSpriteDimensions(), new double[] { 0, 0 },
-            player.getSpeed(), path -> {
-              for (double[] pos : path) {
-                Rectangle2D temp = new Rectangle2D.Double(
-                    pos[0] - 1,
-                    pos[1] - 1,
-                    2,
-                    2);
-                currentPath.add(temp);
-              }
-            });
-        test = true;
-      }
-
       anchorX = clamp(halfViewWidth,
           tileGrids.get("ground").getWidth() * tileGrids.get("ground").getTileSize()
               - halfViewWidth,
@@ -1469,10 +1339,6 @@ public class GameCanvas extends JComponent {
       tileGrids.get("foliage").draw(g2d);
       tileGrids.get("farm").draw(g2d);
       tileGrids.get("tree").draw(g2d);
-
-      for (Rectangle2D rect : currentPath) {
-        g2d.draw(rect);
-      }
 
       for (Player other : otherPlayers.values()) {
         other.draw(g2d);
