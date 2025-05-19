@@ -1,3 +1,24 @@
+/**
+ * The ConnectionScreen class represents the initial connection screen. It is where players
+ * can enter server details, choose their character, and connect to the game.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
+
 import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -18,6 +39,12 @@ public class ConnectionScreen extends JPanel {
 
   private ArrayList<JTextField> textfields;
 
+  /**
+   * Constructs a new ConnectionScreen with server connection fields and character selection.
+   * 
+   * @param s the GameStarter instance
+   * @param f the SetupFrame instance
+   */
   public ConnectionScreen(GameStarter s, SetupFrame f) {
     starter = s;
     frame = f;
@@ -117,12 +144,20 @@ public class ConnectionScreen extends JPanel {
     });
   }
 
+  /**
+   * Loads the current avatar sprite based on the selected skin.
+   */
   private void loadAvatar() {
     String path = "assets/characters/" + skin + "/avatar/";
     SpriteFiles spriteFiles = new SpriteFiles(path);
     currentAvatar = new Sprite(spriteFiles.getFiles(), 128);
   }
 
+  /**
+   * Paints the connection screen with background, avatar, and UI elements.
+   * 
+   * @param g the graphics context
+   */
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);

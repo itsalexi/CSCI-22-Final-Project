@@ -1,3 +1,24 @@
+/**
+ * The SkillTreeGrid class manages the visual representation of the skill tree.
+ * It handles the rendering of skills, connections, and skill levels in a grid layout.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
+
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -52,6 +73,13 @@ public class SkillTreeGrid {
             { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }
     };
 
+    /**
+     * Creates a new SkillTreeGrid instance.
+     * Initializes the grid layout and loads necessary sprites.
+     * 
+     * @param sys the SkillTreeSystem to display
+     * @param c the GameCanvas to draw on
+     */
     public SkillTreeGrid(SkillTreeSystem sys, GameCanvas c) {
         SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap/inventory");
         SpriteFiles itemFiles = new SpriteFiles("assets/skill_icons");
@@ -68,6 +96,13 @@ public class SkillTreeGrid {
         getX();
     }
 
+    /**
+     * Gets the grid coordinates at the mouse position.
+     * 
+     * @param mouseX the mouse x-coordinate
+     * @param mouseY the mouse y-coordinate
+     * @return array containing coordinates
+     */
     public int[] getTileAtMouse(double mouseX, double mouseY) {
         double tileSize = skillTreeGrid.getTileSize();
         double gridWidth = skillTreeGridMap[0].length * tileSize;
@@ -83,18 +118,40 @@ public class SkillTreeGrid {
         return new int[] { tileX, tileY };
     }
 
+    /**
+     * Gets the positions of all skills in the grid.
+     * 
+     * @return array of skill positions
+     */
     public int[][] getSkillPositions() {
         return skillPositions;
     }
 
+    /**
+     * Checks if the skill tree is currently open.
+     * 
+     * @return true if the skill tree is open, false otherwise
+     */
     public boolean isOpen() {
         return isOpen;
     }
 
+    /**
+     * Sets whether the skill tree is open.
+     * 
+     * @param open boolean 
+     */
     public void setOpen(boolean open) {
         isOpen = open;
     }
 
+    /**
+     * Gets the skill at the specified grid position.
+     * 
+     * @param tileX the x-coordinate in the grid
+     * @param tileY the y-coordinate in the grid
+     * @return the skill at the position, or null if no skill exists there
+     */
     public Skill getSkillAtTile(double tileX, double tileY) {
         for (int i=0; i < skillPositions.length; i++) {
             int[] skillPos = skillPositions[i];
@@ -105,6 +162,9 @@ public class SkillTreeGrid {
         return null;
     }
 
+    /**
+     * Updates the skill tree grid based on current skill states.
+     */
     public void updateSkillTree() {
         ArrayList<Skill> skills = skillTree.getSkills();
         for (int i = 0; i < skills.size(); i++) {
@@ -121,6 +181,11 @@ public class SkillTreeGrid {
         }
     }
 
+    /**
+     * Draws the skill levels on the grid.
+     * 
+     * @param g2d the graphics context
+     */
     private void drawSkillLevels(Graphics2D g2d) {
         for (int i = 0; i < skillTree.getSkills().size(); i++) {
             Skill currSkill = skillTree.getSkills().get(i);
@@ -133,6 +198,15 @@ public class SkillTreeGrid {
         }
     }
 
+    /**
+     * Draws a label at the specified grid position.
+     * 
+     * @param g2d the graphics context
+     * @param label the text to draw
+     * @param col the column in the grid
+     * @param row the row in the grid
+     * @param tileSize the size of each tile
+     */
     private void drawLabel(Graphics2D g2d, String label, int col, int row, double tileSize) {
         g2d.setFont(new Font("Minecraft", Font.PLAIN, (int) (25 * tileSize / 32)));
         FontMetrics fm = g2d.getFontMetrics();
@@ -151,6 +225,11 @@ public class SkillTreeGrid {
         g2d.drawString(label, quantityLabelX, quantityLabelY);
     }
 
+    /**
+     * Gets the x-coordinate of the grid's top-left corner.
+     * 
+     * @return the x-coordinate
+     */
     public double getX() {
         double tileSize = canvas.getWidth() * 32 / 800;
         double gridWidth = skillTreeGridMap[0].length * tileSize;
@@ -158,6 +237,11 @@ public class SkillTreeGrid {
         return (canvas.getWidth() - gridWidth) / 2;
     }
 
+    /**
+     * Gets the y-coordinate of the grid's top-left corner.
+     * 
+     * @return the y-coordinate
+     */
     public double getY() {
         double tileSize = canvas.getWidth() * 32 / 800;
         double gridHeight = skillTreeGridMap.length * tileSize;
@@ -165,6 +249,11 @@ public class SkillTreeGrid {
         return (canvas.getHeight() - gridHeight) / 2;
     }
 
+    /**
+     * Draws the connection arrows between skills.
+     * 
+     * @param g2d the graphics context
+     */
     public void drawArrows(Graphics2D g2d) {
         for (int i=0; i < skillPositions.length; i++) {
             int[] currPosition = skillPositions[i];
@@ -182,6 +271,11 @@ public class SkillTreeGrid {
         }
     }
 
+    /**
+     * Draws the skill tree grid and all its components.
+     * 
+     * @param g2d the graphics context
+     */
     public void draw(Graphics2D g2d) {
         updateSkillTree();
 

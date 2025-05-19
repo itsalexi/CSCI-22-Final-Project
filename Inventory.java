@@ -1,3 +1,24 @@
+/**
+ * The Inventory class manages the player's inventory system.
+ * It handles item storage, display, and interaction with the game world.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +59,11 @@ public class Inventory {
 
   private Item[] inventory;
 
+  /**
+   * Creates a new Inventory instance.
+   * 
+   * @param c the game canvas to draw on
+   */
   public Inventory(GameCanvas c) {
 
     SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap/inventory");
@@ -96,14 +122,33 @@ public class Inventory {
 
   }
 
+  /**
+   * Clamps a value between a minimum and maximum.
+   * 
+   * @param left minimum value
+   * @param right maximum value
+   * @param value value to clamp
+   * @return clamped value
+   */
   private double clamp(double left, double right, double value) {
     return Math.max(left, Math.min(right, value));
   }
 
+  /**
+   * Gets the player's inventory array.
+   * 
+   * @return array of items in inventory
+   */
   public Item[] getInventory() {
     return inventory;
   }
 
+  /**
+   * Finds an item in the inventory.
+   * 
+   * @param item the item to find
+   * @return the found item or null if not found
+   */
   public Item findItem(Item item) {
     for (int i = 0; i < inventory.length; i++) {
       if (inventory[i] == null)
@@ -115,6 +160,12 @@ public class Inventory {
     return null;
   }
 
+  /**
+   * Finds an unfilled stack of an item.
+   * 
+   * @param item the item to find a stack for
+   * @return the unfilled stack or null if not found
+   */
   public Item findUnfilledStack(Item item) {
     for (int i = 0; i < inventory.length; i++) {
       if (inventory[i] == null)
@@ -128,6 +179,12 @@ public class Inventory {
     return null;
   }
 
+  /**
+   * Gets the total quantity of an item in the inventory.
+   * 
+   * @param id the item ID to count
+   * @return total quantity of the item
+   */
   public int getQuantity(int id) {
     Item item = new Item(id, 0);
     int quantity = 0;
@@ -141,6 +198,12 @@ public class Inventory {
     return quantity;
   }
 
+  /**
+   * Removes items from the inventory.
+   * 
+   * @param id the item ID to remove
+   * @param quantity the quantity to remove
+   */
   public void removeItem(int id, int quantity) {
 
     Item item = new Item(id, quantity);
@@ -160,6 +223,12 @@ public class Inventory {
 
   }
 
+  /**
+   * Adds items to the inventory.
+   * 
+   * @param id the item ID to add
+   * @param quantity the quantity to add
+   */
   public void addItem(int id, int quantity) {
     Item item = new Item(id, quantity);
 
@@ -207,35 +276,79 @@ public class Inventory {
 
   }
 
+  /**
+   * Sets an item in a specific slot.
+   * 
+   * @param slot the slot to set
+   * @param item the item to set
+   */
   public void setItem(int slot, Item item) {
     inventory[slot] = item;
   }
 
+  /**
+   * Gets an item from a specific slot.
+   * 
+   * @param slot the slot to get from
+   * @return the item in the slot
+   */
   public Item getItem(int slot) {
     return inventory[slot];
   }
 
+  /**
+   * Gets the currently active item.
+   * 
+   * @return the active item
+   */
   public Item getActiveItem() {
     return inventory[activeHotbarSlot];
   }
 
+  /**
+   * Gets the active hotbar slot.
+   * 
+   * @return the active slot index
+   */
   public int getActiveHotbarSlot() {
     return activeHotbarSlot;
   }
 
+  /**
+   * Sets the active hotbar slot.
+   * 
+   * @param slot the slot to set as active
+   */
   public void setActiveHotbarSlot(int slot) {
     lastSwitchedItem = System.currentTimeMillis();
     activeHotbarSlot = slot;
   }
 
+  /**
+   * Checks if the inventory is open.
+   * 
+   * @return true if inventory is open
+   */
   public boolean isOpen() {
     return isOpen;
   }
 
+  /**
+   * Sets the inventory open state.
+   * 
+   * @param open whether the inventory should be open
+   */
   public void setOpen(boolean open) {
     isOpen = open;
   }
 
+  /**
+   * Gets the tile coordinates at the mouse position.
+   * 
+   * @param mouseX mouse x position
+   * @param mouseY mouse y position
+   * @return tile coordinates at the position
+   */
   public int[] getTileAtMouse(double mouseX, double mouseY) {
     double tileSize = inventoryGrid.getTileSize();
     double gridWidth = inventoryMap[0].length * tileSize;
@@ -266,6 +379,12 @@ public class Inventory {
     return null;
   }
 
+  /**
+   * Converts inventory index to grid coordinates.
+   * 
+   * @param i inventory index
+   * @return grid coordinates
+   */
   private int[] getGridFromInventory(int i) {
     int[] grid = { 0, 0 };
     grid[0] = i % 9;
@@ -278,6 +397,11 @@ public class Inventory {
     return grid;
   }
 
+  /**
+   * Draws item quantities in the inventory.
+   * 
+   * @param g2d the graphics context
+   */
   public void drawQuantities(Graphics2D g2d) {
     double tileSize = inventoryGrid.getTileSize();
 
@@ -324,6 +448,11 @@ public class Inventory {
     }
   }
 
+  /**
+   * Draws the inventory interface.
+   * 
+   * @param g2d the graphics context
+   */
   public void draw(Graphics2D g2d) {
     double tileSize = canvas.getWidth() * 32 / 800;
     tiles.setSize(tileSize);
@@ -405,10 +534,22 @@ public class Inventory {
 
   }
 
+  /**
+   * Gets the item sprites.
+   * 
+   * @return the sprite containing item images
+   */
   public Sprite getItemSprites() {
     return items;
   }
 
+  /**
+   * Converts grid coordinates to inventory slot.
+   * 
+   * @param x grid x coordinate
+   * @param y grid y coordinate
+   * @return inventory slot index
+   */
   public int getSlotFromGrid(int x, int y) {
     if (y == 6) {
       return x - 1;
@@ -416,6 +557,11 @@ public class Inventory {
     return (y - 1) * 9 + (x - 1) + 9;
   }
 
+  /**
+   * Gets the first empty slot in the inventory.
+   * 
+   * @return index of first empty slot or -1 if full
+   */
   public int getEmptySlot() {
     for (int i = 0; i < 36; i++) {
       if (getItem(i) == null) {

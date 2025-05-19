@@ -1,3 +1,24 @@
+/**
+ * The WorldGenerator class handles procedural generation of the game world.
+ * It creates terrain, water, foliage, and trees using noise-based algorithms.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
+
 import java.util.ArrayList;
 
 public class WorldGenerator {
@@ -14,14 +35,28 @@ public class WorldGenerator {
 
   private int[] validSpawn;
 
+  /**
+   * Represents a 3x3 matrix of water positions for edge detection.
+   */
   private class WaterEdgeMatrix {
 
     private Boolean[][] waterPositions;
 
+    /**
+     * Creates a new WaterEdgeMatrix with specified water positions.
+     * 
+     * @param wp 3x3 boolean array representing water positions
+     */
     public WaterEdgeMatrix(Boolean[][] wp) {
       waterPositions = wp;
     }
 
+    /**
+     * Compares this matrix with another for equality.
+     * 
+     * @param another the object to compare with
+     * @return true if the matrices are equal
+     */
     @Override
     public boolean equals(Object another) {
       if (another == this) {
@@ -50,11 +85,23 @@ public class WorldGenerator {
       return true;
     }
 
+    /**
+     * Gets the water positions matrix.
+     * 
+     * @return the 3x3 boolean array of water positions
+     */
     public Boolean[][] getWaterPositions() {
       return waterPositions;
     }
   }
 
+  /**
+   * Creates a new WorldGenerator instance and generates the world.
+   * 
+   * @param s the seed for world generation
+   * @param w the width of the world
+   * @param h the height of the world
+   */
   public WorldGenerator(int s, int w, int h) {
     seed = s;
     width = w;
@@ -180,6 +227,11 @@ public class WorldGenerator {
 
   }
 
+  /**
+   * Finds a valid spawn location for the player.
+   * 
+   * @return array containing coordinates of valid spawn point
+   */
   private int[] findValidSpawn() {
     int[] coords = { 0, 0 };
     for (int y = height / 2; y < height; y++) {
@@ -212,10 +264,18 @@ public class WorldGenerator {
     return null;
   }
 
+  /**
+   * Gets the valid spawn location.
+   * 
+   * @return array containing coordinates of valid spawn point
+   */
   public int[] getValidSpawn() {
     return validSpawn;
   }
 
+  /**
+   * Regenerates the world using noise-based generation.
+   */
   private void regenerateWorld() {
 
     NoiseGenerator groundGen = new NoiseGenerator(seed);
@@ -279,6 +339,11 @@ public class WorldGenerator {
 
   }
 
+  /**
+   * Gets a list of valid spawn locations.
+   * 
+   * @return ArrayList of valid spawn coordinates
+   */
   public ArrayList<int[]> getValidSpawns() {
     ArrayList<int[]> valids = new ArrayList<>();
     for (int i = 0; i < 100; i++) {
@@ -291,6 +356,9 @@ public class WorldGenerator {
     return valids;
   }
 
+  /**
+   * Generates water edges and transitions.
+   */
   private void generateWaterEdges() {
     ArrayList<int[]> possibleEdges;
     ArrayList<WaterEdgeMatrix> edgeMatrices;
@@ -379,18 +447,38 @@ public class WorldGenerator {
     }
   }
 
+  /**
+   * Gets the ground tile map.
+   * 
+   * @return 2D array of ground tile IDs
+   */
   public int[][] getGroundMap() {
     return groundMap;
   }
 
+  /**
+   * Gets the foliage tile map.
+   * 
+   * @return 2D array of foliage tile IDs
+   */
   public int[][] getFoliageMap() {
     return foliageMap;
   }
 
+  /**
+   * Gets the edge tile map.
+   * 
+   * @return 2D array of edge tile IDs
+   */
   public int[][] getEdgeMap() {
     return edgeMap;
   }
 
+  /**
+   * Gets the tree tile map.
+   * 
+   * @return 2D array of tree tile IDs
+   */
   public int[][] getTreeMap() {
     return treeMap;
   }

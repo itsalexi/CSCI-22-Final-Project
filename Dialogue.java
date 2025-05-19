@@ -1,3 +1,24 @@
+/**
+ * The Dialogue class manages the display of dialogue boxes with text and avatars.
+ * It handles the text formatting, positioning for the dialogues.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -22,6 +43,15 @@ public class Dialogue {
   private final double AVATAR_X_OFFSET = 400;
   private final double AVATAR_Y_OFFSET = -40;
 
+  /**
+   * Creates a new Dialogue with avatar.
+   * 
+   * @param posX x position
+   * @param posY y position
+   * @param n name
+   * @param m message
+   * @param a avatar sprite
+   */
   public Dialogue(double posX, double posY, String n, String m, Sprite a) {
     x = posX;
     y = posY;
@@ -45,10 +75,23 @@ public class Dialogue {
     }
   }
 
+  /**
+   * Creates a new Dialogue without avatar.
+   * 
+   * @param x x position
+   * @param y y position
+   * @param name name
+   * @param message message
+   */
   public Dialogue(double x, double y, String name, String message) {
     this(x, y, name, message, null);
   }
 
+  /**
+   * Draws the dialogue box and its contents.
+   * 
+   * @param g2d graphics context
+   */
   public void draw(Graphics2D g2d) {
     dialogueBox.draw(g2d);
 
@@ -71,22 +114,47 @@ public class Dialogue {
     g2d.setColor(originalColor);
   }
 
+  /**
+   * Sets the name.
+   * 
+   * @param n name
+   */
   public void setName(String n) {
     name = n;
   }
 
+  /**
+   * Gets the name.
+   * 
+   * @return name
+   */
   public String getName() {
     return name;
   }
 
+  /**
+   * Sets the message.
+   * 
+   * @param m message
+   */
   public void setMessage(String m) {
     message = m;
   }
 
+  /**
+   * Gets the message.
+   * 
+   * @return message
+   */
   public String getMessage() {
     return message;
   }
 
+  /**
+   * Sets the avatar.
+   * 
+   * @param a avatar sprite
+   */
   public void setAvatar(Sprite a) {
     avatar = a;
     if (this.avatar != null) {
@@ -94,10 +162,21 @@ public class Dialogue {
     }
   }
 
+  /**
+   * Gets the avatar.
+   * 
+   * @return avatar sprite
+   */
   public Sprite getAvatar() {
     return avatar;
   }
 
+  /**
+   * Sets the position.
+   * 
+   * @param newX x position
+   * @param newY y position
+   */
   public void setPosition(double newX, double newY) {
     x = newX;
     y = newY;
@@ -108,26 +187,56 @@ public class Dialogue {
     }
   }
 
+  /**
+   * Gets the x position.
+   * 
+   * @return x position
+   */
   public double getX() {
     return x;
   }
 
+  /**
+   * Gets the y position.
+   * 
+   * @return y position
+   */
   public double getY() {
     return y;
   }
 
+  /**
+   * Sets the name font.
+   * 
+   * @param font font
+   */
   public void setNameFont(Font font) {
     nameFont = font;
   }
 
+  /**
+   * Sets the message font.
+   * 
+   * @param font font
+   */
   public void setMessageFont(Font font) {
     messageFont = font;
   }
 
+  /**
+   * Sets the name color.
+   * 
+   * @param color color
+   */
   public void setNameColor(Color color) {
     nameColor = color;
   }
 
+  /**
+   * Sets the message color.
+   * 
+   * @param color color
+   */
   public void setMessageColor(Color color) {
     messageColor = color;
   }

@@ -1,3 +1,24 @@
+/**
+ * The GameCanvas class manages the main game interface and rendering.
+ * It handles player movement, interactions, inventory management, and all game systems.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
@@ -80,6 +101,9 @@ public class GameCanvas extends JComponent {
 
   private double greenThumbChance;
 
+  /**
+   * Creates a new GameCanvas with initialized game systems and components.
+   */
   public GameCanvas() {
     isMapLoaded = false;
     otherPlayers = new HashMap<>();
@@ -124,7 +148,7 @@ public class GameCanvas extends JComponent {
     Skill one = new Skill("Fruit of Knowledge", 1, 1, 1, 10, 0,
         "\"Getting smarter one harvest at a time.\"\nYou're so smart you probably have no friends!");
     Skill two = new Skill("Lightfooted", 1, 1, 1, 10, 1,
-        "\"I swear my feet aren’t touching the ground.\"\n No one's gonna catch you slipping");
+        "\"I swear my feet aren't touching the ground.\"\n No one's gonna catch you slipping");
     Skill three = new Skill("Merchant's Rizz", 1, 1, 1, 10, 2,
         "\"Unspoken rizz or an HR complaint?\"\nAre they paying more to buy or just to make you shut up. Either way, you win ");
     Skill four = new Skill("Cheap Tricks", 1, 1, 1, 10, 3,
@@ -132,7 +156,7 @@ public class GameCanvas extends JComponent {
     Skill five = new Skill("Nature's Grasp", 1, 1, 1, 10, 4,
         "\"Why are my fingers so long??\"\nInteract with things from faraway. Kinda weird though.");
     Skill six = new Skill("Green Thumb", 1, 1, 1, 5, 5,
-        "\"Plants just can’t get enough of you.\"\nEither way, you’re their favorite weirdo.");
+        "\"Plants just can't get enough of you.\"\nEither way, you're their favorite weirdo.");
     Skill seven = new Skill("Seal of the Serpent", 1, 1, 1, 5, 6,
         "\"One bite never hurt anyone...\"\nEverything's cheaper, and it only took a bite. What could go wrong?");
 
@@ -198,10 +222,20 @@ public class GameCanvas extends JComponent {
 
   }
 
+  /**
+   * Gets the game client.
+   * 
+   * @return game client
+   */
   public GameStarter getClient() {
     return client;
   }
 
+  /**
+   * Sets skill levels for all skills.
+   * 
+   * @param levels array of skill levels
+   */
   public void setLevels(int[] levels) {
     for (int i = 0; i < levels.length; i++) {
       skills.get(i).setLevel(levels[i]);
@@ -209,14 +243,28 @@ public class GameCanvas extends JComponent {
     updateSkills();
   }
 
+  /**
+   * Sets the server output stream.
+   * 
+   * @param out data output stream
+   */
   public void setServerOut(DataOutputStream out) {
     writer = new WriteToServer(out);
   }
 
+  /**
+   * Sets a tile grid with specified name.
+   * 
+   * @param name grid name
+   * @param grid tile grid
+   */
   public void setTileGrid(String name, TileGrid grid) {
     tileGrids.put(name, grid);
   }
 
+  /**
+   * Initializes the game world.
+   */
   public void initializeWorld() {
     chatSystem.setUsername(client.getPlayerID());
     collidableGrids.add(tileGrids.get("tree"));
@@ -224,14 +272,30 @@ public class GameCanvas extends JComponent {
 
   }
 
+  /**
+   * Sets other players in the game.
+   * 
+   * @param p map of player IDs to players
+   */
   public void setOtherPlayers(Map<String, Player> p) {
     otherPlayers = p;
   }
 
+  /**
+   * Checks if the map is loaded.
+   * 
+   * @return true if map is loaded
+   */
   public boolean isLoaded() {
     return isMapLoaded;
   }
 
+  /**
+   * Checks if a hitbox collides with any collidable objects.
+   * 
+   * @param hitbox hitbox to check
+   * @return true if collision occurs
+   */
   public boolean isColliding(Rectangle2D hitbox) {
     for (TileGrid cg : collidableGrids) {
       for (int i = 0; i < cg.getHeight(); i++) {
@@ -248,6 +312,9 @@ public class GameCanvas extends JComponent {
     return false;
   }
 
+  /**
+   * Syncs inventory data with server.
+   */
   public void syncInventoryBulk() {
     String playerId = client.getPlayerID();
 
@@ -265,6 +332,9 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  /**
+   * Picks up items that collide with player.
+   */
   public void pickUpCollidingItems() {
     Rectangle2D playerHitbox = player.getHitboxAt(player.getX(), player.getY());
 
@@ -284,6 +354,9 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  /**
+   * Drops the currently active item.
+   */
   public void dropActiveItem() {
     Item item = inventory.getActiveItem();
     if (item == null)
@@ -301,6 +374,12 @@ public class GameCanvas extends JComponent {
 
   }
 
+  /**
+   * Drops an item at player's position.
+   * 
+   * @param item item to drop
+   * @param q quantity to drop
+   */
   public void dropItem(Item item, int q) {
     String playerDirection = player.getDirection();
     double droppedItemX = player.getX() + (player.getWidth() / 2);
@@ -341,6 +420,11 @@ public class GameCanvas extends JComponent {
     writer.send(String.format("ITEMDROP CREATE %f %f %d %d", droppedItemX, droppedItemY, item.getId(), q));
   }
 
+  /**
+   * Picks up a dropped item.
+   * 
+   * @param droppedItemId dropped item ID
+   */
   private void pickupDroppedItem(int droppedItemId) {
     DroppedItem item = droppedItems.get(droppedItemId);
     if (inventory.getEmptySlot() == -1) {
@@ -352,10 +436,21 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  /**
+   * Gets all dropped items.
+   * 
+   * @return map of dropped items
+   */
   public Map<Integer, DroppedItem> getDroppedItems() {
     return droppedItems;
   }
 
+  /**
+   * Performs player action at position.
+   * 
+   * @param x x position
+   * @param y y position
+   */
   private void doPlayerAction(int x, int y) {
     if (!player.isDoingAction() && !isPlayerInWater()) {
       if (inventory.getActiveItem() != null) {
@@ -425,10 +520,18 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  /**
+   * Gets all animals in the game.
+   * 
+   * @return map of animals
+   */
   public Map<String, Animal> getAnimals() {
     return animals;
   }
 
+  /**
+   * Adds key bindings for player controls.
+   */
   public void addKeyBindings() {
     this.setFocusable(true);
     this.addKeyListener(new KeyAdapter() {
@@ -676,6 +779,12 @@ public class GameCanvas extends JComponent {
 
   }
 
+  /**
+   * Checks if a player exists.
+   * 
+   * @param playerId player ID to check
+   * @return true if player exists
+   */
   private boolean playerExists(String playerId) {
     for (Player player : otherPlayers.values()) {
       if (player.getId().equals(playerId)) {
@@ -685,6 +794,15 @@ public class GameCanvas extends JComponent {
     return false;
   }
 
+  /**
+   * Adds two vectors.
+   * 
+   * @param x1 first x component
+   * @param y1 first y component
+   * @param x2 second x component
+   * @param y2 second y component
+   * @return normalized sum vector
+   */
   private double[] addVector(double x1, double y1, double x2, double y2) {
     double x = x1 + x2;
     double y = y1 + y2;
@@ -693,10 +811,18 @@ public class GameCanvas extends JComponent {
     return result;
   }
 
+  /**
+   * Gets the chat system.
+   * 
+   * @return chat system
+   */
   public ChatSystem getChatSystem() {
     return chatSystem;
   }
 
+  /**
+   * Moves the player based on input.
+   */
   public void movePlayer() {
     if (player.isDoingAction() || chatSystem.isChatOpen())
       return;
@@ -761,10 +887,23 @@ public class GameCanvas extends JComponent {
 
   }
 
+  /**
+   * Updates a tile in a grid.
+   * 
+   * @param name grid name
+   * @param x x position
+   * @param y y position
+   * @param val new tile value
+   */
   public void updateTileGrid(String name, int x, int y, int val) {
     tileGrids.get(name).setTileAt(y, x, val);
   }
 
+  /**
+   * Checks if player is in water.
+   * 
+   * @return true if player is in water
+   */
   public boolean isPlayerInWater() {
     TileGrid cg = tileGrids.get("ground");
     for (int i = 0; i < cg.getHeight(); i++) {
@@ -782,6 +921,15 @@ public class GameCanvas extends JComponent {
     return false;
   }
 
+  /**
+   * Performs player action.
+   * 
+   * @param id player ID
+   * @param x x position
+   * @param y y position
+   * @param dir direction
+   * @param action action to perform
+   */
   public void actionPlayer(String id, int x, int y, String dir, String action) {
     Player newPlayer = otherPlayers.get(id);
     switch (action) {
@@ -793,6 +941,15 @@ public class GameCanvas extends JComponent {
 
   }
 
+  /**
+   * Updates player position and state.
+   * 
+   * @param id player ID
+   * @param x x position
+   * @param y y position
+   * @param dir direction
+   * @param state animation state
+   */
   public void updatePlayer(String id, double x, double y, String dir, String state) {
     Player newPlayer = otherPlayers.get(id);
     newPlayer.setPosition(x, y);
@@ -807,10 +964,26 @@ public class GameCanvas extends JComponent {
     otherPlayers.put(id, newPlayer);
   }
 
+  /**
+   * Removes a player from the game.
+   * 
+   * @param id player ID
+   */
   public void removePlayer(String id) {
     otherPlayers.remove(id);
   }
 
+  /**
+   * Adds a new player to the game.
+   * 
+   * @param id player ID
+   * @param username player username
+   * @param skin player skin
+   * @param x x position
+   * @param y y position
+   * @param dir direction
+   * @param state animation state
+   */
   public void addPlayer(String id, String username, int skin, double x, double y, String dir, String state) {
     Player newPlayer = new Player(id, skin);
     newPlayer.setPosition(x, y);
@@ -820,11 +993,29 @@ public class GameCanvas extends JComponent {
     otherPlayers.put(id, newPlayer);
   }
 
+  /**
+   * Adds a dropped item to the game.
+   * 
+   * @param x x position
+   * @param y y position
+   * @param itemId item ID
+   * @param quantity item quantity
+   * @param droppedItemId dropped item ID
+   */
   public void addDroppedItem(double x, double y, int itemId, int quantity, int droppedItemId) {
     DroppedItem droppedItem = new DroppedItem(x, y, itemId, quantity, droppedItemId);
     droppedItems.put(droppedItemId, droppedItem);
   }
 
+  /**
+   * Updates a dropped item.
+   * 
+   * @param x x position
+   * @param y y position
+   * @param itemId item ID
+   * @param quantity item quantity
+   * @param droppedItemId dropped item ID
+   */
   public void updateDroppedItem(double x, double y, int itemId, int quantity, int droppedItemId) {
     DroppedItem droppedItem = droppedItems.get(droppedItemId);
     droppedItem.setPosition(x, y);
@@ -833,6 +1024,18 @@ public class GameCanvas extends JComponent {
     droppedItems.put(droppedItemId, droppedItem);
   }
 
+  /**
+   * Adds an animal to the game.
+   * 
+   * @param id animal ID
+   * @param animalName animal name
+   * @param type animal type
+   * @param x x position
+   * @param y y position
+   * @param size animal size
+   * @param dir direction
+   * @param state animation state
+   */
   public void addAnimal(String id, String animalName, int type, double x, double y, int size, String dir,
       String state) {
     Animal newAnimal = new Animal(x, y, animalName, type, size);
@@ -841,6 +1044,15 @@ public class GameCanvas extends JComponent {
     animals.put(id, newAnimal);
   }
 
+  /**
+   * Updates an animal's position and state.
+   * 
+   * @param id animal ID
+   * @param x x position
+   * @param y y position
+   * @param dir direction
+   * @param state animation state
+   */
   public void updateAnimal(String id, double x, double y, String dir, String state) {
     Animal newAnimal = animals.get(id);
     newAnimal.setPosition(x, y);
@@ -855,10 +1067,21 @@ public class GameCanvas extends JComponent {
     animals.put(id, newAnimal);
   }
 
+  /**
+   * Clamps a value between min and max.
+   * 
+   * @param left minimum value
+   * @param right maximum value
+   * @param value value to clamp
+   * @return clamped value
+   */
   private double clamp(double left, double right, double value) {
     return Math.max(left, Math.min(right, value));
   }
 
+  /**
+   * Adds mouse listeners for game interaction.
+   */
   public void addMouseListener() {
     this.addMouseListener(new MouseAdapter() {
       @Override
@@ -1048,6 +1271,12 @@ public class GameCanvas extends JComponent {
 
   }
 
+  /**
+   * Handles crafting grid interactions.
+   * 
+   * @param tileX x tile position
+   * @param tileY y tile position
+   */
   public void handleCraftingGrid(int tileX, int tileY) {
     if (tileY == 7) {
       if (tileX == 1) {
@@ -1072,6 +1301,12 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  /**
+   * Draws grid information on hover.
+   * 
+   * @param mouseX mouse x position
+   * @param mouseY mouse y position
+   */
   private void drawGridInfo(int mouseX, int mouseY) {
     if (!inventory.isOpen() && !skillTree.isOpen())
       return;
@@ -1140,14 +1375,30 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  /**
+   * Gets the server writer.
+   * 
+   * @return server writer
+   */
   public WriteToServer getWriter() {
     return writer;
   }
 
+  /**
+   * Gets the leveling system.
+   * 
+   * @return leveling system
+   */
   public LevelingSystem getLevelingSystem() {
     return levelingSystem;
   }
 
+  /**
+   * Handles shop grid interactions.
+   * 
+   * @param tileX x tile position
+   * @param tileY y tile position
+   */
   public void handleShopGrid(int tileX, int tileY) {
     if (tileY == 7) {
       if (tileX == 1) {
@@ -1172,6 +1423,12 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  /**
+   * Handles skill tree grid interactions.
+   * 
+   * @param tileX x tile position
+   * @param tileY y tile position
+   */
   public void handleSkillTreeGrid(int tileX, int tileY) {
     Skill skill = skillTree.getSkillAtTile(tileX, tileY);
     boolean success;
@@ -1191,6 +1448,9 @@ public class GameCanvas extends JComponent {
     updateSkills();
   }
 
+  /**
+   * Updates all skills and their effects.
+   */
   public void updateSkills() {
     // Lightfooted
     player.setBaseSpeed(2 * (1 + 0.1 * skillTreeSystem.findSkill("Lightfooted").getLevel()));
@@ -1234,18 +1494,38 @@ public class GameCanvas extends JComponent {
 
   }
 
+  /**
+   * Gets the player's inventory.
+   * 
+   * @return inventory
+   */
   public Inventory getInventory() {
     return inventory;
   }
 
+  /**
+   * Gets the player.
+   * 
+   * @return player
+   */
   public Player getPlayer() {
     return player;
   }
 
+  /**
+   * Gets all recipes.
+   * 
+   * @return list of recipes
+   */
   public ArrayList<Recipe> getRecipes() {
     return recipes;
   }
 
+  /**
+   * Sets the game client.
+   * 
+   * @param c game client
+   */
   public void setClient(GameStarter c) {
     client = c;
     player = new Player(client.getUsername(), client.getSkin());
@@ -1253,10 +1533,20 @@ public class GameCanvas extends JComponent {
 
   }
 
+  /**
+   * Sets the map loaded state.
+   * 
+   * @param isLoaded true if map is loaded
+   */
   public void setMapLoaded(boolean isLoaded) {
     isMapLoaded = isLoaded;
   }
 
+  /**
+   * Draws inventory highlight.
+   * 
+   * @param g2d graphics context
+   */
   private void drawInventoryHighlight(Graphics2D g2d) {
 
     if (skillTree.isOpen()) {
@@ -1292,6 +1582,12 @@ public class GameCanvas extends JComponent {
 
   }
 
+  /**
+   * Draws player username.
+   * 
+   * @param g2d graphics context
+   * @param player player to draw username for
+   */
   private void drawUsername(Graphics2D g2d, Player player) {
     g2d.setFont(new Font("Minecraft", 1, 10));
     g2d.setColor(Color.WHITE);
@@ -1307,10 +1603,20 @@ public class GameCanvas extends JComponent {
     g2d.drawString(player.getId(), usernameX, usernameY);
   }
 
+  /**
+   * Gets the economy system.
+   * 
+   * @return economy system
+   */
   public EconomySystem getEconomySystem() {
     return economySystem;
   }
 
+  /**
+   * Paints the game canvas.
+   * 
+   * @param g graphics context
+   */
   @Override
   public void paintComponent(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
@@ -1425,6 +1731,9 @@ public class GameCanvas extends JComponent {
     }
   }
 
+  /**
+   * Sets up game sounds.
+   */
   private void setupSounds() {
     ArrayList<File> sfxList = new ArrayList<>();
     sfxList.addAll(Arrays.asList(new File("assets/sfx/").listFiles()));
@@ -1442,33 +1751,69 @@ public class GameCanvas extends JComponent {
     gameAudio.start();
   }
 
+  /**
+   * Plays music.
+   * 
+   * @param soundCode sound code
+   */
   public void playMusic(String soundCode) {
     Sound sound = sounds.get(soundCode);
     sound.play();
     sound.loop();
   }
 
+  /**
+   * Plays a sound at position.
+   * 
+   * @param soundCode sound code
+   * @param x x position
+   * @param y y position
+   */
   public void playSound(String soundCode, double x, double y) {
     Sound sound = sounds.get(soundCode);
     sound.play();
   }
 
+  /**
+   * Plays a sound globally.
+   * 
+   * @param soundCode sound code
+   */
   public void playGlobalSound(String soundCode) {
     playLocalSound(soundCode);
     writer.send("PLAY_SOUND " + soundCode + " " + player.getX() + " " + player.getY());
   }
 
+  /**
+   * Plays a sound locally.
+   * 
+   * @param soundCode sound code
+   */
   public void playLocalSound(String soundCode) {
     playSound(soundCode, player.getX(), player.getY());
   }
 
+  /**
+   * Inner class for server communication.
+   * Handles writing data to the server output stream.
+   */
   public class WriteToServer implements Runnable {
     private DataOutputStream out;
 
+    /**
+     * Creates a new WriteToServer with the specified output stream.
+     * 
+     * @param out data output stream
+     */
     public WriteToServer(DataOutputStream out) {
       this.out = out;
     }
 
+    /**
+     * Sends a message to the server.
+     * 
+     * @param msg message to send
+     */
     public void send(String msg) {
       synchronized (out) {
         try {
@@ -1481,7 +1826,6 @@ public class GameCanvas extends JComponent {
 
     @Override
     public void run() {
-
     }
   }
 

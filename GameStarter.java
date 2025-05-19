@@ -1,3 +1,23 @@
+/**
+ * The GameStarter class manages the initialization and startup of the game client.
+ * It handles player connection setup, font loading, and game window creation.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
 
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -20,13 +40,18 @@ public class GameStarter {
     private DataInputStream in;
     private DataOutputStream out;
 
+    /**
+     * Starts the game by displaying the setup frame.
+     */
     public void start() {
         SetupFrame sf = new SetupFrame(this);
         sf.setUpGUI();
     }
 
+    /**
+     * Initializes the game connection and starts the game window.
+     */
     public void startGame() {
-
         try {
             socket = new Socket(ip, Integer.parseInt(port));
             in = new DataInputStream(socket.getInputStream());
@@ -48,6 +73,12 @@ public class GameStarter {
         }
     }
 
+    /**
+     * Parses a tile map string into a 2D integer array.
+     * 
+     * @param tilemapString the string representation of the tile map
+     * @return 2D array representing the tile map
+     */
     private static int[][] parseTileMapString(String tilemapString) {
         String[] rows = tilemapString.split(" ", 3)[2].split(" \\| ");
         int[][] map = new int[rows.length][];
@@ -63,14 +94,25 @@ public class GameStarter {
         return map;
     }
 
+    /**
+     * Inner class that handles reading messages from the server.
+     */
     private static class ReadFromServer implements Runnable {
         private DataInputStream in;
 
+        /**
+         * Creates a new ReadFromServer instance.
+         * 
+         * @param in the input stream to read from
+         */
         public ReadFromServer(DataInputStream in) {
             this.in = in;
             System.out.println("[Client] ReadFromServer thread started.");
         }
 
+        /**
+         * Main loop for reading server messages.
+         */
         @Override
         public void run() {
             try {
@@ -83,6 +125,11 @@ public class GameStarter {
             }
         }
 
+        /**
+         * Processes incoming messages from the server.
+         * 
+         * @param msg the message to process
+         */
         private void handleMessage(String msg) {
             String[] parts = msg.split(" ");
             String type = parts[0];
@@ -331,21 +378,43 @@ public class GameStarter {
                     }
             }
         }
-
     }
 
+    /**
+     * Gets the player's ID.
+     * 
+     * @return the player ID
+     */
     public String getPlayerID() {
         return playerId;
     }
 
+    /**
+     * Gets the player's username.
+     * 
+     * @return the username
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Gets the player's skin ID.
+     * 
+     * @return the skin ID
+     */
     public int getSkin() {
         return skin;
     }
 
+    /**
+     * Sets the connection information for the game.
+     * 
+     * @param addr the server address
+     * @param p the server port
+     * @param u the username
+     * @param s the skin ID
+     */
     public void setConnectionInfo(String addr, String p, String u, int s) {
         ip = addr;
         port = p;
@@ -353,6 +422,12 @@ public class GameStarter {
         skin = s;
     }
 
+    /**
+     * Main method to start the game client.
+     * Initializes fonts and starts the game.
+     * 
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         System.setProperty("sun.java2d.uiScale", "1.0");
 
@@ -375,5 +450,4 @@ public class GameStarter {
 
         new GameStarter().start();
     }
-
 }

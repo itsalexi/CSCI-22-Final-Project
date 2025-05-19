@@ -1,3 +1,23 @@
+/**
+ * The CraftingGrid class manages the crafting interface where players can view and interact with crafting recipes.
+ * It handles recipe display, navigation, item quantities, and the visual layout of the crafting grid.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
 
 import java.awt.Color;
 import java.awt.Font;
@@ -55,6 +75,13 @@ public class CraftingGrid {
       { -1, -1, -1, -1, -1 }
   };
 
+  /**
+   * Constructs a new CraftingGrid with specified recipes and game canvas.
+   * 
+   * @param r the list of available recipes
+   * @param c the game canvas
+   * @param s is shop
+   */
   public CraftingGrid(ArrayList<Recipe> r, GameCanvas c, boolean s) {
     SpriteFiles tileMapFiles = new SpriteFiles("assets/tilemap/inventory");
     SpriteFiles itemFiles = new SpriteFiles("assets/items");
@@ -70,6 +97,9 @@ public class CraftingGrid {
 
   }
 
+  /**
+   * Updates the crafting items grid with current page's recipes.
+   */
   private void updateCraftingItemsGrid() {
     int start = currentPage * 4;
     int end = Math.min(start + 4, recipes.size());
@@ -102,6 +132,11 @@ public class CraftingGrid {
 
   }
 
+  /**
+   * Draws the quantity indicators for stackable items in the crafting grid.
+   * 
+   * @param g2d the graphics context
+   */
   private void drawCraftingQuantities(Graphics2D g2d) {
     double tileSize = craftingItemsGrid.getTileSize();
 
@@ -130,6 +165,15 @@ public class CraftingGrid {
     }
   }
 
+  /**
+   * Draws a quantity string for an item at the specified grid position.
+   * 
+   * @param g2d the graphics context
+   * @param quantity the quantity to display
+   * @param col the column position
+   * @param row the row position
+   * @param tileSize the size of each tile
+   */
   private void drawQuantityString(Graphics2D g2d, int quantity, int col, int row, double tileSize) {
     String quantityString = Integer.toString(quantity);
 
@@ -150,6 +194,13 @@ public class CraftingGrid {
     g2d.drawString(quantityString, quantityLabelX, quantityLabelY);
   }
 
+  /**
+   * Gets the grid coordinates at the specified mouse position.
+   * 
+   * @param mouseX the x-coordinate of the mouse
+   * @param mouseY the y-coordinate of the mouse
+   * @return array containing coordinates
+   */
   public int[] getTileAtMouse(double mouseX, double mouseY) {
     double tileSize = craftingGrid.getTileSize();
     double gridWidth = craftingGridMap[0].length * tileSize;
@@ -165,6 +216,9 @@ public class CraftingGrid {
     return new int[] { tileX, tileY };
   }
 
+  /**
+   * Advances to the next page of recipes.
+   */
   public void forwardPage() {
     int totalPages = (int) Math.ceil(recipes.size() / 4.0);
     if (currentPage + 1 >= totalPages)
@@ -173,6 +227,9 @@ public class CraftingGrid {
     canvas.playLocalSound("ui_click");
   }
 
+  /**
+   * Returns to the previous page of recipes.
+   */
   public void backwardPage() {
     if (currentPage <= 0)
       return;
@@ -181,6 +238,11 @@ public class CraftingGrid {
 
   }
 
+  /**
+   * Draws the crafting grid interface with all its components.
+   * 
+   * @param g2d the graphics context
+   */
   public void draw(Graphics2D g2d) {
     updateCraftingItemsGrid();
     double tileSize = canvas.getWidth() * 32 / 800;
@@ -207,6 +269,11 @@ public class CraftingGrid {
 
   }
 
+  /**
+   * Gets the current page number of the recipe display.
+   * 
+   * @return the current page number
+   */
   public int getCurrentPage() {
     return currentPage;
   }

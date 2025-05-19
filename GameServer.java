@@ -1,3 +1,24 @@
+/**
+ * The GameServer class manages the multiplayer game server functionality.
+ * It handles player connections, game state synchronization, and world management.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
+
 import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.net.*;
@@ -18,18 +39,27 @@ public class GameServer {
   private int[][] treeMap;
   private FarmingSystem farmSystem;
 
+  /**
+   * Represents the state of a player in the game.
+   */
   private static class PlayerState {
     double x, y, currXP;
     String direction, state, username;
     int skin, balance, skillPoints, level;
   }
 
+  /**
+   * Represents the state of an animal in the game.
+   */
   private static class AnimalState {
     double x, y;
     String id, name, direction, state;
     int type, size;
   }
 
+  /**
+   * Represents the state of a dropped item in the game.
+   */
   private static class DroppedItemState {
     double x, y;
     int id, itemId, quantity;
@@ -51,6 +81,9 @@ public class GameServer {
 
   private WorldGenerator worldGen;
 
+  /**
+   * Initializes the game server with default settings and world generation.
+   */
   public GameServer() {
     numItemsDropped = 0;
     numPlayers = 0;
@@ -74,7 +107,7 @@ public class GameServer {
     Skill one = new Skill("Fruit of Knowledge", 1, 1, 1, 10, 0,
         "\"Getting smarter one harvest at a time.\"\nYou're so smart you probably have no friends!");
     Skill two = new Skill("Lightfooted", 1, 1, 1, 10, 1,
-        "\"I swear my feet aren’t touching the ground.\"\n No one's gonna catch you slipping");
+        "\"I swear my feet aren't touching the ground.\"\n No one's gonna catch you slipping");
     Skill three = new Skill("Merchant's Rizz", 1, 1, 1, 10, 2,
         "\"Unspoken rizz or an HR complaint?\"\nAre they paying more to buy or just to make you shut up. Either way, you win ");
     Skill four = new Skill("Cheap Tricks", 1, 1, 1, 10, 3,
@@ -82,7 +115,7 @@ public class GameServer {
     Skill five = new Skill("Nature's Grasp", 1, 1, 1, 10, 4,
         "\"Why are my fingers so long??\"\nInteract with things from faraway. Kinda weird though.");
     Skill six = new Skill("Green Thumb", 1, 1, 1, 5, 5,
-        "\"Plants just can’t get enough of you.\"\nEither way, you’re their favorite weirdo.");
+        "\"Plants just can't get enough of you.\"\nEither way, you're their favorite weirdo.");
     Skill seven = new Skill("Seal of the Serpent", 1, 1, 1, 5, 6,
         "\"One bite never hurt anyone...\"\nEverything's cheaper, and it only took a bite. What could go wrong?");
 
@@ -133,6 +166,11 @@ public class GameServer {
     }
   }
 
+  /**
+   * Saves a player's state to memory.
+   * 
+   * @param playerId the ID of the player to save
+   */
   private void savePlayerToMemory(String playerId) {
     PlayerState ps = playerStates.get(playerId);
     if (ps != null) {
@@ -140,6 +178,13 @@ public class GameServer {
     }
   }
 
+  /**
+   * Converts a tile map to a string representation.
+   * 
+   * @param name the name of the map
+   * @param map the 2D array representing the map
+   * @return string representation of the map
+   */
   private String tileMapToString(String name, int[][] map) {
     String output = "TILEMAP " + name + " ";
 
@@ -160,6 +205,14 @@ public class GameServer {
     return output;
   }
   
+  /**
+   * Finds a path between two points avoiding obstacles.
+   * 
+   * @param obj the object to find path for
+   * @param target the target position
+   * @param speed the movement speed
+   * @return deque of positions representing the path
+   */
   private Deque<double[]> findPath(Rectangle2D obj, double[] target, double speed) {
 
     double tileSize = 32;
@@ -254,6 +307,14 @@ public class GameServer {
     return new ArrayDeque<>();
   }
 
+  /**
+   * Asynchronously finds a path between two points.
+   * 
+   * @param obj the object to find path for
+   * @param target the target position
+   * @param speed the movement speed
+   * @param onResult callback for when path is found
+   */
   private void findPathAsync(Rectangle2D obj, double[] target, double speed,
       Consumer<Deque<double[]>> onResult) {
     new Thread(() -> {
@@ -262,14 +323,36 @@ public class GameServer {
     }).start();
   }
 
+  /**
+   * Clamps a value between a minimum and maximum.
+   * 
+   * @param left minimum value
+   * @param right maximum value
+   * @param value value to clamp
+   * @return clamped value
+   */
   private double clamp(double left, double right, double value) {
     return Math.max(left, Math.min(right, value));
   }
 
+  /**
+   * Calculates distance between two points.
+   * 
+   * @param x1 first point x
+   * @param y1 first point y
+   * @param x2 second point x
+   * @param y2 second point y
+   * @return distance between points
+   */
   private double distance(double x1, double y1, double x2, double y2) {
     return Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
   }
 
+  /**
+   * Updates an animal's position based on its path.
+   * 
+   * @param id the animal's ID
+   */
   private void tickAnimal(String id) {
     AnimalState a = animalStates.get(id);
     Deque<double[]> path = animalPaths.get(id);
@@ -296,6 +379,11 @@ public class GameServer {
     }
   }
 
+  /**
+   * Makes an animal move randomly.
+   * 
+   * @param id the animal's ID
+   */
   private void randomMoveAnimal(String id) {
 
     if (animalPaths.get(id).size() != 0) {
@@ -333,6 +421,18 @@ public class GameServer {
       });
   }
 
+  /**
+   * Spawns a new animal in the game world.
+   * 
+   * @param animalId the animal's ID
+   * @param name the animal's name
+   * @param type the animal's type
+   * @param x x position
+   * @param y y position
+   * @param size the animal's size
+   * @param dir the animal's direction
+   * @param state the animal's state
+   */
   public void spawnAnimal(String animalId, String name, int type, double x, double y, int size, String dir,
       String state) {
     AnimalState a = new AnimalState();
@@ -352,6 +452,15 @@ public class GameServer {
         x + " " + y + " " + size + " " + dir + " " + state);
   }
 
+  /**
+   * Moves an animal to a new position.
+   * 
+   * @param animalId the animal's ID
+   * @param x new x position
+   * @param y new y position
+   * @param dir new direction
+   * @param state new state
+   */
   public void moveAnimal(String animalId, double x, double y, String dir, String state) {
     AnimalState a = animalStates.get(animalId);
     if (a != null) {
@@ -364,6 +473,9 @@ public class GameServer {
     }
   }
 
+  /**
+   * Spawns a random animal in a valid location.
+   */
   public void spawnRandomAnimal() {
     String animalId = "animal" + animalStates.size();
     String[] animalTypes = { "cow", "chicken", "sheep", "pig", "fox", "cat", "dog" };
@@ -374,6 +486,9 @@ public class GameServer {
         "IDLE");
   }
 
+  /**
+   * Accepts and manages player connections.
+   */
   public void acceptConnections() {
     for (int i = 0; i < 100; i++) {
       spawnRandomAnimal();
@@ -399,12 +514,23 @@ public class GameServer {
     }
   }
 
+  /**
+   * Handles individual player connections and message processing.
+   */
   private class PlayerConnection implements Runnable {
     private String playerId;
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
 
+    /**
+     * Creates a new player connection.
+     * 
+     * @param id player ID
+     * @param s socket connection
+     * @param inS input stream
+     * @param outS output stream
+     */
     public PlayerConnection(String id, Socket s, DataInputStream inS, DataOutputStream outS) {
       playerId = id;
       socket = s;
@@ -412,6 +538,9 @@ public class GameServer {
       out = outS;
     }
 
+    /**
+     * Main connection loop handling messages.
+     */
     public void run() {
       try {
         while (true) {
@@ -447,6 +576,11 @@ public class GameServer {
       }
     }
 
+    /**
+     * Processes incoming messages from the player.
+     * 
+     * @param msg the message to process
+     */
     private void handleMessage(String msg) {
       String[] parts = msg.split(" ");
       String type = parts[0];
@@ -507,12 +641,6 @@ public class GameServer {
           Item[] inv = new Item[36];
           inv[0] = new Item(1, 1);
           inv[1] = new Item(0, 1);
-          inv[2] = new Item(3, 1);
-          inv[3] = new Item(5, 1);
-          inv[4] = new Item(7, 1);
-          inv[5] = new Item(9, 1);
-          inv[6] = new Item(11, 1);
-          inv[7] = new Item(13, 1);
 
           if (savedInventories.containsKey(playerId)) {
             inv = savedInventories.get(playerId);
@@ -530,7 +658,6 @@ public class GameServer {
 
           ArrayList<Skill> playersSkills = new ArrayList<>(baseSkills);
 
-          playersSkills.get(0).setLevel(10);
 
           if (savedSkillTrees.containsKey(playerId)) {
             playersSkills = savedSkillTrees.get(playerId);
@@ -829,6 +956,11 @@ public class GameServer {
       }
     }
 
+    /**
+     * Sends a message to the player.
+     * 
+     * @param msg the message to send
+     */
     public void send(String msg) {
       synchronized (out) {
         try {
@@ -841,6 +973,12 @@ public class GameServer {
 
   }
 
+  /**
+   * Broadcasts a message to all players except the sender.
+   * 
+   * @param msg the message to broadcast
+   * @param senderId the ID of the sending player
+   */
   private void broadcast(String msg, String senderId) {
     for (PlayerConnection pc : players.values()) {
       if (!pc.playerId.equals(senderId)) {
@@ -852,12 +990,22 @@ public class GameServer {
     }
   }
 
+  /**
+   * Broadcasts a message to all players.
+   * 
+   * @param msg the message to broadcast
+   */
   private void broadcastAll(String msg) {
     for (PlayerConnection pc : players.values()) {
       pc.send(msg);
     }
   }
 
+  /**
+   * Main method to start the game server.
+   * 
+   * @param args command line arguments
+   */
   public static void main(String[] args) {
     GameServer gs = new GameServer();
     gs.acceptConnections();

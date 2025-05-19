@@ -1,3 +1,24 @@
+/**
+ * The TileGrid class manages a grid of tiles for rendering the game world.
+ * It handles tile placement, drawing, and collision detection.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
+
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
@@ -9,6 +30,13 @@ public class TileGrid {
     private int[][] map;
     private Rectangle2D[] hitboxes;
 
+    /**
+     * Creates a new TileGrid instance with specified tiles, map, and hitboxes.
+     * 
+     * @param tiles the sprite containing tile images
+     * @param map the 2D array representing the tile layout
+     * @param hb array of hitboxes for collision detection
+     */
     public TileGrid(Sprite tiles, int[][] map, Rectangle2D[] hb) {
         this.tiles = tiles;
         this.map = map;
@@ -18,6 +46,13 @@ public class TileGrid {
         hitboxes = hb;
     }
 
+    /**
+     * Creates a new TileGrid instance with specified tiles and map.
+     * Initializes an empty hitbox array.
+     * 
+     * @param tiles the sprite containing tile images
+     * @param map the 2D array representing the tile layout
+     */
     public TileGrid(Sprite tiles, int[][] map) {
         this.tiles = tiles;
         this.map = map;
@@ -27,14 +62,29 @@ public class TileGrid {
         hitboxes = new Rectangle2D[512];
     }
 
+    /**
+     * Gets the width of the tile grid.
+     * 
+     * @return the number of columns in the grid
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Gets the height of the tile grid.
+     * 
+     * @return the number of rows in the grid
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * Draws the entire tile grid.
+     * 
+     * @param g2d the graphics context
+     */
     public void draw(Graphics2D g2d) {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
@@ -47,10 +97,22 @@ public class TileGrid {
         }
     }
 
+    /**
+     * Gets the array of hitboxes for collision detection.
+     * 
+     * @return array of hitboxes
+     */
     public Rectangle2D[] getHitboxes() {
         return hitboxes;
     }
 
+    /**
+     * Gets the hitbox for a specific tile.
+     * 
+     * @param row the row index
+     * @param col the column index
+     * @return the hitbox for the tile, or null if invalid position
+     */
     public Rectangle2D getTileHitBoxAt(int row, int col) {
         if (row < 0 || row >= height || col < 0 || col >= width)
             return null;
@@ -69,19 +131,39 @@ public class TileGrid {
 
         if (tiles.isNoScaling()) {
             return new Rectangle2D.Double(x, y, tiles.getWidth(), tiles.getHeight());
-
         }
         return new Rectangle2D.Double(x, y, tileSize, tileSize);
     }
 
+    /**
+     * Gets the tile ID at a specific position.
+     * 
+     * @param row the row index
+     * @param col the column index
+     * @return the tile ID, or -1 if invalid position
+     */
     public int getTileAt(int row, int col) {
         return map[row][col];
     }
 
+    /**
+     * Sets the tile ID at a specific position.
+     * 
+     * @param row the row index
+     * @param col the column index
+     * @param val the new tile ID
+     */
     public void setTileAt(int row, int col, int val) {
         map[row][col] = val;
     }
 
+    /**
+     * Draws a range of rows in the tile grid.
+     * 
+     * @param g2d the graphics context
+     * @param startRow the first row to draw
+     * @param endRow the last row to draw
+     */
     public void drawRows(Graphics2D g2d, int startRow, int endRow) {
         startRow = Math.max(0, startRow);
         endRow = Math.min(height - 1, endRow);
@@ -97,10 +179,20 @@ public class TileGrid {
         }
     }
 
+    /**
+     * Gets the size of each tile.
+     * 
+     * @return the tile size
+     */
     public double getTileSize() {
         return tileSize;
     }
 
+    /**
+     * Sets the size of each tile.
+     * 
+     * @param s the new tile size
+     */
     public void setTileSize(double s) {
         tileSize = s;
     }

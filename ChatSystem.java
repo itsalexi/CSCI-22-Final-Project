@@ -1,3 +1,24 @@
+/**
+ * The ChatSystem class manages the in-game chat interface, handling message display, text input, and cursor blinking animations.
+ * It provides functionality for message history, text wrapping, and real-time chat updates with username display.
+ * 
+ * @author Alexi Roth Luis A. Canamo (245333)
+ * @author Kenaz R. Celestino (241051)
+ * @version May 19, 2025
+ * 
+ * I have not discussed the Java language code in my program 
+ * with anyone other than my instructor or the teaching assistants 
+ * assigned to this course.
+ * 
+ * I have not used Java language code obtained from another student, 
+ * or any other unauthorized source, either modified or unmodified.
+ * 
+ * If any Java language code or documentation used in my program 
+ * was obtained from another source, such as a textbook or website, 
+ * that has been clearly noted with a proper citation in the comments 
+ * of my program.
+ */
+
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
@@ -14,6 +35,9 @@ public class ChatSystem {
   private Timer cursorBlinkTimer;
   private String user;
 
+  /**
+   * Constructs a new ChatSystem
+   */
   public ChatSystem() {
     user = "";
     messages = new ArrayList<>();
@@ -28,26 +52,57 @@ public class ChatSystem {
     cursorBlinkTimer.start();
   }
 
+  /**
+   * Sets the username for the chat system.
+   * 
+   * @param u the username to set
+   */
   public void setUsername(String u) {
     user = u;
   }
 
+  /**
+   * Gets the formatted message content with username prefix.
+   * 
+   * @return the formatted message string
+   */
   public String getMessageContent() {
     return user + ": " + currentInput;
   }
 
+  /**
+   * Checks if the chat interface is currently open.
+   * 
+   * @return true if chat is open, false otherwise
+   */
   public boolean isChatOpen() {
     return chatOpen;
   }
 
+  /**
+   * Sets the chat interface open state.
+   * 
+   * @param b true to open chat, false to close it
+   */
   public void setChatOpen(boolean b) {
     chatOpen = b;
   }
 
+  /**
+   * Sets the current input text in the chat.
+   * 
+   * @param input the text to set as current input
+   */
   public void setCurrentInput(String input) {
     this.currentInput = input;
   }
 
+  /**
+   * Wraps text to fit within the chat window width.
+   * 
+   * @param message the message to wrap
+   * @return list of wrapped text lines
+   */
   private ArrayList<String> wrapText(String message) {
     ArrayList<String> output = new ArrayList<>();
     String curr = "";
@@ -65,6 +120,11 @@ public class ChatSystem {
     return output;
   }
 
+  /**
+   * Adds a new message to the chat history.
+   * 
+   * @param message the message to add
+   */
   public void addMessage(String message) {
     messages.addAll(wrapText(message));
     while (messages.size() > 9) {
@@ -72,6 +132,11 @@ public class ChatSystem {
     }
   }
 
+  /**
+   * Draws the chat interface including message history and input box.
+   * 
+   * @param g2d the graphics context
+   */
   public void draw(Graphics2D g2d) {
     int width = 400;
     int historyHeight = 200;
