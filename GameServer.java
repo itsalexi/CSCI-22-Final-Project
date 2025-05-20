@@ -82,9 +82,6 @@ public class GameServer {
 
   private WorldGenerator worldGen;
 
-  private boolean doneSpawning;
-  private boolean test;
-
   /**
    * Initializes the game server with default settings and world generation.
    */
@@ -108,8 +105,6 @@ public class GameServer {
     foliageMap = worldGen.getFoliageMap();
     treeMap = worldGen.getTreeMap();
     validSpawns = worldGen.getValidSpawns();
-    doneSpawning = false;
-    test = true;
 
     Skill one = new Skill("Fruit of Knowledge", 1, 1, 1, 10, 0,
         "\"Getting smarter one harvest at a time.\"\nYou're so smart you probably have no friends!");
@@ -153,55 +148,6 @@ public class GameServer {
           e.printStackTrace();
         }
       }
-    }).start();
-
-    new Thread(() -> {
-      while (true) {
-        System.out.println("shittertin");
-        if (!doneSpawning) {
-          continue;
-        }
-        ArrayList<String> copyAnimalStates = new ArrayList<>(animalStates.keySet());
-        ArrayList<String> copyPlayerStates = new ArrayList<>(playerStates.keySet());
-        double tileSize = 32;
-        double range = 10 * tileSize;
-        //System.out.println(copyPlayerStates.size());
-        for (String playerID : copyPlayerStates) {
-          PlayerState ps = playerStates.get(playerID);
-          for (String id : copyAnimalStates) {
-            AnimalState a = animalStates.get(id);
-            if (distance(a.x, a.y, ps.x, ps.y) < range) {
-              animalPaths.put(id, findPath(new Rectangle2D.Double(a.x, a.y, a.size, a.size), new double[] {a.x + 32, a.y + 32}, 2));
-              if (!test) {
-                return;
-              }
-              System.out.println("bro " + System.currentTimeMillis());
-            }
-          }
-        }
-      }
-    }).start();
-
-    new Thread(() -> {
-      while (true) {
-        test = false;
-        System.out.println("stupid ass java");
-        try {
-          if (!doneSpawning) {
-            continue;
-          }
-          System.out.println(System.currentTimeMillis());
-          int speed = 2;
-          test = true;
-          Thread.sleep(1000 / (60 * speed));
-          ArrayList<String> copyAnimalStates = new ArrayList<>(animalStates.keySet());
-          for (String id : copyAnimalStates) {
-            tickAnimal(id);
-          }
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      } 
     }).start();
 
     try {
@@ -557,7 +503,6 @@ public class GameServer {
     for (int i = 0; i < 100; i++) {
       spawnRandomAnimal();
     }
-    doneSpawning = true;
     try {
       System.out.println("Waiting for connections.");
       while (numPlayers < maxPlayers) {
