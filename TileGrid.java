@@ -30,6 +30,7 @@ public class TileGrid {
     private int[][] map;
     private Rectangle2D[] hitboxes;
     private double boundsX, boundsY, boundsWidth, boundsHeight;
+    private boolean drawWithinBounds;
 
     /**
      * Creates a new TileGrid instance with specified tiles, map, and hitboxes.
@@ -49,6 +50,7 @@ public class TileGrid {
         boundsY = 0;
         boundsWidth = width * tileSize;
         boundsHeight = height * tileSize;
+        drawWithinBounds = false;
     }
 
     /**
@@ -65,6 +67,11 @@ public class TileGrid {
         width = map[0].length;
         tileSize = tiles.getSize();
         hitboxes = new Rectangle2D[512];
+        boundsX = 0;
+        boundsY = 0;
+        boundsWidth = width * tileSize;
+        boundsHeight = height * tileSize;
+        drawWithinBounds = false;
     }
 
     /**
@@ -101,6 +108,15 @@ public class TileGrid {
     }
 
     /**
+     * Sets if the tile grid should only draw within the bounds.
+     * 
+     * @param b if the tile grid should only draw within the bounds
+     */
+    public void drawWithinBounds(boolean b) {
+        drawWithinBounds = b;
+    }
+
+    /**
      * Draws the tile grid within the bounds.
      * 
      * @param g2d the graphics context
@@ -124,7 +140,7 @@ public class TileGrid {
                         tileSize
                     );
 
-                    if (!tile.intersects(bounds)) {
+                    if (!tile.intersects(bounds) && drawWithinBounds) {
                         continue;
                     }
                     

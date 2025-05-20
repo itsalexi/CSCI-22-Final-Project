@@ -1654,6 +1654,7 @@ public class GameCanvas extends JComponent {
       zOrder.add("tree");
       for (String name : zOrder) {
         TileGrid currGrid = tileGrids.get(name);
+        currGrid.drawWithinBounds(true);
         currGrid.setBounds(x, y, width, height);
         currGrid.draw(g2d);
       }
