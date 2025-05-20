@@ -41,7 +41,7 @@ Welcome to the Garden of Eden\! This manual will guide you through all the game 
 
 #### Basic Tools
 
-1. **Hoe**  
+1. **Iron Hoe**  
    * Used to till soil for farming  
    * Can break foliage for resources  
    * Required for starting a farm  
@@ -71,7 +71,7 @@ Welcome to the Garden of Eden\! This manual will guide you through all the game 
 
 ### **Farming System**
 
-1. Use the **Hoe** tool to till soil.  
+1. Use the **Iron Hoe** tool to till soil.  
 2. Water the tilled soil using the **Watering Can**.  
 3. Plant **seeds** in watered soil.  
 4. Wait for crops to grow.  

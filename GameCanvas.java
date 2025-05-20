@@ -506,7 +506,7 @@ public class GameCanvas extends JComponent {
             if (itemUsed) {
               if (planted) {
                 int random = (int) (Math.random() * 100);
-                if (random > 100 - greenThumbChance) {
+                if (random >= 100 - greenThumbChance) {
                   return;
                 }
               }
