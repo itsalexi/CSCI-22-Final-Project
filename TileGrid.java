@@ -29,6 +29,7 @@ public class TileGrid {
     private double tileSize;
     private int[][] map;
     private Rectangle2D[] hitboxes;
+    private double boundsX, boundsY, boundsWidth, boundsHeight;
 
     /**
      * Creates a new TileGrid instance with specified tiles, map, and hitboxes.
@@ -44,6 +45,10 @@ public class TileGrid {
         width = map[0].length;
         tileSize = tiles.getSize();
         hitboxes = hb;
+        boundsX = 0;
+        boundsY = 0;
+        boundsWidth = width * tileSize;
+        boundsHeight = height * tileSize;
     }
 
     /**
@@ -81,14 +86,48 @@ public class TileGrid {
     }
 
     /**
-     * Draws the entire tile grid.
+     * Sets the bounds of the tiles that the tile grid will draw.
+     * 
+     * @param x the x position of the bounds
+     * @param y the y position of the bounds
+     * @param w the width of the bounds
+     * @param h the height of the bounds
+     */
+    public void setBounds(double x, double y, double w, double h) {
+        boundsX = x;
+        boundsY = y;
+        boundsWidth = w;
+        boundsHeight = h;
+    }
+
+    /**
+     * Draws the tile grid within the bounds.
      * 
      * @param g2d the graphics context
      */
     public void draw(Graphics2D g2d) {
+
+        Rectangle2D bounds = new Rectangle2D.Double(
+            boundsX,
+            boundsY,
+            boundsWidth,
+            boundsHeight
+        );
+
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (map[i][j] != -1) {
+                    Rectangle2D tile = new Rectangle2D.Double(
+                        j * tileSize,
+                        i * tileSize,
+                        tileSize,
+                        tileSize
+                    );
+
+                    if (!tile.intersects(bounds)) {
+                        continue;
+                    }
+                    
                     tiles.setPosition(j * tileSize, i * tileSize);
                     tiles.setSprite(map[i][j]);
                     tiles.draw(g2d);

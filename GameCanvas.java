@@ -1640,11 +1640,23 @@ public class GameCanvas extends JComponent {
       camera.translate(-anchorX, -anchorY);
 
       g2d.setTransform(camera);
-      tileGrids.get("ground").draw(g2d);
-      tileGrids.get("edge").draw(g2d);
-      tileGrids.get("foliage").draw(g2d);
-      tileGrids.get("farm").draw(g2d);
-      tileGrids.get("tree").draw(g2d);
+
+      double width = getWidth() / g2d.getTransform().getScaleX();
+      double height = getHeight() / g2d.getTransform().getScaleY();
+      double x = anchorX - width / 2;
+      double y = anchorY - height / 2;
+
+      ArrayList<String> zOrder = new ArrayList<>();
+      zOrder.add("ground");
+      zOrder.add("edge");
+      zOrder.add("foliage");
+      zOrder.add("farm");
+      zOrder.add("tree");
+      for (String name : zOrder) {
+        TileGrid currGrid = tileGrids.get(name);
+        currGrid.setBounds(x, y, width, height);
+        currGrid.draw(g2d);
+      }
 
       for (Player other : otherPlayers.values()) {
         other.draw(g2d);
