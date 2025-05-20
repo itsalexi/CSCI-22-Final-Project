@@ -368,7 +368,6 @@ public class GameServer {
     Deque<double[]> path = animalPaths.get(id);
 
     if (path.size() != 0) {
-      System.out.println("BRO IT'S WALKING");
       double[] newPos = path.peekFirst();
       String dir = a.direction;
       String state = "WALK";
@@ -408,11 +407,8 @@ public class GameServer {
     double chanceToMove = 5;
     double roll = Math.random() * 100;
     if (roll < 100 - chanceToMove) {
-      System.out.println(roll + " " + chanceToMove);
       return;
     }
-
-    System.out.println("should move " + id);
 
     double movementRange = 5 * tileSize;
     double x = a.x + (2 * movementRange * Math.random()) - movementRange;
@@ -425,7 +421,6 @@ public class GameServer {
         if (newPath.size() > 0) { 
           animalPaths.put(id, newPath);
         } else {
-          System.out.println("no path");
           numMovingAnimals--;
         }
       });
@@ -919,7 +914,6 @@ public class GameServer {
             int droppedItemId = Integer.parseInt(parts[3]);
             DroppedItemState dis = droppedItemStates.get(droppedItemId);
             if (dis != null) {
-              System.out.println("test1");
               broadcast(String.format("ITEMDROP PICKUP %s %d", playerPickupId, droppedItemId), playerId);
               send(String.format("INVENTORY ADD %s %d %d", playerPickupId, dis.itemId, dis.quantity));
               droppedItemStates.remove(droppedItemId);

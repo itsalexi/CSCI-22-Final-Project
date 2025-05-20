@@ -29,6 +29,7 @@ public class Animal extends Entity {
 
   private double speed;
   private AnimalSprite sprite;
+  private float alpha;
 
   /**
    * Constructs a new Animal with specified position, type, skin, and size.
@@ -42,6 +43,7 @@ public class Animal extends Entity {
   public Animal(double posX, double posY, String t, int skin, int size) {
     super(posX, posY);
     speed = 1.0;
+    alpha = 1;
     String pathName = String.format("assets/animals/%s/%d/", t, skin);
 
     Map<String, String> animations = Map.of(
@@ -58,6 +60,15 @@ public class Animal extends Entity {
   @Override
   public void tick() {
     sprite.tick();
+  }
+
+  /**
+   * Sets the transparency of the animal sprite
+   * 
+   * @param a the alpha value of the composite
+   */
+  public void setComposite(float a) {
+    alpha = a;
   }
 
   /**
@@ -107,7 +118,9 @@ public class Animal extends Entity {
 
   @Override
   public void draw(Graphics2D g2d) {
+    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
     sprite.draw(g2d, x, y);
+    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
   }
 
   @Override

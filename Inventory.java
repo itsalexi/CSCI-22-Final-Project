@@ -516,8 +516,6 @@ public class Inventory {
     // highlight hotbar slot
     inventoryMap[6][1 + activeHotbarSlot] = 1;
 
-    // System.out.printf("%d, %d\n", x, y);
-
     g2d.translate(x, y);
 
     if (isOpen) {

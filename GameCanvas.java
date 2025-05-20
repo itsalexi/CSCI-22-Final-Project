@@ -1473,7 +1473,6 @@ public class GameCanvas extends JComponent {
       }
       trades.set(i, trade);
     }
-    System.out.println("level " + skillTreeSystem.findSkill("Seal of the Serpent").getLevel());
 
     // Cheap Tricks
     for (int i = 0; i < skills.size(); i++) {
@@ -1613,6 +1612,19 @@ public class GameCanvas extends JComponent {
   }
 
   /**
+   * Calculates distance between two points.
+   * 
+   * @param x1 first point x
+   * @param y1 first point y
+   * @param x2 second point x
+   * @param y2 second point y
+   * @return distance between points
+   */
+  private double distance(double x1, double y1, double x2, double y2) {
+    return Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
+  }
+
+  /**
    * Paints the game canvas.
    * 
    * @param g graphics context
@@ -1674,6 +1686,7 @@ public class GameCanvas extends JComponent {
 
       Map<String, Animal> copyAnimals = new HashMap<>(animals);
       for (Animal an : copyAnimals.values()) {
+        an.setComposite((float) clamp(0.2, 1, distance(player.getX(), player.getY(), an.getX(), an.getY()) / 100));
         an.draw(g2d);
       }
 
