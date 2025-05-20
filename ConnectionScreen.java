@@ -4,7 +4,7 @@
  * 
  * @author Alexi Roth Luis A. Canamo (245333)
  * @author Kenaz R. Celestino (241051)
- * @version May 20, 2025
+ * @version 20 May 2025
  * 
  * I have not discussed the Java language code in my program 
  * with anyone other than my instructor or the teaching assistants 
