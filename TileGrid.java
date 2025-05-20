@@ -19,6 +19,7 @@
  * of my program.
  */
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
@@ -28,6 +29,7 @@ public class TileGrid {
     private int width, height;
     private double tileSize;
     private int[][] map;
+    private float[][] alphaMap;
     private Rectangle2D[] hitboxes;
     private double boundsX, boundsY, boundsWidth, boundsHeight;
     private boolean drawWithinBounds;
@@ -51,6 +53,12 @@ public class TileGrid {
         boundsWidth = width * tileSize;
         boundsHeight = height * tileSize;
         drawWithinBounds = false;
+        alphaMap = new float[height][width];
+        for (int i=0; i < height; i++) {
+            for (int j=0; j < width; j++) {
+                alphaMap[i][j] = 1f;
+            }
+        }
     }
 
     /**
@@ -72,6 +80,12 @@ public class TileGrid {
         boundsWidth = width * tileSize;
         boundsHeight = height * tileSize;
         drawWithinBounds = false;
+        alphaMap = new float[height][width];
+        for (int i=0; i < height; i++) {
+            for (int j=0; j < width; j++) {
+                alphaMap[i][j] = 1f;
+            }
+        }
     }
 
     /**
@@ -105,6 +119,17 @@ public class TileGrid {
         boundsY = y;
         boundsWidth = w;
         boundsHeight = h;
+    }
+
+    /**
+     * Sets the opacity of a specific tile
+     * 
+     * @param tileX the x coordinate of the tile
+     * @param tileY the y coordinate of the tile
+     * @param alpha the opacity of the tile
+     */
+    public void setTileOpacity(int tileX, int tileY, float alpha) {
+        alphaMap[tileY][tileX] = alpha;
     }
 
     /**
@@ -146,7 +171,9 @@ public class TileGrid {
                     
                     tiles.setPosition(j * tileSize, i * tileSize);
                     tiles.setSprite(map[i][j]);
+                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaMap[i][j]));
                     tiles.draw(g2d);
+                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
                 }
             }
         }

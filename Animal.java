@@ -63,11 +63,11 @@ public class Animal extends Entity {
   }
 
   /**
-   * Sets the transparency of the animal sprite
+   * Sets the opacity of the animal sprite
    * 
-   * @param a the alpha value of the composite
+   * @param a the opacity of the animal
    */
-  public void setComposite(float a) {
+  public void setOpacity(float a) {
     alpha = a;
   }
 

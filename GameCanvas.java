@@ -1664,6 +1664,15 @@ public class GameCanvas extends JComponent {
       zOrder.add("foliage");
       zOrder.add("farm");
       zOrder.add("tree");
+
+      TileGrid treeGrid = tileGrids.get("tree");
+      double tileSize = treeGrid.getTileSize();
+      for (int i=0; i < treeGrid.getWidth(); i++) {
+        for (int j=0; j < treeGrid.getHeight(); j++) {
+          treeGrid.setTileOpacity(j, i, (float) clamp(0.2, 1, distance(j * tileSize, i * tileSize, player.getX(), player.getY()) / 150) );
+        }
+      }
+
       for (String name : zOrder) {
         TileGrid currGrid = tileGrids.get(name);
         currGrid.drawWithinBounds(true);
@@ -1686,7 +1695,7 @@ public class GameCanvas extends JComponent {
 
       Map<String, Animal> copyAnimals = new HashMap<>(animals);
       for (Animal an : copyAnimals.values()) {
-        an.setComposite((float) clamp(0.2, 1, distance(player.getX(), player.getY(), an.getX(), an.getY()) / 100));
+        an.setOpacity((float) clamp(0.2, 1, distance(player.getX(), player.getY(), an.getX(), an.getY()) / 100));
         an.draw(g2d);
       }
 
